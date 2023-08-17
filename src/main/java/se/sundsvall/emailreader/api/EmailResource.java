@@ -57,7 +57,7 @@ public class EmailResource {
             @ApiResponse(
                 responseCode = "200",
                 description = "Ok",
-                useReturnTypeSchema = gittrue
+                useReturnTypeSchema = true
             )
 
         }
