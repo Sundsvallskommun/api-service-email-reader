@@ -6,7 +6,10 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 
 import java.util.List;
 
+import jakarta.websocket.server.PathParam;
+
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,14 +21,13 @@ import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 @RestController
+@Validated
 @RequestMapping(path = "/email",
-    consumes = APPLICATION_JSON_VALUE,
     produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
 )
 @ApiResponse(
@@ -45,11 +47,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 )
 public class EmailResource {
 
-
     private final EmailService service;
 
     public EmailResource(final EmailService service) {this.service = service;}
-
 
     @Operation(
         summary = "Get a list of emails",
@@ -57,40 +57,18 @@ public class EmailResource {
             @ApiResponse(
                 responseCode = "200",
                 description = "Ok",
-                content = @Content(
-                    mediaType = "application/json",
-                    array = @ArraySchema(schema = @Schema(implementation = Email.class)))
+                useReturnTypeSchema = gittrue
             )
+
         }
     )
     @GetMapping()
-    public ResponseEntity<List<Email>> getAllEmails() {
-        return ResponseEntity.ok(service.getAllEmails());
+    public ResponseEntity<List<Email>> getAllEmails(@PathParam("municipalityId") final String municipalityId, @PathParam("namespace") final String namespace) {
+        return ResponseEntity.ok(service.getAllEmails(municipalityId, namespace));
     }
 
     @Operation(
-        summary = "Get a single email",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Ok",
-                content = @Content(schema = @Schema(implementation = Email.class))
-            ),
-            @ApiResponse(
-                responseCode = "404",
-                description = "Not Found",
-                content = @Content(schema = @Schema(implementation = Problem.class))
-            )
-        }
-    )
-    @GetMapping("{messageID}")
-    public ResponseEntity<Email> getEmail(@PathVariable final String messageID) {
-
-        return ResponseEntity.ok(service.getEmail(messageID));
-    }
-
-    @Operation(
-        summary = "Delete a email by messageID",
+        summary = "Delete an email by messageID",
         responses = {
             @ApiResponse(
                 responseCode = "204",
@@ -98,7 +76,7 @@ public class EmailResource {
             )
         }
     )
-    @DeleteMapping("{messageID}")
+    @DeleteMapping(path = "{messageID}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteEmail(@PathVariable final String messageID) {
         service.deleteEmail(messageID);
         return ResponseEntity.noContent().build();

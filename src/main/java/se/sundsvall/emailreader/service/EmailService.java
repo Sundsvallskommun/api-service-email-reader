@@ -10,8 +10,7 @@ import se.sundsvall.emailreader.api.model.Email;
 @Service
 public class EmailService {
 
-
-    public List<Email> getAllEmails() {
+    public List<Email> getAllEmails(final String municipalityId, final String namespace) {
         return List.of(Email.builder()
             .withSubject("someSubject")
             .withTo("someTo")
@@ -19,17 +18,6 @@ public class EmailService {
             .withMessage("someMessage")
             .withMessageID("someMessageId")
             .build());
-    }
-
-    public Email getEmail(final String messageID) {
-
-        return Email.builder()
-            .withSubject("someSubject")
-            .withTo("someTo")
-            .withFrom("someFrom")
-            .withMessage("someMessage")
-            .withMessageID(messageID)
-            .build();
     }
 
     public void deleteEmail(final String messageID) {

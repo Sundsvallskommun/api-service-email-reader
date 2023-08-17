@@ -22,16 +22,14 @@ import se.sundsvall.emailreader.service.EmailService;
 @ExtendWith(MockitoExtension.class)
 class EmailResourceTest {
 
-    @Mock
-    EmailService emailService;
-
     @InjectMocks
-    EmailResource emailResource;
-
+    private EmailResource emailResource;
+    @Mock
+    private EmailService emailService;
 
     @Test
     void testGetAllEmails() {
-        when(emailService.getAllEmails())
+        when(emailService.getAllEmails(any(String.class), any(String.class)))
             .thenReturn(List.of(Email.builder()
                 .withSubject("someSubject")
                 .withTo("someTo")
@@ -39,7 +37,7 @@ class EmailResourceTest {
                 .withMessageID("someMessageId")
                 .build()));
 
-        final var result = emailResource.getAllEmails();
+        final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
 
         assertThat(result).isNotNull();
         assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
@@ -56,39 +54,9 @@ class EmailResourceTest {
         assertThat(email.message()).isEqualTo("someMessage");
 
 
-        verify(emailService, times(1)).getAllEmails();
+        verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
         verifyNoMoreInteractions(emailService);
 
-    }
-
-
-    @Test
-    void testGetEmail() {
-
-        when(emailService.getEmail(any(String.class)))
-            .thenReturn(Email.builder()
-                .withSubject("someSubject")
-                .withTo("someTo")
-                .withFrom("someFrom").withMessage("someMessage")
-                .withMessageID("someMessageId")
-                .build());
-
-        final var result = emailResource.getEmail("someMessageId");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
-
-        final var email = result.getBody();
-
-        assertThat(email).isNotNull();
-        assertThat(email.messageID()).isEqualTo("someMessageId");
-        assertThat(email.subject()).isEqualTo("someSubject");
-        assertThat(email.to()).isEqualTo("someTo");
-        assertThat(email.from()).isEqualTo("someFrom");
-        assertThat(email.message()).isEqualTo("someMessage");
-
-        verify(emailService, times(1)).getEmail(any(String.class));
-        verifyNoMoreInteractions(emailService);
     }
 
     @Test

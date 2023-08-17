@@ -11,13 +11,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class EmailServiceTest {
 
     @InjectMocks
-    EmailService emailService;
+    private EmailService emailService;
 
 
     @Test
     void testGetAllEmails() {
 
-        final var result = emailService.getAllEmails();
+        final var result = emailService.getAllEmails("someMunicipalityId", "someNamespace");
 
         assertThat(result).isNotNull().isNotEmpty().hasSize(1);
 
@@ -30,20 +30,6 @@ class EmailServiceTest {
         assertThat(email.from()).isEqualTo("someFrom");
         assertThat(email.message()).isEqualTo("someMessage");
 
-    }
-
-
-    @Test
-    void getEmailWithMessageId() {
-
-        final var result = emailService.getEmail("someMessageId");
-
-        assertThat(result).isNotNull();
-        assertThat(result.messageID()).isEqualTo("someMessageId");
-        assertThat(result.subject()).isEqualTo("someSubject");
-        assertThat(result.to()).isEqualTo("someTo");
-        assertThat(result.from()).isEqualTo("someFrom");
-        assertThat(result.message()).isEqualTo("someMessage");
     }
 
     @Test
