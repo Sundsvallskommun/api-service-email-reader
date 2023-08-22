@@ -9,8 +9,8 @@ class EmailTest {
 
     @Test
     void testBuilderAndGetters() {
-        
-        final var result = Email.builder().withMessageID("someMessageId")
+
+        final var result = Email.builder().withId("someId")
             .withSubject("someSubject")
             .withTo("someTo")
             .withFrom("someFrom")
@@ -18,7 +18,7 @@ class EmailTest {
             .build();
 
         assertThat(result).isNotNull();
-        assertThat(result.messageID()).isEqualTo("someMessageId");
+        assertThat(result.id()).isEqualTo("someId");
         assertThat(result.subject()).isEqualTo("someSubject");
         assertThat(result.to()).isEqualTo("someTo");
         assertThat(result.from()).isEqualTo("someFrom");

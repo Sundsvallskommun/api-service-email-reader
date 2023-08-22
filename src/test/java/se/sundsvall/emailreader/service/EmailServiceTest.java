@@ -19,12 +19,12 @@ class EmailServiceTest {
 
         final var result = emailService.getAllEmails("someMunicipalityId", "someNamespace");
 
-        assertThat(result).isNotNull().isNotEmpty().hasSize(1);
+        assertThat(result).isNotNull().hasSize(1);
 
         final var email = result.get(0);
 
         assertThat(email).isNotNull();
-        assertThat(email.messageID()).isEqualTo("someMessageId");
+        assertThat(email.id()).isEqualTo("someId");
         assertThat(email.subject()).isEqualTo("someSubject");
         assertThat(email.to()).isEqualTo("someTo");
         assertThat(email.from()).isEqualTo("someFrom");
@@ -34,7 +34,7 @@ class EmailServiceTest {
 
     @Test
     void deleteEmail() {
-        emailService.deleteEmail("someMessageId");
+        emailService.deleteEmail("someId");
     }
 
 }

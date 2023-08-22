@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -76,9 +78,10 @@ public class EmailResource {
             )
         }
     )
-    @DeleteMapping(path = "{messageID}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> deleteEmail(@PathVariable final String messageID) {
-        service.deleteEmail(messageID);
+    @DeleteMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteEmail(
+        @Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id) {
+        service.deleteEmail(id);
         return ResponseEntity.noContent().build();
     }
 }

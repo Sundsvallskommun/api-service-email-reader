@@ -29,12 +29,13 @@ class EmailResourceTest {
 
     @Test
     void testGetAllEmails() {
+
         when(emailService.getAllEmails(any(String.class), any(String.class)))
             .thenReturn(List.of(Email.builder()
                 .withSubject("someSubject")
                 .withTo("someTo")
                 .withFrom("someFrom").withMessage("someMessage")
-                .withMessageID("someMessageId")
+                .withId("someId")
                 .build()));
 
         final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
@@ -47,12 +48,11 @@ class EmailResourceTest {
         final var email = result.getBody().get(0);
 
         assertThat(email).isNotNull();
-        assertThat(email.messageID()).isEqualTo("someMessageId");
+        assertThat(email.id()).isEqualTo("someId");
         assertThat(email.subject()).isEqualTo("someSubject");
         assertThat(email.to()).isEqualTo("someTo");
         assertThat(email.from()).isEqualTo("someFrom");
         assertThat(email.message()).isEqualTo("someMessage");
-
 
         verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
         verifyNoMoreInteractions(emailService);

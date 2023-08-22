@@ -16,11 +16,11 @@ public class EmailService {
             .withTo("someTo")
             .withFrom("someFrom")
             .withMessage("someMessage")
-            .withMessageID("someMessageId")
+            .withId("someId")
             .build());
     }
 
-    public void deleteEmail(final String messageID) {
-        // TODO integrate with JPA to delete message by messageID;
+    public void deleteEmail(final String id) {
+        // TODO integrate with JPA to delete message by id;
     }
 }
