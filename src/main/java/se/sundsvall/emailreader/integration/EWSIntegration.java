@@ -33,6 +33,8 @@ public class EWSIntegration {
 
     private final EWSMapper mapper;
 
+    private final FolderView folderView = new FolderView(10);
+
     private final ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 
     private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
@@ -91,7 +93,7 @@ public class EWSIntegration {
 
     private Folder findFolder(final ExchangeService service, final String folderName) throws Exception {
 
-        final var folderView = new FolderView(10); // Max number of folders to retrieve
+        // Max number of folders to retrieve
         folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
 
         final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
