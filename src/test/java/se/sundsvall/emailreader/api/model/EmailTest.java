@@ -29,7 +29,7 @@ class EmailTest {
         assertThat(result.id()).isEqualTo("someId");
         assertThat(result.subject()).isEqualTo("someSubject");
         assertThat(result.to()).hasSize(1).element(0).satisfies(to ->
-            assertThat(to).isEqualTo("someTo"));
+            assertThat(to).isEqualTo(List.of("someTo"));
         assertThat(result.from()).isEqualTo("someFrom");
         assertThat(result.message()).isEqualTo("someMessage");
         assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> {
