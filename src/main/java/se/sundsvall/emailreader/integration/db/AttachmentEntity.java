@@ -11,11 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -43,7 +44,7 @@ public class AttachmentEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Generated // To avoid jacoco coverage check for this field
+    @ExcludeFromJacocoGeneratedCoverageReport
     @PrePersist
     void prePersist() {
         createdAt = LocalDateTime.now();
