@@ -83,11 +83,15 @@ class EWSIntegrationTest {
             any(SearchFilter.class), any(FolderView.class)))
             .thenReturn(findFolderResults);
 
-
         when(mapper.toEmail(any(ExchangeService.class),
             any(EmailMessage.class)))
             .thenReturn(new Email(List.of("Test testorsson"), "Testy testorsson",
-                "someSubject", "someBody", "someId"));
+                "someSubject", "someBody", "someId",
+                List.of(Email.Attachment.builder()
+                    .withContentType("someContentType")
+                    .withName("someName")
+                    .withContent("someContent")
+                    .build())));
 
         final var result = ewsIntegration.pageThroughEntireInbox("someFolder");
 
@@ -96,6 +100,14 @@ class EWSIntegrationTest {
         assertThat(result.get(0).subject()).isEqualTo("someSubject");
         assertThat(result.get(0).message()).isEqualTo("someBody");
         assertThat(result.get(0).id()).isNotEmpty();
+        assertThat(result.get(0).to()).hasSize(1).satisfies(to -> {
+            assertThat(to.get(0)).isEqualTo("Test testorsson");
+        });
+        assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
+            assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");
+            assertThat(attachment.get(0).name()).isEqualTo("someName");
+            assertThat(attachment.get(0).content()).isEqualTo("someContent");
+        });
 
     }
 

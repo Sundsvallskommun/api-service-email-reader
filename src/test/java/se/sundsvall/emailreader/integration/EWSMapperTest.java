@@ -3,6 +3,8 @@ package se.sundsvall.emailreader.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.util.Base64;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,14 +37,25 @@ class EWSMapperTest {
         emailMessage.setSubject("Test Email Subject");
         emailMessage.getToRecipients().add("recipient@example.com");
         emailMessage.setBody(new MessageBody("Mocked email body"));
+        
+        emailMessage.getAttachments()
+            .addFileAttachment("Mocked attachment", "mockedfile.jpg".getBytes())
+            .setContentType("text/plain");
 
         final var result = mapper.toEmail(mockExchangeService, emailMessage);
 
         assertThat(result.from()).isEqualTo("sender@example.com");
-        assertThat(result.to().get(0)).isEqualTo("recipient@example.com");
+        assertThat(result.to()).hasSize(1).satisfies(
+            to -> assertThat(to.get(0)).isEqualTo("recipient@example.com"));
         assertThat(result.subject()).isEqualTo("Test Email Subject");
         assertThat(result.message()).isEqualTo("Mocked email body");
         assertThat(result.id()).isNotNull().isNotEmpty();
+        assertThat(result.attachments()).hasSize(1).satisfies(
+            attachment -> {
+                assertThat(attachment.get(0).name()).isEqualTo("Mocked attachment");
+                assertThat(attachment.get(0).contentType()).isEqualTo("text/plain");
+                assertThat(attachment.get(0).content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
+            });
     }
 
 }
