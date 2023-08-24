@@ -24,6 +24,7 @@ class EmailResourceTest {
 
     @InjectMocks
     private EmailResource emailResource;
+
     @Mock
     private EmailService emailService;
 
@@ -33,9 +34,14 @@ class EmailResourceTest {
         when(emailService.getAllEmails(any(String.class), any(String.class)))
             .thenReturn(List.of(Email.builder()
                 .withSubject("someSubject")
-                .withTo("someTo")
+                .withTo(List.of("someTo"))
                 .withFrom("someFrom").withMessage("someMessage")
                 .withId("someId")
+                .withAttachments(List.of(Email.Attachment.builder()
+                    .withName("someName")
+                    .withContent("someContent")
+                    .withContentType("someContentType")
+                    .build()))
                 .build()));
 
         final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
@@ -50,9 +56,15 @@ class EmailResourceTest {
         assertThat(email).isNotNull();
         assertThat(email.id()).isEqualTo("someId");
         assertThat(email.subject()).isEqualTo("someSubject");
-        assertThat(email.to()).isEqualTo("someTo");
+        assertThat(email.to()).hasSize(1).element(0)
+            .satisfies(to -> assertThat(to).isEqualTo("someTo"));
         assertThat(email.from()).isEqualTo("someFrom");
         assertThat(email.message()).isEqualTo("someMessage");
+        assertThat(email.attachments()).hasSize(1).element(0).satisfies(attachment -> {
+            assertThat(attachment.name()).isEqualTo("someName");
+            assertThat(attachment.contentType()).isEqualTo("someContentType");
+            assertThat(attachment.content()).isEqualTo("someContent");
+        });
 
         verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
         verifyNoMoreInteractions(emailService);
