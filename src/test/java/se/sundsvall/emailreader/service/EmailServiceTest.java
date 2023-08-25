@@ -64,7 +64,7 @@ class EmailServiceTest {
         assertThat(email).isNotNull();
         assertThat(email.id()).isEqualTo("someId");
         assertThat(email.subject()).isEqualTo("someSubject");
-        assertThat(email.to().get(0)).hasSize(1).element(0).satisfies(to ->
+        assertThat(email.to()).hasSize(1).element(0).satisfies(to ->
             assertThat(to).isEqualTo("someTo"));
         assertThat(email.from()).isEqualTo("someFrom");
         assertThat(email.message()).isEqualTo("someMessage");
