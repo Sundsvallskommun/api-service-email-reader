@@ -5,13 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,28 +36,27 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 class EWSIntegrationTest {
 
     @Mock
-    EWSProperties properties;
+    private EWSProperties properties;
 
     @InjectMocks
     private EWSIntegration ewsIntegration;
 
     private ExchangeService mockedService;
 
-    @Mock
     private EWSMapper mapper;
 
     @BeforeEach
-    public void setUp() throws IllegalAccessException {
+    public void setUp() throws IllegalAccessException, NoSuchFieldException {
 
         mockedService = mock(ExchangeService.class);
+        final var serviceField = ewsIntegration.getClass().getDeclaredField("service");
+        serviceField.setAccessible(true);
+        serviceField.set(ewsIntegration, mockedService);
 
-        final Field field = ReflectionUtils
-            .findFields(EWSIntegration.class, f -> f.getName().equals("service"),
-                ReflectionUtils.HierarchyTraversalMode.TOP_DOWN)
-            .get(0);
-
-        field.setAccessible(true);
-        field.set(ewsIntegration, mockedService);
+        mapper = mock(EWSMapper.class);
+        final var mapperField = ewsIntegration.getClass().getDeclaredField("mapper");
+        mapperField.setAccessible(true);
+        mapperField.set(ewsIntegration, mapper);
 
         when(properties.username()).thenReturn("username");
         when(properties.password()).thenReturn("password");
@@ -83,7 +80,7 @@ class EWSIntegrationTest {
             any(SearchFilter.class), any(FolderView.class)))
             .thenReturn(findFolderResults);
 
-        when(mapper.toEmail(any(ExchangeService.class),
+        when(mapper.toEmail(
             any(EmailMessage.class)))
             .thenReturn(new Email(List.of("Test testorsson"), "Testy testorsson",
                 "someSubject", "someBody", "someId",
@@ -148,7 +145,6 @@ class EWSIntegrationTest {
         assertThat(output).contains("Could not find items")
             .contains("microsoft.exchange.webservices.data.core.exception.http.HttpErrorException: Some cool error message from the server");
     }
-
 
     private FindFoldersResults setUpFindFolderResults() throws Exception {
 

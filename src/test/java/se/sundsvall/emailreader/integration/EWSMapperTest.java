@@ -37,12 +37,12 @@ class EWSMapperTest {
         emailMessage.setSubject("Test Email Subject");
         emailMessage.getToRecipients().add("recipient@example.com");
         emailMessage.setBody(new MessageBody("Mocked email body"));
-        
+
         emailMessage.getAttachments()
             .addFileAttachment("Mocked attachment", "mockedfile.jpg".getBytes())
             .setContentType("text/plain");
 
-        final var result = mapper.toEmail(mockExchangeService, emailMessage);
+        final var result = mapper.toEmail(emailMessage);
 
         assertThat(result.from()).isEqualTo("sender@example.com");
         assertThat(result.to()).hasSize(1).satisfies(

@@ -14,11 +14,13 @@ import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.enumeration.property.BasePropertySet;
+import microsoft.exchange.webservices.data.core.enumeration.property.BodyType;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.FolderSchema;
+import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
 import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
@@ -31,7 +33,7 @@ public class EWSIntegration {
 
     private final EWSProperties properties;
 
-    private final EWSMapper mapper;
+    private final EWSMapper mapper = new EWSMapper();
 
     private final FolderView folderView = new FolderView(10);
 
@@ -39,9 +41,12 @@ public class EWSIntegration {
 
     private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
 
-    public EWSIntegration(final EWSProperties properties, final EWSMapper mapper) {
+    private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
+        ItemSchema.Body);
+
+    public EWSIntegration(final EWSProperties properties) {
         this.properties = properties;
-        this.mapper = mapper;
+        this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
     }
 
     public List<Email> pageThroughEntireInbox(final String requestedDestinationFolder) {
@@ -76,7 +81,8 @@ public class EWSIntegration {
                 try {
                     if (item instanceof final EmailMessage message) {
                         message.load(); // Load the full message data
-                        emails.add(mapper.toEmail(service, message));
+                        service.loadPropertiesForItems(List.of(message), propertySetTextBody);
+                        emails.add(mapper.toEmail(message));
                         message.move(destinationFolder.getId());
                     }
                 } catch (final Exception e) {
