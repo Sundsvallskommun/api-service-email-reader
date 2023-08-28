@@ -19,6 +19,7 @@ import org.zalando.problem.Problem;
 
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.service.EmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +52,12 @@ public class EmailResource {
 
     private final EmailService service;
 
-    public EmailResource(final EmailService service) {this.service = service;}
+    private final EWSIntegration integration;
+
+    public EmailResource(final EmailService service, final EWSIntegration integration) {
+        this.service = service;
+        this.integration = integration;
+    }
 
     @Operation(
         summary = "Get a list of emails",
@@ -84,4 +90,10 @@ public class EmailResource {
         service.deleteEmail(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/test")
+    public ResponseEntity<List<Email>> test() {
+        return ResponseEntity.ok(integration.pageThroughEntireInbox("archive"));
+    }
+
 }

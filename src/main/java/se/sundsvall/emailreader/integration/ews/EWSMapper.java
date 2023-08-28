@@ -1,4 +1,4 @@
-package se.sundsvall.emailreader.integration;
+package se.sundsvall.emailreader.integration.ews;
 
 
 import java.util.Base64;

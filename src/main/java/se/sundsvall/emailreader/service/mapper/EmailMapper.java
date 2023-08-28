@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 import se.sundsvall.emailreader.api.model.Email;
-import se.sundsvall.emailreader.integration.db.AttachmentEntity;
-import se.sundsvall.emailreader.integration.db.EmailEntity;
+import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 
 
 @Component

@@ -18,9 +18,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import se.sundsvall.emailreader.integration.db.AttachmentEntity;
-import se.sundsvall.emailreader.integration.db.EmailEntity;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.service.mapper.EmailMapper;
 
 @ExtendWith(MockitoExtension.class)
