@@ -1,16 +1,15 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+
+import org.hibernate.annotations.UuidGenerator;
 
 import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
 
@@ -29,19 +28,26 @@ import lombok.NoArgsConstructor;
 public class CredentialsEntity {
 
     @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
+    @UuidGenerator
+    @Column(name = "id")
+    private String id;
 
+    @Column(name = "username")
     private String username;
 
+    @Column(name = "password")
     private String password;
 
+    @Column(name = "domain")
     private String domain;
 
+    @Column(name = "municipality_id")
     private String municipalityId;
 
+    @Column(name = "namespace")
     private String namespace;
 
+    @Column(name = "destination_folder")
     private String destinationFolder;
 
     @Column(name = "created_at")
