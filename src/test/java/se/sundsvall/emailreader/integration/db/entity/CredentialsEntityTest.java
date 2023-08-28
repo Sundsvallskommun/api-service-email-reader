@@ -1,4 +1,4 @@
-package se.sundsvall.emailreader.integration.db;
+package se.sundsvall.emailreader.integration.db.entity;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -15,14 +15,14 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class AttachmentEntityTest {
+class CredentialsEntityTest {
 
     @Test
     void testBean() {
 
         BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
 
-        MatcherAssert.assertThat(AttachmentEntity.class, allOf(
+        MatcherAssert.assertThat(CredentialsEntity.class, allOf(
             hasValidBeanConstructor(),
             hasValidGettersAndSetters(),
             hasValidBeanHashCode(),
@@ -33,11 +33,14 @@ class AttachmentEntityTest {
     @Test
     void testFields() {
 
-        final var object = AttachmentEntity.builder()
+        final var object = CredentialsEntity.builder()
             .withId(new Random().nextLong())
-            .withName("someName")
-            .withContent("someContent")
-            .withContentType("someContentType")
+            .withUsername("someUsername")
+            .withPassword("somePassword")
+            .withDomain("someDomain")
+            .withMunicipalityId("someMunicipalityId")
+            .withNamespace("someNamespace")
+            .withDestinationFolder("someDestinationFolder")
             .withCreatedAt(LocalDateTime.now())
             .build();
 

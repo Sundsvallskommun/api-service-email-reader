@@ -1,4 +1,4 @@
-package se.sundsvall.emailreader.integration.db;
+package se.sundsvall.emailreader.integration.db.entity;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
@@ -8,7 +8,6 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetter
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Random;
 
 import com.google.code.beanmatchers.BeanMatchers;
@@ -16,14 +15,14 @@ import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
-class EmailEntityTest {
+class AttachmentEntityTest {
 
     @Test
     void testBean() {
 
         BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
 
-        MatcherAssert.assertThat(EmailEntity.class, allOf(
+        MatcherAssert.assertThat(AttachmentEntity.class, allOf(
             hasValidBeanConstructor(),
             hasValidGettersAndSetters(),
             hasValidBeanHashCode(),
@@ -34,20 +33,13 @@ class EmailEntityTest {
     @Test
     void testFields() {
 
-        final var object = EmailEntity.builder()
-            .withId(String.valueOf(new Random().nextInt()))
-            .withNamespace("someNamespace")
-            .withMunicipalityId("someMunicipalityId")
-            .withTo(List.of("someTo"))
-            .withFrom("someFrom")
-            .withSubject("someSubject")
-            .withMessage("someMessage")
+        final var object = AttachmentEntity.builder()
+            .withId(new Random().nextLong())
+            .withName("someName")
+            .withContent("someContent")
+            .withContentType("someContentType")
             .withCreatedAt(LocalDateTime.now())
-            .withAttachments(List.of(AttachmentEntity.builder()
-                .withName("someName")
-                .withContent("someContent")
-                .withContentType("someContentType")
-                .build())).build();
+            .build();
 
         Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
     }

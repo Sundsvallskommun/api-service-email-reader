@@ -1,4 +1,4 @@
-package se.sundsvall.emailreader.integration.db;
+package se.sundsvall.emailreader.integration.db.entity;
 
 
 import java.time.LocalDateTime;
