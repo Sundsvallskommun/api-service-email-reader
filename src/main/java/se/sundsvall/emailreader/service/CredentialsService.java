@@ -31,7 +31,7 @@ public class CredentialsService {
 
     public void create(Credentials credentials) {
 
-        final var encryptedPassword = encryptionUtility.encrypt("someinput".getBytes());
+        final var encryptedPassword = encryptionUtility.encrypt(credentials.password().getBytes());
         credentials = credentials.withPassword(encryptedPassword);
 
         credentialsRepository.save(credentialsMapper.toEntity(credentials));
@@ -46,8 +46,8 @@ public class CredentialsService {
 
         final var entity = credentialsRepository.findById(id).orElseThrow();
 
-        final var encryptedPasword = encryptionUtility.encrypt("someinput".getBytes());
-        credentials = credentials.withPassword(encryptedPasword);
+        final var encryptedPassword = encryptionUtility.encrypt(credentials.password().getBytes());
+        credentials = credentials.withPassword(encryptedPassword);
 
         credentialsMapper.updateEntity(entity, credentials);
 
