@@ -80,7 +80,7 @@ public class EmailResource {
             )
         }
     )
-    @DeleteMapping(path = "{id}", consumes = APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "{id}")
     public ResponseEntity<Void> deleteEmail(
         @Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id) {
         service.deleteEmail(id);

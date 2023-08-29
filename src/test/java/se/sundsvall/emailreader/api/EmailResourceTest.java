@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createEmail;
 
 import java.util.List;
 
@@ -15,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
 
 
@@ -32,17 +32,7 @@ class EmailResourceTest {
     void testGetAllEmails() {
 
         when(emailService.getAllEmails(any(String.class), any(String.class)))
-            .thenReturn(List.of(Email.builder()
-                .withSubject("someSubject")
-                .withTo(List.of("someTo"))
-                .withFrom("someFrom").withMessage("someMessage")
-                .withId("someId")
-                .withAttachments(List.of(Email.Attachment.builder()
-                    .withName("someName")
-                    .withContent("someContent")
-                    .withContentType("someContentType")
-                    .build()))
-                .build()));
+            .thenReturn(List.of(createEmail()));
 
         final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
 

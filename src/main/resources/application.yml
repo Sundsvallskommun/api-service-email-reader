@@ -1,10 +1,12 @@
 logging:
   level:
     root: INFO
+
 openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
   version: '@project.version@'
+
 spring:
   application:
     name: api-email-reader
@@ -26,3 +28,7 @@ integration:
 properties:
   credentials:
     secret-key: ${SECRET_KEY}
+
+scheduled:
+  initial-delay: ${INITIAL_DELAY}
+  fixed-rate: ${FIXED_RATE}

@@ -11,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import org.hibernate.Length;
+
 import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
 
 import lombok.AccessLevel;
@@ -35,7 +37,7 @@ public class AttachmentEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "content")
+    @Column(name = "content", length = Length.LONG32)
     private String content;
 
     @Column(name = "content_type")

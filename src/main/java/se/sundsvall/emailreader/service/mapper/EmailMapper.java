@@ -37,6 +37,40 @@ public class EmailMapper {
             .build();
     }
 
+    public List<EmailEntity> toEmailEntites(final List<Email> emails, final String namespace, final String municipalityId) {
+
+        return emails.stream()
+            .map((Email email) -> toEmailEntity(email, namespace, municipalityId))
+            .toList();
+    }
+
+    private EmailEntity toEmailEntity(final Email email, final String namespace, final String municipalityId) {
+
+        final var attachmentEntites = Optional.ofNullable(email.attachments())
+            .orElse(List.of()).stream()
+            .map(this::toAttachmentEntity)
+            .toList();
+
+        return EmailEntity.builder()
+            .withSubject(email.subject())
+            .withTo(email.to())
+            .withFrom(email.from())
+            .withMessage(email.message())
+            .withAttachments(attachmentEntites)
+            .withMunicipalityId(municipalityId)
+            .withNamespace(namespace)
+            .build();
+    }
+
+    private AttachmentEntity toAttachmentEntity(final Email.Attachment attachment) {
+
+        return AttachmentEntity.builder()
+            .withName(attachment.name())
+            .withContent(attachment.content())
+            .withContentType(attachment.contentType())
+            .build();
+    }
+
     public Email.Attachment toAttachment(final AttachmentEntity attachmentEntity) {
 
         return Email.Attachment.builder()

@@ -4,19 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import java.util.List;
+import static se.sundsvall.emailreader.TestUtility.createEmail;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
-
-import se.sundsvall.emailreader.api.model.Email;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
@@ -34,9 +30,6 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class EWSIntegrationTest {
-
-    @Mock
-    private EWSProperties properties;
 
     @InjectMocks
     private EWSIntegration ewsIntegration;
@@ -58,9 +51,6 @@ class EWSIntegrationTest {
         mapperField.setAccessible(true);
         mapperField.set(ewsIntegration, mapper);
 
-        when(properties.username()).thenReturn("username");
-        when(properties.password()).thenReturn("password");
-        when(properties.url()).thenReturn("https://epost.dummy.se/EWS/Exchange.asmx");
     }
 
     @Test
@@ -82,23 +72,18 @@ class EWSIntegrationTest {
 
         when(mapper.toEmail(
             any(EmailMessage.class)))
-            .thenReturn(new Email(List.of("Test testorsson"), "Testy testorsson",
-                "someSubject", "someBody", "someId",
-                List.of(Email.Attachment.builder()
-                    .withContentType("someContentType")
-                    .withName("someName")
-                    .withContent("someContent")
-                    .build())));
+            .thenReturn(createEmail());
 
-        final var result = ewsIntegration.pageThroughEntireInbox("someFolder");
+        final var result = ewsIntegration.pageThroughEntireInbox(
+            "someFolder", "someUsername", "somePassword", "someDomain");
 
         assertThat(result).isNotNull().hasSize(1);
-        assertThat(result.get(0).from()).isEqualTo("Testy testorsson");
+        assertThat(result.get(0).from()).isEqualTo("someFrom");
         assertThat(result.get(0).subject()).isEqualTo("someSubject");
-        assertThat(result.get(0).message()).isEqualTo("someBody");
+        assertThat(result.get(0).message()).isEqualTo("someMessage");
         assertThat(result.get(0).id()).isNotEmpty();
         assertThat(result.get(0).to()).hasSize(1).satisfies(to -> {
-            assertThat(to.get(0)).isEqualTo("Test testorsson");
+            assertThat(to.get(0)).isEqualTo("someTo");
         });
         assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
             assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");
@@ -115,7 +100,8 @@ class EWSIntegrationTest {
             any(SearchFilter.class), any(FolderView.class)))
             .thenReturn(new FindFoldersResults());
 
-        final var result = ewsIntegration.pageThroughEntireInbox("someFolder");
+        final var result = ewsIntegration.pageThroughEntireInbox(
+            "someFolder", "someUsername", "somePassword", "someDomain");
 
         assertThat(result).isNotNull().isEmpty();
         assertThat(output).contains("Could not find destination folder")
@@ -139,7 +125,8 @@ class EWSIntegrationTest {
             any()))
             .thenThrow(new HttpErrorException("Some cool error message from the server", 401));
 
-        final var result = ewsIntegration.pageThroughEntireInbox("someFolder");
+        final var result = ewsIntegration.pageThroughEntireInbox(
+            "someFolder", "someUsername", "somePassword", "someDomain");
 
         assertThat(result).isNotNull().isEmpty();
         assertThat(output).contains("Could not find items")

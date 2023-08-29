@@ -31,7 +31,6 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 @Service
 public class EWSIntegration {
 
-    private final EWSProperties properties;
 
     private final EWSMapper mapper = new EWSMapper();
 
@@ -44,16 +43,15 @@ public class EWSIntegration {
     private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
         ItemSchema.Body);
 
-    public EWSIntegration(final EWSProperties properties) {
-        this.properties = properties;
+    public EWSIntegration() {
         this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
     }
 
-    public List<Email> pageThroughEntireInbox(final String requestedDestinationFolder) {
+    public List<Email> pageThroughEntireInbox(final String requestedDestinationFolder, final String username, final String password, final String domain) {
 
         // These properties should be replaced with credentials from the database in a later step
-        this.service.setCredentials(new WebCredentials(properties.username(), properties.password()));
-        this.service.setUrl(URI.create(properties.url()));
+        this.service.setCredentials(new WebCredentials(username, password));
+        this.service.setUrl(URI.create(domain));
 
         final var emails = new ArrayList<Email>();
 
