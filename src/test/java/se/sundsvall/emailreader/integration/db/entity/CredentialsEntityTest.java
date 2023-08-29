@@ -34,7 +34,7 @@ class CredentialsEntityTest {
     void testFields() {
 
         final var object = CredentialsEntity.builder()
-            .withId(new Random().nextLong())
+            .withId(String.valueOf(new Random().nextInt()))
             .withUsername("someUsername")
             .withPassword("somePassword")
             .withDomain("someDomain")

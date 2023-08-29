@@ -8,3 +8,21 @@ openapi:
 spring:
   application:
     name: api-email-reader
+  datasource:
+    driver-class-name: ${DB_DRIVER}
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${HIBERNATE.DDL_AUTO}
+
+integration:
+  ews:
+    url: ${EWS_URL}
+    username: ${EWS_USERNAME}
+    password: ${EWS_PASSWORD}
+
+properties:
+  credentials:
+    secret-key: ${SECRET_KEY}

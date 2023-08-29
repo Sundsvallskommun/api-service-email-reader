@@ -26,9 +26,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @Validated
+@Tag(name = "Email", description = "Email")
 @RequestMapping(path = "/email",
     produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
 )
@@ -84,4 +86,5 @@ public class EmailResource {
         service.deleteEmail(id);
         return ResponseEntity.noContent().build();
     }
+
 }

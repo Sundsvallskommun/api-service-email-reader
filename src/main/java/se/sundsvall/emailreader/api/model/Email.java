@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder(setterPrefix = "with")
-@Schema(name = "Email", description = "Email")
+@Schema(name = "Email", description = "Email", accessMode = Schema.AccessMode.READ_ONLY)
 public record Email(
 
     @ArraySchema(schema = @Schema(implementation = String.class, description = "Recipient E-Mail addresses"))
