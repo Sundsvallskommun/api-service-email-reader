@@ -19,12 +19,6 @@ spring:
     hibernate:
       ddl-auto: ${HIBERNATE.DDL_AUTO}
 
-integration:
-  ews:
-    url: ${EWS_URL}
-    username: ${EWS_USERNAME}
-    password: ${EWS_PASSWORD}
-
 properties:
   credentials:
     secret-key: ${SECRET_KEY}

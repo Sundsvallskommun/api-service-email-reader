@@ -37,14 +37,7 @@ public class EmailMapper {
             .build();
     }
 
-    public List<EmailEntity> toEmailEntites(final List<Email> emails, final String namespace, final String municipalityId) {
-
-        return emails.stream()
-            .map((Email email) -> toEmailEntity(email, namespace, municipalityId))
-            .toList();
-    }
-
-    private EmailEntity toEmailEntity(final Email email, final String namespace, final String municipalityId) {
+    public EmailEntity toEmailEntity(final Email email, final String namespace, final String municipalityId) {
 
         final var attachmentEntites = Optional.ofNullable(email.attachments())
             .orElse(List.of()).stream()

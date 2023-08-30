@@ -5,13 +5,16 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static java.time.LocalDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
 import java.util.Random;
 
 import com.google.code.beanmatchers.BeanMatchers;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 
@@ -38,10 +41,12 @@ class AttachmentEntityTest {
             .withName("someName")
             .withContent("someContent")
             .withContentType("someContentType")
-            .withCreatedAt(LocalDateTime.now())
+            .withCreatedAt(now())
             .build();
 
-        Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+        object.prePersist();
+        assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+        assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
     }
 
 }

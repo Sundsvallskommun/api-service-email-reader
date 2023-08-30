@@ -13,6 +13,8 @@ import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
+import microsoft.exchange.webservices.data.property.complex.ItemId;
+
 @Component
 @EnableScheduling
 public class EmailScheduler {
@@ -42,21 +44,32 @@ public class EmailScheduler {
     public void scheduleEmailReader() {
 
         log.info("Starting scheduled email reader");
-        final var result = credentialsRepository.findAll();
-        
-        result.forEach(credential -> {
 
-            final var resulty = ewsIntegration
-                .pageThroughEntireInbox(credential.getDestinationFolder(),
-                    credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain());
+        credentialsRepository.findAll().forEach(credential -> {
 
-            log.info("Found {} emails for mailbox {}", resulty.size(), credential.getUsername());
+            final var result = ewsIntegration
+                .pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain());
 
-            emailRepository.saveAll(emailMapper.toEmailEntites(resulty, credential.getNamespace(), credential.getMunicipalityId()));
+            log.info("Found {} emails for mailbox {}", result.size(), credential.getUsername());
 
+            result.forEach(email -> {
+
+                try {
+                    emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId()));
+                } catch (final Exception e) {
+                    log.error("Failed to save email", e);
+                    return;
+                }
+
+                try {
+                    ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), credential);
+                } catch (final Exception e) {
+                    log.error("Failed to move email", e);
+                }
+            });
+
+            log.info("Finished scheduled email reader");
         });
-
-        log.info("Finished scheduled email reader");
     }
 
 }

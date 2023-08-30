@@ -5,6 +5,10 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
+import static java.time.LocalDateTime.now;
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
@@ -43,7 +47,9 @@ class CredentialsEntityTest {
             .withDestinationFolder("someDestinationFolder")
             .withCreatedAt(LocalDateTime.now())
             .build();
-
+        
+        object.prePersist();
+        assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
         Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
     }
 

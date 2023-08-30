@@ -30,6 +30,7 @@ public class EWSMapper {
             .toList();
 
         return Email.builder()
+            .withId(emailMessage.getId().getUniqueId())
             .withSubject(emailMessage.getSubject())
             .withFrom(emailMessage.getFrom().getAddress())
             .withTo(recipients)
