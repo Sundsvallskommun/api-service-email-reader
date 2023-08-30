@@ -55,7 +55,9 @@ public class EncryptionUtility {
         return Base64.getEncoder().encodeToString(cipherText);
     }
 
-    public String decrypt(final byte[] input) {
+    public String decrypt(final String base64Input) {
+
+        final var input = Base64.getDecoder().decode(base64Input);
 
         final var key = getSecretKeySpec();
 

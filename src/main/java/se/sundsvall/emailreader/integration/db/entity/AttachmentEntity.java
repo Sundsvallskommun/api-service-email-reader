@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
-import se.sundsvall.dept44.util.jacoco.ExcludeFromJacocoGeneratedCoverageReport;
+import org.hibernate.Length;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class AttachmentEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "content")
+    @Column(name = "content", length = Length.LONG32)
     private String content;
 
     @Column(name = "content_type")
@@ -44,7 +44,6 @@ public class AttachmentEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ExcludeFromJacocoGeneratedCoverageReport
     @PrePersist
     void prePersist() {
         createdAt = LocalDateTime.now();

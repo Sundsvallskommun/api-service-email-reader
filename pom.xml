@@ -21,6 +21,8 @@
         <published.container.port.sandbox>8707</published.container.port.sandbox>
         <published.container.port.test>8706</published.container.port.test>
         <published.container.port.production>8706</published.container.port.production>
+
+        <powermock.version>2.0.2</powermock.version>
     </properties>
     <dependencies>
         <dependency>

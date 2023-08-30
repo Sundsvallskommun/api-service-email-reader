@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import java.util.List;
 
@@ -39,21 +40,7 @@ class EmailServiceTest {
     void testGetAllEmails() {
 
         when(emailRepository.findByMunicipalityIdAndNamespace(any(String.class), any(String.class)))
-            .thenReturn(List.of(EmailEntity.builder()
-                .withSubject("someSubject")
-                .withTo(List.of("someTo"))
-                .withFrom("someFrom").withMessage("someMessage")
-                .withId("someId")
-                .withNamespace("someNamespace")
-                .withMunicipalityId("someMunicipalityId")
-                .withAttachments(List.of(
-                    AttachmentEntity.builder()
-                        .withName("someName")
-                        .withContent("someContent")
-                        .withContentType("someContentType")
-                        .build()
-                ))
-                .build()));
+            .thenReturn(List.of(createEmailEntity()));
 
         final var result = emailService.getAllEmails("someMunicipalityId", "someNamespace");
 

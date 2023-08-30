@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
+import org.hibernate.Length;
 import org.hibernate.annotations.UuidGenerator;
 
 import lombok.AccessLevel;
@@ -44,7 +45,7 @@ public class EmailEntity {
     @Column(name = "subject")
     private String subject;
 
-    @Column(name = "message")
+    @Column(name = "message", length = Length.LONG32)
     private String message;
 
     @Column(name = "municipality_id")

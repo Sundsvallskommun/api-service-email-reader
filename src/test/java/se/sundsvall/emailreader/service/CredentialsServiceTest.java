@@ -59,12 +59,12 @@ class CredentialsServiceTest {
     @Test
     void create() {
 
-        when(encryptionUtility.encrypt(any())).thenReturn("someEncryptedPassword");
+        when(encryptionUtility.encrypt(any(byte[].class))).thenReturn("someEncryptedPassword");
 
         final var result = createCredentialsWithPassword("somePassword");
         service.create(result);
 
-        verify(encryptionUtility).encrypt(any());
+        verify(encryptionUtility).encrypt(any(byte[].class));
         verify(repository).save(any(CredentialsEntity.class));
         verifyNoMoreInteractions(repository, encryptionUtility);
 
@@ -86,7 +86,7 @@ class CredentialsServiceTest {
         when(repository.findById(any())).thenReturn(java.util.Optional.of(createCredentialsEntity()));
 
         service.update("someId", createCredentialsWithPassword("somePassword"));
-        
+
         verify(repository, times(1)).findById(any());
         verify(repository, times(1)).save(any());
         verify(encryptionUtility, times(1)).encrypt(any());

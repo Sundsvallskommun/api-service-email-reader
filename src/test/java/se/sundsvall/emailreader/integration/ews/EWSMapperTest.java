@@ -1,6 +1,7 @@
 package se.sundsvall.emailreader.integration.ews;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Base64;
@@ -8,20 +9,18 @@ import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import microsoft.exchange.webservices.data.core.ExchangeService;
-import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.property.complex.AttachmentCollection;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
+import microsoft.exchange.webservices.data.property.complex.EmailAddressCollection;
+import microsoft.exchange.webservices.data.property.complex.FileAttachment;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 
 @ExtendWith({MockitoExtension.class})
 class EWSMapperTest {
-
-    @Mock
-    private ExchangeService mockExchangeService;
 
     @InjectMocks
     private EWSMapper mapper;
@@ -29,18 +28,23 @@ class EWSMapperTest {
     @Test
     void testToEmail() throws Exception {
 
-        when(mockExchangeService.getRequestedServerVersion())
-            .thenReturn(ExchangeVersion.Exchange2010_SP2);
+        final EmailMessage emailMessage = mock(EmailMessage.class);
 
-        final var emailMessage = new EmailMessage(mockExchangeService);
-        emailMessage.setFrom(new EmailAddress("Test testorsson", "sender@example.com"));
-        emailMessage.setSubject("Test Email Subject");
+        when(emailMessage.getToRecipients()).thenReturn(new EmailAddressCollection());
         emailMessage.getToRecipients().add("recipient@example.com");
-        emailMessage.setBody(new MessageBody("Mocked email body"));
 
-        emailMessage.getAttachments()
-            .addFileAttachment("Mocked attachment", "mockedfile.jpg".getBytes())
-            .setContentType("text/plain");
+        when(emailMessage.getId()).thenReturn(new ItemId("123456789"));
+        when(emailMessage.getBody()).thenReturn(new MessageBody("Mocked email body"));
+        when(emailMessage.getSubject()).thenReturn("Test Email Subject");
+        when(emailMessage.getFrom()).thenReturn(new EmailAddress("test", "sender@example.com"));
+
+        when(emailMessage.getAttachments()).thenReturn(new AttachmentCollection());
+        final AttachmentCollection attachments = emailMessage.getAttachments();
+        final FileAttachment fileAttachment = mock(FileAttachment.class);
+        when(fileAttachment.getName()).thenReturn("Mocked attachment");
+        when(fileAttachment.getContent()).thenReturn("mockedfile.jpg" .getBytes());
+        when(fileAttachment.getContentType()).thenReturn("text/plain");
+        attachments.getItems().add(fileAttachment);
 
         final var result = mapper.toEmail(emailMessage);
 
@@ -54,7 +58,7 @@ class EWSMapperTest {
             attachment -> {
                 assertThat(attachment.get(0).name()).isEqualTo("Mocked attachment");
                 assertThat(attachment.get(0).contentType()).isEqualTo("text/plain");
-                assertThat(attachment.get(0).content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
+                assertThat(attachment.get(0).content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg" .getBytes()));
             });
     }
 

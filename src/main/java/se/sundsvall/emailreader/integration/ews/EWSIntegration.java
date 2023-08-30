@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
@@ -22,6 +23,7 @@ import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.FolderSchema;
 import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
@@ -31,7 +33,6 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 @Service
 public class EWSIntegration {
 
-    private final EWSProperties properties;
 
     private final EWSMapper mapper = new EWSMapper();
 
@@ -44,29 +45,21 @@ public class EWSIntegration {
     private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
         ItemSchema.Body);
 
-    public EWSIntegration(final EWSProperties properties) {
-        this.properties = properties;
+    public EWSIntegration() {
         this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
     }
 
-    public List<Email> pageThroughEntireInbox(final String requestedDestinationFolder) {
+    public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain) {
 
         // These properties should be replaced with credentials from the database in a later step
-        this.service.setCredentials(new WebCredentials(properties.username(), properties.password()));
-        this.service.setUrl(URI.create(properties.url()));
+        this.service.setCredentials(new WebCredentials(username, password));
+        this.service.setUrl(URI.create(domain));
 
         final var emails = new ArrayList<Email>();
 
         final var pageSize = 50;
         final var view = new ItemView(pageSize);
-        final Folder destinationFolder;
 
-        try {
-            destinationFolder = findFolder(service, requestedDestinationFolder);
-        } catch (final Exception e) {
-            log.error("Could not find destination folder", e);
-            return emails;
-        }
 
         FindItemsResults<Item> findResults;
 
@@ -83,7 +76,6 @@ public class EWSIntegration {
                         message.load(); // Load the full message data
                         service.loadPropertiesForItems(List.of(message), propertySetTextBody);
                         emails.add(mapper.toEmail(message));
-                        message.move(destinationFolder.getId());
                     }
                 } catch (final Exception e) {
                     log.error("Could not load message", e);
@@ -97,7 +89,18 @@ public class EWSIntegration {
         return emails;
     }
 
-    private Folder findFolder(final ExchangeService service, final String folderName) throws Exception {
+    public void moveEmail(final ItemId emailId, final CredentialsEntity credential) throws Exception {
+
+        final Folder destinationFolder;
+
+        destinationFolder = findFolder(credential.getDestinationFolder());
+
+        final var email = service.bindToItem(emailId, new PropertySet());
+
+        email.move(destinationFolder.getId());
+    }
+
+    private Folder findFolder(final String folderName) throws Exception {
 
         // Max number of folders to retrieve
         folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
