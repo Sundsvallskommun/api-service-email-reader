@@ -18,6 +18,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: ${HIBERNATE.DDL_AUTO}
+jakarta:
+  persistence:
+    schema-generation:
+      scripts:
+        create-target: target/database/generated-schema.sql
 
 properties:
   credentials:
