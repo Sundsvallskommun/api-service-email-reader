@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import se.sundsvall.emailreader.api.model.Email;
-import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
@@ -17,13 +16,16 @@ import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion
 import microsoft.exchange.webservices.data.core.enumeration.property.BasePropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.property.BodyType;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
+import microsoft.exchange.webservices.data.core.enumeration.service.ConflictResolutionMode;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.core.service.schema.FolderSchema;
 import microsoft.exchange.webservices.data.core.service.schema.ItemSchema;
 import microsoft.exchange.webservices.data.credential.WebCredentials;
+import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
+import microsoft.exchange.webservices.data.property.complex.Mailbox;
 import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
@@ -49,7 +51,7 @@ public class EWSIntegration {
         this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
     }
 
-    public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain) {
+    public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAdress) {
 
         // These properties should be replaced with credentials from the database in a later step
         this.service.setCredentials(new WebCredentials(username, password));
@@ -62,10 +64,12 @@ public class EWSIntegration {
 
 
         FindItemsResults<Item> findResults;
+        final var userMailbox = new Mailbox(emailAdress);
+        final var folderId = new FolderId(WellKnownFolderName.Inbox, userMailbox);
 
         do {
             try {
-                findResults = service.findItems(WellKnownFolderName.Inbox, view);
+                findResults = service.findItems(folderId, view);
             } catch (final Exception e) {
                 log.error("Could not find items", e);
                 return emails;
@@ -89,24 +93,31 @@ public class EWSIntegration {
         return emails;
     }
 
-    public void moveEmail(final ItemId emailId, final CredentialsEntity credential) throws Exception {
+    public void moveEmail(final ItemId emailId, final String emailAdress, final String folderName) throws Exception {
 
         final Folder destinationFolder;
 
-        destinationFolder = findFolder(credential.getDestinationFolder());
+        destinationFolder = findFolder(emailAdress, folderName);
 
         final var email = service.bindToItem(emailId, new PropertySet());
 
-        email.move(destinationFolder.getId());
+        if (email instanceof final EmailMessage message) {
+            message.setIsRead(true);
+            message.update(ConflictResolutionMode.AutoResolve);
+            message.move(destinationFolder.getId());
+        }
     }
 
-    private Folder findFolder(final String folderName) throws Exception {
+    private Folder findFolder(final String emailAdress, final String folderName) throws Exception {
+
+        final var userMailbox = new Mailbox(emailAdress);
+        final var folderId = new FolderId(WellKnownFolderName.MsgFolderRoot, userMailbox);
 
         // Max number of folders to retrieve
         folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
 
         final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
-        final var findFoldersResults = service.findFolders(WellKnownFolderName.MsgFolderRoot, searchFilter, folderView);
+        final var findFoldersResults = service.findFolders(folderId, searchFilter, folderView);
 
         if (findFoldersResults == null || findFoldersResults.getFolders().size() != 1) {
             throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);

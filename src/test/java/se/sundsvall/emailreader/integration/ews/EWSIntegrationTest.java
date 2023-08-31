@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 
@@ -15,16 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
-import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
-
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
-import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.exception.http.HttpErrorException;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
+import microsoft.exchange.webservices.data.property.complex.FolderId;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import microsoft.exchange.webservices.data.search.FindFoldersResults;
@@ -63,7 +64,7 @@ class EWSIntegrationTest {
 
         final var findItemsResults = setUpFindItemsResults();
 
-        when(mockedService.findItems(any(WellKnownFolderName.class),
+        when(mockedService.findItems(any(FolderId.class),
             any()))
             .thenReturn(findItemsResults);
 
@@ -72,7 +73,7 @@ class EWSIntegrationTest {
             .thenReturn(createEmail());
 
         final var result = ewsIntegration.pageThroughEntireInbox(
-            "someUsername", "somePassword", "someDomain");
+            "someUsername", "somePassword", "someDomain", "someEmailAdress");
 
         assertThat(result).isNotNull().hasSize(1);
         assertThat(result.get(0).from()).isEqualTo("someFrom");
@@ -93,12 +94,12 @@ class EWSIntegrationTest {
     @Test
     void pageThroughEntireInbox_cantFindItems(final CapturedOutput output) throws Exception {
 
-        when(mockedService.findItems(any(WellKnownFolderName.class),
+        when(mockedService.findItems(any(FolderId.class),
             any()))
             .thenThrow(new HttpErrorException("Some cool error message from the server", 401));
 
         final var result = ewsIntegration.pageThroughEntireInbox(
-            "someUsername", "somePassword", "someDomain");
+            "someUsername", "somePassword", "someDomain", "someEmailAdress");
 
         assertThat(result).isNotNull().isEmpty();
         assertThat(output).contains("Could not find items")
@@ -109,12 +110,13 @@ class EWSIntegrationTest {
     @Test
     void pageThroughEntireInbox_cantFindFolder(final CapturedOutput output) throws Exception {
 
-        when(mockedService.findFolders(any(WellKnownFolderName.class),
+        when(mockedService.findFolders(any(FolderId.class),
             any(SearchFilter.class), any(FolderView.class)))
             .thenReturn(new FindFoldersResults());
-        
-        assertThatThrownBy(() -> ewsIntegration.moveEmail(new ItemId("123"),
-            CredentialsEntity.builder().withDestinationFolder("someFolder").build()))
+
+        final var itemId = new ItemId("123");
+
+        assertThatThrownBy(() -> ewsIntegration.moveEmail(itemId, "someEmailAdress", "someFolder"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Could not determine a unique folder with the name: someFolder");
     }
@@ -126,7 +128,7 @@ class EWSIntegrationTest {
             .thenReturn(ExchangeVersion.Exchange2010_SP2);
 
         final var findFolderResults = setUpFindFolderResults();
-        when(mockedService.findFolders(any(WellKnownFolderName.class),
+        when(mockedService.findFolders(any(FolderId.class),
             any(SearchFilter.class), any(FolderView.class)))
             .thenReturn(findFolderResults);
 
@@ -135,7 +137,10 @@ class EWSIntegrationTest {
         when(mockedService.bindToItem(any(ItemId.class), any()))
             .thenReturn(email);
 
-        ewsIntegration.moveEmail(new ItemId("12123"), CredentialsEntity.builder().withDestinationFolder("someFolder").build());
+        ewsIntegration.moveEmail(new ItemId("12123"), "someEmailAdress", "someFolder");
+
+        verify(mockedService, times(1)).bindToItem(any(ItemId.class), any());
+        verifyNoMoreInteractions(mockedService);
     }
 
     private FindFoldersResults setUpFindFolderResults() throws Exception {

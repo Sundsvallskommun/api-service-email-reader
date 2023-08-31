@@ -14,6 +14,7 @@ public class CredentialsMapper {
             .withMunicipalityId(credentials.municipalityId())
             .withNamespace(credentials.namespace())
             .withUsername(credentials.username())
+            .withEmailAdress(credentials.emailAdress())
             .withDestinationFolder(credentials.destinationFolder())
             .withPassword(credentials.password())
             .build();
@@ -23,6 +24,7 @@ public class CredentialsMapper {
         return Credentials.builder()
             .withId(entity.getId())
             .withDomain(entity.getDomain())
+            .withEmailAdress(entity.getEmailAdress())
             .withMunicipalityId(entity.getMunicipalityId())
             .withNamespace(entity.getNamespace())
             .withUsername(entity.getUsername())
@@ -45,6 +47,7 @@ public class CredentialsMapper {
         entity.setUsername(credentials.username());
         entity.setDestinationFolder(credentials.destinationFolder());
         entity.setPassword(credentials.password());
+        entity.setEmailAdress(credentials.emailAdress());
 
     }
 
