@@ -10,19 +10,22 @@ import lombok.Builder;
 @Schema(name = "Email", description = "Email", accessMode = Schema.AccessMode.READ_ONLY)
 public record Email(
 
-    @ArraySchema(schema = @Schema(implementation = String.class, description = "Recipient E-Mail addresses"))
+    @ArraySchema(arraySchema = @Schema(
+        implementation = String.class,
+        description = "My description",
+        example = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]"))
     List<String> to,
 
-    @Schema(description = "Sender E-Mail address")
+    @Schema(description = "Sender E-Mail address", example = "sender@sundsvall.se")
     String from,
 
-    @Schema(description = "E-mail subject")
+    @Schema(description = "E-mail subject", example = "E-mail subject")
     String subject,
 
-    @Schema(description = "E-mail plain-text body")
+    @Schema(description = "E-mail plain-text body", example = "E-mail body")
     String message,
 
-    @Schema(description = "E-mail message id")
+    @Schema(description = "E-mail message id", example = "74531aac-ffea-42cc-8a0a-52715bb27850")
     String id,
 
     @ArraySchema(schema = @Schema(implementation = Attachment.class))

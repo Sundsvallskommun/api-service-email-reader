@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Random;
 
 import com.google.code.beanmatchers.BeanMatchers;
@@ -43,11 +44,12 @@ class CredentialsEntityTest {
             .withPassword("somePassword")
             .withDomain("someDomain")
             .withMunicipalityId("someMunicipalityId")
+            .withEmailAdress(Collections.singletonList("someEmailAdress"))
             .withNamespace("someNamespace")
             .withDestinationFolder("someDestinationFolder")
             .withCreatedAt(LocalDateTime.now())
             .build();
-        
+
         object.prePersist();
         assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
         Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();

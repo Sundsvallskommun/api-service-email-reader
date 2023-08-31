@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader;
 
+import java.util.Collections;
 import java.util.List;
 
 import se.sundsvall.emailreader.api.model.Credentials;
@@ -23,6 +24,7 @@ public class TestUtility {
             .withNamespace("someNamespace")
             .withMunicipalityId("someMunicipalityId")
             .withUsername("someUsername")
+            .withEmailAdress(Collections.singletonList("someEmailAdress"))
             .withId("someId")
             .withPassword(password)
             .build();
@@ -36,6 +38,7 @@ public class TestUtility {
             .withNamespace("someNamespace")
             .withMunicipalityId("someMunicipalityId")
             .withUsername("someUsername")
+            .withEmailAdress(Collections.singletonList("someEmailAdress"))
             .withId("someId")
             .withPassword("somePassword")
             .build();

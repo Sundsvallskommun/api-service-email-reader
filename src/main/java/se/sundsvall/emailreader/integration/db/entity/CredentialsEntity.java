@@ -2,8 +2,10 @@ package se.sundsvall.emailreader.integration.db.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
@@ -35,6 +37,10 @@ public class CredentialsEntity {
 
     @Column(name = "password")
     private String password;
+
+    @ElementCollection
+    @Column(name = "email_adress")
+    private List<String> emailAdress;
 
     @Column(name = "domain")
     private String domain;

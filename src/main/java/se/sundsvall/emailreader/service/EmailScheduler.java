@@ -45,12 +45,12 @@ public class EmailScheduler {
 
         log.info("Starting scheduled email reader");
 
-        credentialsRepository.findAll().forEach(credential -> {
+        credentialsRepository.findAll().forEach(credential -> credential.getEmailAdress().forEach(emailAdress -> {
 
             final var result = ewsIntegration
-                .pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain());
+                .pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAdress);
 
-            log.info("Found {} emails for mailbox {}", result.size(), credential.getUsername());
+            log.info("Found {} emails for mailbox {}", result.size(), emailAdress);
 
             result.forEach(email -> {
 
@@ -62,14 +62,13 @@ public class EmailScheduler {
                 }
 
                 try {
-                    ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), credential);
+                    ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAdress, credential.getDestinationFolder());
                 } catch (final Exception e) {
                     log.error("Failed to move email", e);
                 }
             });
-
-            log.info("Finished scheduled email reader");
-        });
+        }));
+        log.info("Finished scheduled email reader");
     }
 
 }
