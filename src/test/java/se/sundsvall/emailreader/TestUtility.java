@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -67,6 +68,7 @@ public class TestUtility {
             .withTo(List.of("someTo"))
             .withFrom("someFrom").withMessage("someMessage")
             .withId("someId")
+            .withCreatedAt(LocalDateTime.now())
             .withNamespace("someNamespace")
             .withMunicipalityId("someMunicipalityId")
             .withAttachments(List.of(
