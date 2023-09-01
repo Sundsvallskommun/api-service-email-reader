@@ -89,7 +89,7 @@ public class CredentialsResource {
     public ResponseEntity<Void> create(@Valid @RequestBody final Credentials credentials) {
 
         credentialsService.create(credentials);
-        
+
         return ResponseEntity.noContent().build();
 
     }

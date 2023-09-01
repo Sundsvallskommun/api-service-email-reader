@@ -8,6 +8,18 @@ openapi:
   version: '@project.version@'
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          messaging:
+            authorization-grant-type: client_credentials
+            provider: messaging
+            client-id: ${integration.messaging.client-id}
+            client-secret: ${integration.messaging.client-secret}
+        provider:
+          messaging:
+            token-uri: ${integration.messaging.token-url}
   application:
     name: api-email-reader
   datasource:

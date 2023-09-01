@@ -52,7 +52,7 @@ class EmailEntityTest {
                 .withContent("someContent")
                 .withContentType("someContentType")
                 .build())).build();
-        
+
         object.prePersist();
         assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
         Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();

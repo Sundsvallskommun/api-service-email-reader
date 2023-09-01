@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import generated.se.sundsvall.messaging.EmailRequest;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
-@FeignClient(name = MessagingConfiguration.REGISTRATION_ID, url = "${integration.messaging.base-url}", configuration = MessagingConfiguration.class)
-@CircuitBreaker(name = MessagingConfiguration.REGISTRATION_ID)
+@FeignClient(name = MessagingConfiguration.CLIENT_ID, url = "${integration.messaging.base-url}", configuration = MessagingConfiguration.class)
+@CircuitBreaker(name = MessagingConfiguration.CLIENT_ID)
 public interface MessagingClient {
 
     @PostMapping("/email")

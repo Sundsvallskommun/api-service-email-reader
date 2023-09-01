@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +20,6 @@ import se.sundsvall.emailreader.utility.EncryptionUtility;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 
 @Component
-@EnableScheduling
 public class EmailScheduler {
 
     private static final String EMAIL_SUBJECT = "[Warning] EmailReader has detected unhandled emails";

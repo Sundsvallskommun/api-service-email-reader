@@ -5,13 +5,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessagingIntegration {
 
-    static final String INTEGRATION_NAME = "Messaging";
-
     private final MessagingClient messagingClient;
 
     private final MessagingProperties properties;
-
-    private final MessagingIntegrationMapper mapper = new MessagingIntegrationMapper();
 
     public MessagingIntegration(final MessagingClient messagingClient, final MessagingProperties properties) {
         this.messagingClient = messagingClient;
@@ -20,7 +16,7 @@ public class MessagingIntegration {
 
     public void sendEmail(final String message, final String emailSubject) {
 
-        messagingClient.sendEmail(mapper.toRequest(properties.getRecipientAdress(), message, emailSubject));
+        messagingClient.sendEmail(MessagingIntegrationMapper.toRequest(properties.getRecipientAdress(), message, emailSubject));
     }
 
 }

@@ -1,7 +1,5 @@
 package se.sundsvall.emailreader.integration.messaging;
 
-import java.time.Duration;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Getter;
@@ -17,9 +15,9 @@ public class MessagingProperties {
     /// BASE PROPERTIES
     private String baseUrl;
 
-    private Duration readTimeout = Duration.ofSeconds(15);
+    private int readTimeout = 15;
 
-    private Duration connectTimeout = Duration.ofSeconds(5);
+    private int connectTimeout = 5;
 
     private String tokenUri;
 

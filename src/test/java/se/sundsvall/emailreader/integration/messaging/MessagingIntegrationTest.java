@@ -1,7 +1,6 @@
 package se.sundsvall.emailreader.integration.messaging;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -20,12 +19,8 @@ import generated.se.sundsvall.messaging.EmailRequest;
 @ExtendWith(MockitoExtension.class)
 class MessagingIntegrationTest {
 
-
     @Mock
     private MessagingProperties properties;
-
-
-    private MessagingIntegrationMapper mapper;
 
     @Mock
     private MessagingClient messagingClient;
@@ -33,30 +28,21 @@ class MessagingIntegrationTest {
     @InjectMocks
     private MessagingIntegration messagingIntegration;
 
-
     @BeforeEach
-    public void setup() throws Exception {
-
-        mapper = mock(MessagingIntegrationMapper.class);
-        final var mapperField = messagingIntegration.getClass().getDeclaredField("mapper");
-        mapperField.setAccessible(true);
-        mapperField.set(messagingIntegration, mapper);
+    public void setup() {
     }
 
     @Test
     void sendEmail() {
 
         when(properties.getRecipientAdress()).thenReturn("someAddress");
-        when(mapper.toRequest(any(String.class), any(String.class), any(String.class)))
-            .thenReturn(new EmailRequest("someAddress", "some message"));
 
         messagingIntegration.sendEmail("some message", "someSubject");
 
         verify(messagingClient, times(1))
             .sendEmail(any(EmailRequest.class));
-        verify(mapper, times(1))
-            .toRequest(any(String.class), any(String.class), any(String.class));
-        verifyNoMoreInteractions(messagingClient, mapper);
+
+        verifyNoMoreInteractions(messagingClient);
     }
 
 }

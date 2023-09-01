@@ -42,7 +42,7 @@ class EWSMapperTest {
         final AttachmentCollection attachments = emailMessage.getAttachments();
         final FileAttachment fileAttachment = mock(FileAttachment.class);
         when(fileAttachment.getName()).thenReturn("Mocked attachment");
-        when(fileAttachment.getContent()).thenReturn("mockedfile.jpg" .getBytes());
+        when(fileAttachment.getContent()).thenReturn("mockedfile.jpg".getBytes());
         when(fileAttachment.getContentType()).thenReturn("text/plain");
         attachments.getItems().add(fileAttachment);
 
@@ -58,7 +58,7 @@ class EWSMapperTest {
             attachment -> {
                 assertThat(attachment.get(0).name()).isEqualTo("Mocked attachment");
                 assertThat(attachment.get(0).contentType()).isEqualTo("text/plain");
-                assertThat(attachment.get(0).content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg" .getBytes()));
+                assertThat(attachment.get(0).content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
             });
     }
 

@@ -6,12 +6,10 @@ import org.junit.jupiter.api.Test;
 
 class MessagingIntegrationMapperTest {
 
-    MessagingIntegrationMapper messagingIntegrationMapper = new MessagingIntegrationMapper();
-
     @Test
     void toRequest() {
 
-        final var result = messagingIntegrationMapper.toRequest("someAddress", "some message", "[Warning] EmailReader has detected unhandled emails");
+        final var result = MessagingIntegrationMapper.toRequest("someAddress", "some message", "[Warning] EmailReader has detected unhandled emails");
 
         assertThat(result).isNotNull();
         assertThat(result.getEmailAddress()).isEqualTo("someAddress");
