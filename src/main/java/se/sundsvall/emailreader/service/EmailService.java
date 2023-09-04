@@ -12,26 +12,26 @@ import se.sundsvall.emailreader.service.mapper.EmailMapper;
 @Service
 public class EmailService {
 
-    private final EmailRepository emailRepository;
+	private final EmailRepository emailRepository;
 
-    private final EmailMapper emailMapper;
+	private final EmailMapper emailMapper;
 
-    public EmailService(final EmailRepository emailRepository, final EmailMapper emailMapper) {
-        this.emailRepository = emailRepository;
-        this.emailMapper = emailMapper;
-    }
+	public EmailService(final EmailRepository emailRepository, final EmailMapper emailMapper) {
+		this.emailRepository = emailRepository;
+		this.emailMapper = emailMapper;
+	}
 
-    public List<Email> getAllEmails(final String municipalityId, final String namespace) {
+	public List<Email> getAllEmails(final String municipalityId, final String namespace) {
 
-        final var result = emailRepository.findByMunicipalityIdAndNamespace(municipalityId, namespace);
+		final var result = emailRepository.findByMunicipalityIdAndNamespace(municipalityId, namespace);
 
-        return emailMapper.toEmails(result);
-    }
+		return emailMapper.toEmails(result);
+	}
 
-    public void deleteEmail(final String id) {
+	public void deleteEmail(final String id) {
 
-        emailRepository.deleteById(id);
+		emailRepository.deleteById(id);
 
-    }
+	}
 
 }

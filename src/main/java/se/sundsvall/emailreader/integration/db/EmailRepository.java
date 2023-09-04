@@ -8,6 +8,6 @@ import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 
 public interface EmailRepository extends JpaRepository<EmailEntity, String> {
 
-    List<EmailEntity> findByMunicipalityIdAndNamespace(String municipalityId, String namespace);
+	List<EmailEntity> findByMunicipalityIdAndNamespace(String municipalityId, String namespace);
 
 }

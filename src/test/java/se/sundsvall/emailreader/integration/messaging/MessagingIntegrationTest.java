@@ -19,30 +19,30 @@ import generated.se.sundsvall.messaging.EmailRequest;
 @ExtendWith(MockitoExtension.class)
 class MessagingIntegrationTest {
 
-    @Mock
-    private MessagingProperties properties;
+	@Mock
+	private MessagingProperties properties;
 
-    @Mock
-    private MessagingClient messagingClient;
+	@Mock
+	private MessagingClient messagingClient;
 
-    @InjectMocks
-    private MessagingIntegration messagingIntegration;
+	@InjectMocks
+	private MessagingIntegration messagingIntegration;
 
-    @BeforeEach
-    public void setup() {
-    }
+	@BeforeEach
+	public void setup() {
+	}
 
-    @Test
-    void sendEmail() {
+	@Test
+	void sendEmail() {
 
-        when(properties.getRecipientAdress()).thenReturn("someAddress");
+		when(properties.getRecipientAdress()).thenReturn("someAddress");
 
-        messagingIntegration.sendEmail("some message", "someSubject");
+		messagingIntegration.sendEmail("some message", "someSubject");
 
-        verify(messagingClient, times(1))
-            .sendEmail(any(EmailRequest.class));
+		verify(messagingClient, times(1))
+			.sendEmail(any(EmailRequest.class));
 
-        verifyNoMoreInteractions(messagingClient);
-    }
+		verifyNoMoreInteractions(messagingClient);
+	}
 
 }

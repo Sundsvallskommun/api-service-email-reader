@@ -30,39 +30,39 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class EmailEntity {
 
-    @Id
-    @UuidGenerator
-    @Column(name = "id")
-    private String id;
+	@Id
+	@UuidGenerator
+	@Column(name = "id")
+	private String id;
 
-    @ElementCollection
-    @Column(name = "email_to")
-    private List<String> to;
+	@ElementCollection
+	@Column(name = "email_to")
+	private List<String> to;
 
-    @Column(name = "email_from")
-    private String from;
+	@Column(name = "email_from")
+	private String from;
 
-    @Column(name = "subject")
-    private String subject;
+	@Column(name = "subject")
+	private String subject;
 
-    @Column(name = "message", length = Length.LONG32)
-    private String message;
+	@Column(name = "message", length = Length.LONG32)
+	private String message;
 
-    @Column(name = "municipality_id")
-    private String municipalityId;
+	@Column(name = "municipality_id")
+	private String municipalityId;
 
-    @Column(name = "namespace")
-    private String namespace;
+	@Column(name = "namespace")
+	private String namespace;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AttachmentEntity> attachments;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<AttachmentEntity> attachments;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+	@Column(name = "created_at")
+	private LocalDateTime createdAt;
 
-    @PrePersist
-    void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
+	@PrePersist
+	void prePersist() {
+		createdAt = LocalDateTime.now();
+	}
 
 }

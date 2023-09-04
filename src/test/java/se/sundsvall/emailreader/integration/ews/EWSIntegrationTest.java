@@ -37,132 +37,132 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class EWSIntegrationTest {
 
-    @InjectMocks
-    private EWSIntegration ewsIntegration;
+	@InjectMocks
+	private EWSIntegration ewsIntegration;
 
-    private ExchangeService mockedService;
+	private ExchangeService mockedService;
 
-    private EWSMapper mapper;
+	private EWSMapper mapper;
 
-    @BeforeEach
-    public void setUp() throws Exception {
+	@BeforeEach
+	public void setUp() throws Exception {
 
-        mockedService = mock(ExchangeService.class);
-        final var serviceField = ewsIntegration.getClass().getDeclaredField("service");
-        serviceField.setAccessible(true);
-        serviceField.set(ewsIntegration, mockedService);
+		mockedService = mock(ExchangeService.class);
+		final var serviceField = ewsIntegration.getClass().getDeclaredField("service");
+		serviceField.setAccessible(true);
+		serviceField.set(ewsIntegration, mockedService);
 
-        mapper = mock(EWSMapper.class);
-        final var mapperField = ewsIntegration.getClass().getDeclaredField("mapper");
-        mapperField.setAccessible(true);
-        mapperField.set(ewsIntegration, mapper);
+		mapper = mock(EWSMapper.class);
+		final var mapperField = ewsIntegration.getClass().getDeclaredField("mapper");
+		mapperField.setAccessible(true);
+		mapperField.set(ewsIntegration, mapper);
 
-    }
+	}
 
-    @Test
-    void pageThroughEntireInbox() throws Exception {
+	@Test
+	void pageThroughEntireInbox() throws Exception {
 
-        final var findItemsResults = setUpFindItemsResults();
+		final var findItemsResults = setUpFindItemsResults();
 
-        when(mockedService.findItems(any(FolderId.class),
-            any()))
-            .thenReturn(findItemsResults);
+		when(mockedService.findItems(any(FolderId.class),
+			any()))
+			.thenReturn(findItemsResults);
 
-        when(mapper.toEmail(
-            any(EmailMessage.class)))
-            .thenReturn(createEmail());
+		when(mapper.toEmail(
+			any(EmailMessage.class)))
+			.thenReturn(createEmail());
 
-        final var result = ewsIntegration.pageThroughEntireInbox(
-            "someUsername", "somePassword", "someDomain", "someEmailAdress");
+		final var result = ewsIntegration.pageThroughEntireInbox(
+			"someUsername", "somePassword", "someDomain", "someEmailAdress");
 
-        assertThat(result).isNotNull().hasSize(1);
-        assertThat(result.get(0).from()).isEqualTo("someFrom");
-        assertThat(result.get(0).subject()).isEqualTo("someSubject");
-        assertThat(result.get(0).message()).isEqualTo("someMessage");
-        assertThat(result.get(0).id()).isNotEmpty();
-        assertThat(result.get(0).to()).hasSize(1).satisfies(to -> {
-            assertThat(to.get(0)).isEqualTo("someTo");
-        });
-        assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
-            assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");
-            assertThat(attachment.get(0).name()).isEqualTo("someName");
-            assertThat(attachment.get(0).content()).isEqualTo("someContent");
-        });
+		assertThat(result).isNotNull().hasSize(1);
+		assertThat(result.get(0).from()).isEqualTo("someFrom");
+		assertThat(result.get(0).subject()).isEqualTo("someSubject");
+		assertThat(result.get(0).message()).isEqualTo("someMessage");
+		assertThat(result.get(0).id()).isNotEmpty();
+		assertThat(result.get(0).to()).hasSize(1).satisfies(to -> {
+			assertThat(to.get(0)).isEqualTo("someTo");
+		});
+		assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
+			assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");
+			assertThat(attachment.get(0).name()).isEqualTo("someName");
+			assertThat(attachment.get(0).content()).isEqualTo("someContent");
+		});
 
-    }
+	}
 
-    @Test
-    void pageThroughEntireInbox_cantFindItems(final CapturedOutput output) throws Exception {
+	@Test
+	void pageThroughEntireInbox_cantFindItems(final CapturedOutput output) throws Exception {
 
-        when(mockedService.findItems(any(FolderId.class),
-            any()))
-            .thenThrow(new HttpErrorException("Some cool error message from the server", 401));
+		when(mockedService.findItems(any(FolderId.class),
+			any()))
+			.thenThrow(new HttpErrorException("Some cool error message from the server", 401));
 
-        final var result = ewsIntegration.pageThroughEntireInbox(
-            "someUsername", "somePassword", "someDomain", "someEmailAdress");
+		final var result = ewsIntegration.pageThroughEntireInbox(
+			"someUsername", "somePassword", "someDomain", "someEmailAdress");
 
-        assertThat(result).isNotNull().isEmpty();
-        assertThat(output).contains("Could not find items")
-            .contains("microsoft.exchange.webservices.data.core.exception.http.HttpErrorException: Some cool error message from the server");
-    }
+		assertThat(result).isNotNull().isEmpty();
+		assertThat(output).contains("Could not find items")
+			.contains("microsoft.exchange.webservices.data.core.exception.http.HttpErrorException: Some cool error message from the server");
+	}
 
 
-    @Test
-    void pageThroughEntireInbox_cantFindFolder(final CapturedOutput output) throws Exception {
+	@Test
+	void pageThroughEntireInbox_cantFindFolder(final CapturedOutput output) throws Exception {
 
-        when(mockedService.findFolders(any(FolderId.class),
-            any(SearchFilter.class), any(FolderView.class)))
-            .thenReturn(new FindFoldersResults());
+		when(mockedService.findFolders(any(FolderId.class),
+			any(SearchFilter.class), any(FolderView.class)))
+			.thenReturn(new FindFoldersResults());
 
-        final var itemId = new ItemId("123");
+		final var itemId = new ItemId("123");
 
-        assertThatThrownBy(() -> ewsIntegration.moveEmail(itemId, "someEmailAdress", "someFolder"))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Could not determine a unique folder with the name: someFolder");
-    }
+		assertThatThrownBy(() -> ewsIntegration.moveEmail(itemId, "someEmailAdress", "someFolder"))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Could not determine a unique folder with the name: someFolder");
+	}
 
-    @Test
-    void testMoveEmail() throws Exception {
+	@Test
+	void testMoveEmail() throws Exception {
 
-        when(mockedService.getRequestedServerVersion())
-            .thenReturn(ExchangeVersion.Exchange2010_SP2);
+		when(mockedService.getRequestedServerVersion())
+			.thenReturn(ExchangeVersion.Exchange2010_SP2);
 
-        final var findFolderResults = setUpFindFolderResults();
-        when(mockedService.findFolders(any(FolderId.class),
-            any(SearchFilter.class), any(FolderView.class)))
-            .thenReturn(findFolderResults);
+		final var findFolderResults = setUpFindFolderResults();
+		when(mockedService.findFolders(any(FolderId.class),
+			any(SearchFilter.class), any(FolderView.class)))
+			.thenReturn(findFolderResults);
 
-        final var email = mock(EmailMessage.class);
+		final var email = mock(EmailMessage.class);
 
-        when(mockedService.bindToItem(any(ItemId.class), any()))
-            .thenReturn(email);
+		when(mockedService.bindToItem(any(ItemId.class), any()))
+			.thenReturn(email);
 
-        ewsIntegration.moveEmail(new ItemId("12123"), "someEmailAdress", "someFolder");
+		ewsIntegration.moveEmail(new ItemId("12123"), "someEmailAdress", "someFolder");
 
-        verify(mockedService, times(1)).bindToItem(any(ItemId.class), any());
-        verifyNoMoreInteractions(mockedService);
-    }
+		verify(mockedService, times(1)).bindToItem(any(ItemId.class), any());
+		verifyNoMoreInteractions(mockedService);
+	}
 
-    private FindFoldersResults setUpFindFolderResults() throws Exception {
+	private FindFoldersResults setUpFindFolderResults() throws Exception {
 
-        final var findFolderResults = new FindFoldersResults();
-        findFolderResults.setTotalCount(1);
-        findFolderResults.getFolders().add(new Folder(mockedService));
+		final var findFolderResults = new FindFoldersResults();
+		findFolderResults.setTotalCount(1);
+		findFolderResults.getFolders().add(new Folder(mockedService));
 
-        return findFolderResults;
-    }
+		return findFolderResults;
+	}
 
-    private FindItemsResults<Item> setUpFindItemsResults() throws Exception {
+	private FindItemsResults<Item> setUpFindItemsResults() throws Exception {
 
-        final var emailMessage = mock(EmailMessage.class);
-        emailMessage.setFrom(new EmailAddress("Test testorsson", "test@test.se"));
-        emailMessage.setSubject("someSubject");
-        emailMessage.setBody(new MessageBody("someBody"));
+		final var emailMessage = mock(EmailMessage.class);
+		emailMessage.setFrom(new EmailAddress("Test testorsson", "test@test.se"));
+		emailMessage.setSubject("someSubject");
+		emailMessage.setBody(new MessageBody("someBody"));
 
-        final var findItemsResults = new FindItemsResults<>();
-        findItemsResults.getItems().add(emailMessage);
+		final var findItemsResults = new FindItemsResults<>();
+		findItemsResults.getItems().add(emailMessage);
 
-        return findItemsResults;
-    }
+		return findItemsResults;
+	}
 
 }

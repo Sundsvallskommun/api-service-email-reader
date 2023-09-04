@@ -15,24 +15,24 @@ import se.sundsvall.emailreader.configuration.CredentialsProperties;
 @ExtendWith(MockitoExtension.class)
 class EncryptionUtilityTest {
 
-    @Mock
-    CredentialsProperties credentialsProperties;
+	@Mock
+	CredentialsProperties credentialsProperties;
 
-    @InjectMocks
-    private EncryptionUtility encryptionUtility;
+	@InjectMocks
+	private EncryptionUtility encryptionUtility;
 
-    @Test
-    void encryptAndDecrypt() {
+	@Test
+	void encryptAndDecrypt() {
 
-        final var input = "someInput";
+		final var input = "someInput";
 
-        when(credentialsProperties.secretKey()).thenReturn("WbVG8XC%m&9Z!7a$xyKGWzB^#kUSoUUs");
+		when(credentialsProperties.secretKey()).thenReturn("WbVG8XC%m&9Z!7a$xyKGWzB^#kUSoUUs");
 
-        final var encodedResult = encryptionUtility.encrypt(input.getBytes());
-        final var decodedResult = encryptionUtility.decrypt(encodedResult);
+		final var encodedResult = encryptionUtility.encrypt(input.getBytes());
+		final var decodedResult = encryptionUtility.decrypt(encodedResult);
 
-        assertThat(decodedResult).isEqualTo(input);
+		assertThat(decodedResult).isEqualTo(input);
 
-    }
+	}
 
 }

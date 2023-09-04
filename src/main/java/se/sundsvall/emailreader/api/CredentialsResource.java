@@ -35,103 +35,103 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Validated
 @Tag(name = "Credentials", description = "Credentials")
 @RequestMapping(path = "/credentials",
-    produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
+	produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
 )
 @ApiResponse(
-    responseCode = "400",
-    description = "Bad Request",
-    content = @Content(schema = @Schema(implementation = Problem.class))
+	responseCode = "400",
+	description = "Bad Request",
+	content = @Content(schema = @Schema(implementation = Problem.class))
 )
 @ApiResponse(
-    responseCode = "500",
-    description = "Internal Server Error",
-    content = @Content(schema = @Schema(implementation = Problem.class))
+	responseCode = "500",
+	description = "Internal Server Error",
+	content = @Content(schema = @Schema(implementation = Problem.class))
 )
 @ApiResponse(
-    responseCode = "502",
-    description = "Bad Gateway",
-    content = @Content(schema = @Schema(implementation = Problem.class))
+	responseCode = "502",
+	description = "Bad Gateway",
+	content = @Content(schema = @Schema(implementation = Problem.class))
 )
 public class CredentialsResource {
 
-    private final CredentialsService credentialsService;
+	private final CredentialsService credentialsService;
 
-    public CredentialsResource(final CredentialsService credentialsService) {this.credentialsService = credentialsService;}
+	public CredentialsResource(final CredentialsService credentialsService) {this.credentialsService = credentialsService;}
 
-    @Operation(
-        summary = "Get a list of credentials",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Ok",
-                useReturnTypeSchema = true
-            )
+	@Operation(
+		summary = "Get a list of credentials",
+		responses = {
+			@ApiResponse(
+				responseCode = "200",
+				description = "Ok",
+				useReturnTypeSchema = true
+			)
 
-        }
-    )
-    @GetMapping
-    public ResponseEntity<List<Credentials>> getAll() {
+		}
+	)
+	@GetMapping
+	public ResponseEntity<List<Credentials>> getAll() {
 
-        return ResponseEntity.ok(credentialsService.getAllCredentials());
+		return ResponseEntity.ok(credentialsService.getAllCredentials());
 
-    }
+	}
 
-    @Operation(
-        summary = "Create credentials",
-        responses = {
-            @ApiResponse(
-                responseCode = "204",
-                description = "No content"
-            )
-        }
-    )
-    @PostMapping(consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> create(@Valid @RequestBody final Credentials credentials) {
+	@Operation(
+		summary = "Create credentials",
+		responses = {
+			@ApiResponse(
+				responseCode = "204",
+				description = "No content"
+			)
+		}
+	)
+	@PostMapping(consumes = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> create(@Valid @RequestBody final Credentials credentials) {
 
-        credentialsService.create(credentials);
+		credentialsService.create(credentials);
 
-        return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent().build();
 
-    }
+	}
 
-    @Operation(
-        summary = "Update credentials",
-        responses = {
-            @ApiResponse(
-                responseCode = "204",
-                description = "No content"
-            )
-        }
-    )
-    @PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> update(
-        @Parameter(name = "id", description = "Email message ID",
-            example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id,
-        @Valid @RequestBody final Credentials credentials) {
+	@Operation(
+		summary = "Update credentials",
+		responses = {
+			@ApiResponse(
+				responseCode = "204",
+				description = "No content"
+			)
+		}
+	)
+	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> update(
+		@Parameter(name = "id", description = "Email message ID",
+			example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id,
+		@Valid @RequestBody final Credentials credentials) {
 
-        credentialsService.update(id, credentials);
+		credentialsService.update(id, credentials);
 
-        return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent().build();
 
-    }
+	}
 
-    @Operation(
-        summary = "Delete credentials by id",
-        responses = {
-            @ApiResponse(
-                responseCode = "204",
-                description = "No content"
-            )
-        }
-    )
-    @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> delete(@Parameter(name = "id", description = "Email message ID",
-        example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id) {
+	@Operation(
+		summary = "Delete credentials by id",
+		responses = {
+			@ApiResponse(
+				responseCode = "204",
+				description = "No content"
+			)
+		}
+	)
+	@DeleteMapping(path = "/{id}")
+	public ResponseEntity<Void> delete(@Parameter(name = "id", description = "Email message ID",
+		example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id) {
 
-        credentialsService.delete(id);
+		credentialsService.delete(id);
 
-        return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent().build();
 
-    }
+	}
 
 }

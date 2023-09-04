@@ -26,71 +26,71 @@ import se.sundsvall.emailreader.utility.EncryptionUtility;
 @ExtendWith(MockitoExtension.class)
 class CredentialsServiceTest {
 
-    @Mock
-    EncryptionUtility encryptionUtility;
+	@Mock
+	EncryptionUtility encryptionUtility;
 
-    @Mock
-    CredentialsRepository repository;
+	@Mock
+	CredentialsRepository repository;
 
-    @InjectMocks
-    private CredentialsService service;
+	@InjectMocks
+	private CredentialsService service;
 
-    @Test
-    void getAllCredentials() {
+	@Test
+	void getAllCredentials() {
 
-        when(repository.findAll()).thenReturn(List.of(createCredentialsEntity()));
+		when(repository.findAll()).thenReturn(List.of(createCredentialsEntity()));
 
-        final var result = service.getAllCredentials();
+		final var result = service.getAllCredentials();
 
-        assertThat(result).isNotNull().isNotEmpty().element(0).satisfies(
-            credentials -> {
-                assertThat(credentials.id()).isEqualTo("someId");
-                assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
-                assertThat(credentials.domain()).isEqualTo("someDomain");
-                assertThat(credentials.namespace()).isEqualTo("someNamespace");
-                assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
-                assertThat(credentials.username()).isEqualTo("someUsername");
-                assertThat(credentials.password()).isNull();
-            }
-        );
+		assertThat(result).isNotNull().isNotEmpty().element(0).satisfies(
+			credentials -> {
+				assertThat(credentials.id()).isEqualTo("someId");
+				assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
+				assertThat(credentials.domain()).isEqualTo("someDomain");
+				assertThat(credentials.namespace()).isEqualTo("someNamespace");
+				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
+				assertThat(credentials.username()).isEqualTo("someUsername");
+				assertThat(credentials.password()).isNull();
+			}
+		);
 
-    }
+	}
 
-    @Test
-    void create() {
+	@Test
+	void create() {
 
-        when(encryptionUtility.encrypt(any(byte[].class))).thenReturn("someEncryptedPassword");
+		when(encryptionUtility.encrypt(any(byte[].class))).thenReturn("someEncryptedPassword");
 
-        final var result = createCredentialsWithPassword("somePassword");
-        service.create(result);
+		final var result = createCredentialsWithPassword("somePassword");
+		service.create(result);
 
-        verify(encryptionUtility).encrypt(any(byte[].class));
-        verify(repository).save(any(CredentialsEntity.class));
-        verifyNoMoreInteractions(repository, encryptionUtility);
+		verify(encryptionUtility).encrypt(any(byte[].class));
+		verify(repository).save(any(CredentialsEntity.class));
+		verifyNoMoreInteractions(repository, encryptionUtility);
 
-    }
+	}
 
-    @Test
-    void delete() {
+	@Test
+	void delete() {
 
-        service.delete("someId");
+		service.delete("someId");
 
-        verify(repository, times(1)).deleteById(any());
-        verifyNoMoreInteractions(repository);
-        verifyNoInteractions(encryptionUtility);
-    }
+		verify(repository, times(1)).deleteById(any());
+		verifyNoMoreInteractions(repository);
+		verifyNoInteractions(encryptionUtility);
+	}
 
-    @Test
-    void update() {
+	@Test
+	void update() {
 
-        when(repository.findById(any())).thenReturn(java.util.Optional.of(createCredentialsEntity()));
+		when(repository.findById(any())).thenReturn(java.util.Optional.of(createCredentialsEntity()));
 
-        service.update("someId", createCredentialsWithPassword("somePassword"));
+		service.update("someId", createCredentialsWithPassword("somePassword"));
 
-        verify(repository, times(1)).findById(any());
-        verify(repository, times(1)).save(any());
-        verify(encryptionUtility, times(1)).encrypt(any());
-        verifyNoMoreInteractions(repository, encryptionUtility);
-    }
+		verify(repository, times(1)).findById(any());
+		verify(repository, times(1)).save(any());
+		verify(encryptionUtility, times(1)).encrypt(any());
+		verifyNoMoreInteractions(repository, encryptionUtility);
+	}
 
 }

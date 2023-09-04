@@ -12,7 +12,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @CircuitBreaker(name = MessagingConfiguration.CLIENT_ID)
 public interface MessagingClient {
 
-    @PostMapping("/email")
-    ResponseEntity<Void> sendEmail(EmailRequest request);
+	@PostMapping("/email")
+	ResponseEntity<Void> sendEmail(EmailRequest request);
 
 }

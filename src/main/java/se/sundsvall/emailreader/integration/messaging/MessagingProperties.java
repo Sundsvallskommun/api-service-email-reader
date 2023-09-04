@@ -10,21 +10,21 @@ import lombok.Setter;
 @Setter
 public class MessagingProperties {
 
-    private String recipientAdress;
+	private String recipientAdress;
 
-    /// BASE PROPERTIES
-    private String baseUrl;
+	/// BASE PROPERTIES
+	private String baseUrl;
 
-    private int readTimeout = 15;
+	private int readTimeout = 15;
 
-    private int connectTimeout = 5;
+	private int connectTimeout = 5;
 
-    private String tokenUri;
+	private String tokenUri;
 
-    private String clientId;
+	private String clientId;
 
-    private String clientSecret;
+	private String clientSecret;
 
-    private String grantType = "client_credentials";
+	private String grantType = "client_credentials";
 
 }

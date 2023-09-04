@@ -23,86 +23,86 @@ import se.sundsvall.emailreader.service.CredentialsService;
 @ExtendWith(MockitoExtension.class)
 class CredentialsResourceTest {
 
-    @Mock
-    private CredentialsService service;
+	@Mock
+	private CredentialsService service;
 
-    @InjectMocks
-    private CredentialsResource resource;
+	@InjectMocks
+	private CredentialsResource resource;
 
-    @Test
-    void getAll() {
+	@Test
+	void getAll() {
 
-        when(service.getAllCredentials()).thenReturn(List.of(createCredentials()));
+		when(service.getAllCredentials()).thenReturn(List.of(createCredentials()));
 
-        final var result = resource.getAll();
+		final var result = resource.getAll();
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        assertThat(result.getBody()).isNotNull().hasSize(1);
-        assertThat(result.getBody()).element(0).satisfies(
-            credentials -> {
-                assertThat(credentials.id()).isEqualTo("someId");
-                assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
-                assertThat(credentials.domain()).isEqualTo("someDomain");
-                assertThat(credentials.namespace()).isEqualTo("someNamespace");
-                assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
-                assertThat(credentials.username()).isEqualTo("someUsername");
-                assertThat(credentials.emailAdress()).hasSize(1).element(0).satisfies(emailAdress ->
-                    assertThat(emailAdress).isEqualTo("someEmailAdress"));
-                assertThat(credentials.password()).isNull();
-            }
-        );
+		assertThat(result.getBody()).isNotNull().hasSize(1);
+		assertThat(result.getBody()).element(0).satisfies(
+			credentials -> {
+				assertThat(credentials.id()).isEqualTo("someId");
+				assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
+				assertThat(credentials.domain()).isEqualTo("someDomain");
+				assertThat(credentials.namespace()).isEqualTo("someNamespace");
+				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
+				assertThat(credentials.username()).isEqualTo("someUsername");
+				assertThat(credentials.emailAdress()).hasSize(1).element(0).satisfies(emailAdress ->
+					assertThat(emailAdress).isEqualTo("someEmailAdress"));
+				assertThat(credentials.password()).isNull();
+			}
+		);
 
-        verify(service, times(1)).getAllCredentials();
-        verifyNoMoreInteractions(service);
-    }
+		verify(service, times(1)).getAllCredentials();
+		verifyNoMoreInteractions(service);
+	}
 
-    @Test
-    void create() {
+	@Test
+	void create() {
 
-        doNothing().when(service).create(any(Credentials.class));
+		doNothing().when(service).create(any(Credentials.class));
 
-        final var credentials = createCredentials();
+		final var credentials = createCredentials();
 
-        final var result = resource.create(credentials);
+		final var result = resource.create(credentials);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        verify(service, times(1)).create(any(Credentials.class));
-        verifyNoMoreInteractions(service);
-    }
+		verify(service, times(1)).create(any(Credentials.class));
+		verifyNoMoreInteractions(service);
+	}
 
-    @Test
-    void update() {
+	@Test
+	void update() {
 
-        doNothing().when(service).update(any(String.class), any(Credentials.class));
+		doNothing().when(service).update(any(String.class), any(Credentials.class));
 
-        final var credentials = createCredentials();
+		final var credentials = createCredentials();
 
-        final var result = resource.update("someId", credentials);
+		final var result = resource.update("someId", credentials);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        verify(service, times(1)).update(any(String.class), any(Credentials.class));
-        verifyNoMoreInteractions(service);
-    }
+		verify(service, times(1)).update(any(String.class), any(Credentials.class));
+		verifyNoMoreInteractions(service);
+	}
 
-    @Test
-    void delete() {
+	@Test
+	void delete() {
 
-        doNothing().when(service).delete(any(String.class));
+		doNothing().when(service).delete(any(String.class));
 
-        final var result = resource.delete("someId");
+		final var result = resource.delete("someId");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        verify(service, times(1)).delete(any(String.class));
-        verifyNoMoreInteractions(service);
-    }
+		verify(service, times(1)).delete(any(String.class));
+		verifyNoMoreInteractions(service);
+	}
 
 
 }

@@ -20,33 +20,33 @@ import org.junit.jupiter.api.Test;
 
 class AttachmentEntityTest {
 
-    @Test
-    void testBean() {
+	@Test
+	void testBean() {
 
-        BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
+		BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
 
-        MatcherAssert.assertThat(AttachmentEntity.class, allOf(
-            hasValidBeanConstructor(),
-            hasValidGettersAndSetters(),
-            hasValidBeanHashCode(),
-            hasValidBeanEquals(),
-            hasValidBeanToString()));
-    }
+		MatcherAssert.assertThat(AttachmentEntity.class, allOf(
+			hasValidBeanConstructor(),
+			hasValidGettersAndSetters(),
+			hasValidBeanHashCode(),
+			hasValidBeanEquals(),
+			hasValidBeanToString()));
+	}
 
-    @Test
-    void testFields() {
+	@Test
+	void testFields() {
 
-        final var object = AttachmentEntity.builder()
-            .withId(new Random().nextLong())
-            .withName("someName")
-            .withContent("someContent")
-            .withContentType("someContentType")
-            .withCreatedAt(now())
-            .build();
+		final var object = AttachmentEntity.builder()
+			.withId(new Random().nextLong())
+			.withName("someName")
+			.withContent("someContent")
+			.withContentType("someContentType")
+			.withCreatedAt(now())
+			.build();
 
-        object.prePersist();
-        assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
-        assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
-    }
+		object.prePersist();
+		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+		assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+	}
 
 }

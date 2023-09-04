@@ -36,94 +36,94 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 public class EWSIntegration {
 
 
-    private final EWSMapper mapper = new EWSMapper();
+	private final EWSMapper mapper = new EWSMapper();
 
-    private final FolderView folderView = new FolderView(10);
+	private final FolderView folderView = new FolderView(10);
 
-    private final ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
+	private final ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 
-    private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
+	private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
 
-    private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
-        ItemSchema.Body);
+	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
+		ItemSchema.Body);
 
-    public EWSIntegration() {
-        this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
-    }
+	public EWSIntegration() {
+		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
+	}
 
-    public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAdress) {
+	public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAdress) {
 
-        // These properties should be replaced with credentials from the database in a later step
-        this.service.setCredentials(new WebCredentials(username, password));
-        this.service.setUrl(URI.create(domain));
+		// These properties should be replaced with credentials from the database in a later step
+		this.service.setCredentials(new WebCredentials(username, password));
+		this.service.setUrl(URI.create(domain));
 
-        final var emails = new ArrayList<Email>();
+		final var emails = new ArrayList<Email>();
 
-        final var pageSize = 50;
-        final var view = new ItemView(pageSize);
+		final var pageSize = 50;
+		final var view = new ItemView(pageSize);
 
 
-        FindItemsResults<Item> findResults;
-        final var userMailbox = new Mailbox(emailAdress);
-        final var folderId = new FolderId(WellKnownFolderName.Inbox, userMailbox);
+		FindItemsResults<Item> findResults;
+		final var userMailbox = new Mailbox(emailAdress);
+		final var folderId = new FolderId(WellKnownFolderName.Inbox, userMailbox);
 
-        do {
-            try {
-                findResults = service.findItems(folderId, view);
-            } catch (final Exception e) {
-                log.error("Could not find items", e);
-                return emails;
-            }
-            findResults.getItems().forEach(item -> {
-                try {
-                    if (item instanceof final EmailMessage message) {
-                        message.load(); // Load the full message data
-                        service.loadPropertiesForItems(List.of(message), propertySetTextBody);
-                        emails.add(mapper.toEmail(message));
-                    }
-                } catch (final Exception e) {
-                    log.error("Could not load message", e);
-                }
-            });
+		do {
+			try {
+				findResults = service.findItems(folderId, view);
+			} catch (final Exception e) {
+				log.error("Could not find items", e);
+				return emails;
+			}
+			findResults.getItems().forEach(item -> {
+				try {
+					if (item instanceof final EmailMessage message) {
+						message.load(); // Load the full message data
+						service.loadPropertiesForItems(List.of(message), propertySetTextBody);
+						emails.add(mapper.toEmail(message));
+					}
+				} catch (final Exception e) {
+					log.error("Could not load message", e);
+				}
+			});
 
-            view.setOffset(view.getOffset() + pageSize);
+			view.setOffset(view.getOffset() + pageSize);
 
-        } while (findResults.isMoreAvailable());
+		} while (findResults.isMoreAvailable());
 
-        return emails;
-    }
+		return emails;
+	}
 
-    public void moveEmail(final ItemId emailId, final String emailAdress, final String folderName) throws Exception {
+	public void moveEmail(final ItemId emailId, final String emailAdress, final String folderName) throws Exception {
 
-        final Folder destinationFolder;
+		final Folder destinationFolder;
 
-        destinationFolder = findFolder(emailAdress, folderName);
+		destinationFolder = findFolder(emailAdress, folderName);
 
-        final var email = service.bindToItem(emailId, new PropertySet());
+		final var email = service.bindToItem(emailId, new PropertySet());
 
-        if (email instanceof final EmailMessage message) {
-            message.setIsRead(true);
-            message.update(ConflictResolutionMode.AutoResolve);
-            message.move(destinationFolder.getId());
-        }
-    }
+		if (email instanceof final EmailMessage message) {
+			message.setIsRead(true);
+			message.update(ConflictResolutionMode.AutoResolve);
+			message.move(destinationFolder.getId());
+		}
+	}
 
-    private Folder findFolder(final String emailAdress, final String folderName) throws Exception {
+	private Folder findFolder(final String emailAdress, final String folderName) throws Exception {
 
-        final var userMailbox = new Mailbox(emailAdress);
-        final var folderId = new FolderId(WellKnownFolderName.MsgFolderRoot, userMailbox);
+		final var userMailbox = new Mailbox(emailAdress);
+		final var folderId = new FolderId(WellKnownFolderName.MsgFolderRoot, userMailbox);
 
-        // Max number of folders to retrieve
-        folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
+		// Max number of folders to retrieve
+		folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
 
-        final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
-        final var findFoldersResults = service.findFolders(folderId, searchFilter, folderView);
+		final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
+		final var findFoldersResults = service.findFolders(folderId, searchFilter, folderView);
 
-        if (findFoldersResults == null || findFoldersResults.getFolders().size() != 1) {
-            throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
-        }
+		if (findFoldersResults == null || findFoldersResults.getFolders().size() != 1) {
+			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
+		}
 
-        return findFoldersResults.getFolders().get(0);
-    }
+		return findFoldersResults.getFolders().get(0);
+	}
 
 }
