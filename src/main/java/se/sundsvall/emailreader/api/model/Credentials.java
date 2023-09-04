@@ -37,7 +37,7 @@ public record Credentials(
 		implementation = String.class,
 		description = "List of email addresses to check for new emails. The provided user must have access to these email addresses.",
 		example = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]"))
-	List<String> emailAdress,
+	List<String> emailAddress,
 
 	@NotBlank
 	@Schema(description = "domain for the email server", example = "https://mail.example.com/EWS/Exchange.asmx")

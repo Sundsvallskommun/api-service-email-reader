@@ -40,7 +40,7 @@ public class CredentialsEntity {
 	private String password;
 
 	@ElementCollection(fetch = FetchType.EAGER)
-	private List<String> emailAdress;
+	private List<String> emailAddress;
 
 	@Column(name = "domain")
 	private String domain;

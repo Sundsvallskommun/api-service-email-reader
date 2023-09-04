@@ -16,7 +16,7 @@ class CredentialsTest {
 			.withDomain("someDomain")
 			.withNamespace("someNamespace")
 			.withMunicipalityId("someMunicipalityId")
-			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withUsername("someUsername")
 			.withPassword("somePassword")
 			.withId("someId").build();
@@ -29,8 +29,8 @@ class CredentialsTest {
 		assertThat(result.municipalityId()).isEqualTo("someMunicipalityId");
 		assertThat(result.username()).isEqualTo("someUsername");
 		assertThat(result.password()).isEqualTo("somePassword");
-		assertThat(result.emailAdress()).hasSize(1).element(0).satisfies(emailAdress ->
-			assertThat(emailAdress).isEqualTo("someEmailAdress"));
+		assertThat(result.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
+			assertThat(emailAddress).isEqualTo("someEmailAddress"));
 
 	}
 
@@ -45,7 +45,7 @@ class CredentialsTest {
 			.withMunicipalityId("someMunicipalityId")
 			.withUsername("someUsername")
 			.withPassword("somePassword")
-			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withId("someId");
 
 		assertThat(result).isNotNull();
@@ -56,8 +56,8 @@ class CredentialsTest {
 		assertThat(result.municipalityId()).isEqualTo("someMunicipalityId");
 		assertThat(result.username()).isEqualTo("someUsername");
 		assertThat(result.password()).isEqualTo("somePassword");
-		assertThat(result.emailAdress()).hasSize(1).element(0).satisfies(emailAdress ->
-			assertThat(emailAdress).isEqualTo("someEmailAdress"));
+		assertThat(result.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
+			assertThat(emailAddress).isEqualTo("someEmailAddress"));
 	}
 
 }

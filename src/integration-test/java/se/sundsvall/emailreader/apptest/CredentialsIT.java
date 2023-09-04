@@ -14,16 +14,20 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.Credentials;
-import se.sundsvall.emailreader.configuration.TestContainersConfiguration;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 
 @WireMockAppTestSuite(files = "classpath:/CredentialsIT/",
-	classes = {Application.class, TestContainersConfiguration.class})
+	classes = Application.class)
+@Sql(scripts = {
+	"/sql/truncate.sql",
+	"/sql/init-db.sql"
+})
 class CredentialsIT extends AbstractAppTest {
 
 	@Autowired
@@ -46,8 +50,8 @@ class CredentialsIT extends AbstractAppTest {
 				assertThat(credentials.municipalityId()).isEqualTo("2281");
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.username()).isEqualTo("someUsername");
-				assertThat(credentials.emailAdress()).hasSize(2)
-					.element(0).satisfies(emailAdress -> assertThat(emailAdress)
+				assertThat(credentials.emailAddress()).hasSize(2)
+					.element(0).satisfies(emailAddress -> assertThat(emailAddress)
 						.isEqualTo("inbox1@sundsvall.se"));
 				assertThat(credentials.password()).isNull();
 				assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
@@ -67,7 +71,7 @@ class CredentialsIT extends AbstractAppTest {
 				{
 				  "username": "joe01doe",
 				  "password": "someSecretPassword",
-				        "emailAdress": [
+				        "emailAddress": [
 				          "myothersupportemail@sundsvall.se",
 				          "mysupportemail@sundsvall.se"
 				        ],
@@ -109,7 +113,7 @@ class CredentialsIT extends AbstractAppTest {
 				  "username": "joe02doe",
 				  "password": "mySecretPassword",
 				  "domain": "https://mail.example.com/EWS/Exchange.asmx",
-				      "emailAdress": [
+				      "emailAddress": [
 				        "myotherupdatedsupportemail@sundsvall.se",
 				        "myupdatedsupportemail@sundsvall.se"
 				      ],
@@ -135,7 +139,7 @@ class CredentialsIT extends AbstractAppTest {
 		assertThat(result.getNamespace()).isEqualTo("updated.namespace");
 		assertThat(result.getDestinationFolder()).isEqualTo("updatedFolder");
 		assertThat(result.getId()).isNotNull();
-		assertThat(result.getEmailAdress()).isNotNull().hasSize(2).element(0).satisfies(emailAdress -> assertThat(emailAdress)
+		assertThat(result.getEmailAddress()).isNotNull().hasSize(2).element(0).satisfies(emailAddress -> assertThat(emailAddress)
 			.isEqualTo("myotherupdatedsupportemail@sundsvall.se"));
 
 	}

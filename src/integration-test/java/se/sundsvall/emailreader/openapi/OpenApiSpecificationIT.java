@@ -17,11 +17,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 
 import se.sundsvall.emailreader.Application;
-import se.sundsvall.emailreader.configuration.TestContainersConfiguration;
 
 @SpringBootTest(
 	webEnvironment = RANDOM_PORT,
-	classes = {Application.class, TestContainersConfiguration.class},
+	classes = Application.class,
 	properties = {
 		"spring.main.banner-mode=off",
 		"logging.level.se.sundsvall.dept44.payload=OFF"

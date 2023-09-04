@@ -14,3 +14,20 @@ scheduled:
 properties:
   credentials:
     secret-key: tY2$9dHiu*%EqRLhgUM8X446AF4*eSWV
+
+  #-------------------------------------------------------------------------------
+  # Datasource settings
+  #-------------------------------------------------------------------------------
+spring:
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action:validate
+  datasource:
+    url: jdbc:tc:mariadb:10.6.12:///
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  flyway:
+    enabled: true

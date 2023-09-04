@@ -48,8 +48,8 @@ class CredentialsResourceTest {
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
 				assertThat(credentials.username()).isEqualTo("someUsername");
-				assertThat(credentials.emailAdress()).hasSize(1).element(0).satisfies(emailAdress ->
-					assertThat(emailAdress).isEqualTo("someEmailAdress"));
+				assertThat(credentials.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
+					assertThat(emailAddress).isEqualTo("someEmailAddress"));
 				assertThat(credentials.password()).isNull();
 			}
 		);

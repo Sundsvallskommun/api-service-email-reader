@@ -25,7 +25,7 @@ public class TestUtility {
 			.withNamespace("someNamespace")
 			.withMunicipalityId("someMunicipalityId")
 			.withUsername("someUsername")
-			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withId("someId")
 			.withPassword(password)
 			.build();
@@ -39,7 +39,7 @@ public class TestUtility {
 			.withNamespace("someNamespace")
 			.withMunicipalityId("someMunicipalityId")
 			.withUsername("someUsername")
-			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withId("someId")
 			.withPassword("somePassword")
 			.build();

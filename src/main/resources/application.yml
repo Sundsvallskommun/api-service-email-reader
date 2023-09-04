@@ -6,6 +6,7 @@ openapi:
   name: ${spring.application.name}
   title: ${spring.application.name}
   version: '@project.version@'
+
 spring:
   application:
     name: api-email-reader
@@ -21,3 +22,5 @@ spring:
         provider:
           messaging:
             token-uri: ${integration.messaging.token-url}
+  flyway:
+    enabled: true
