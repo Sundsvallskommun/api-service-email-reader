@@ -14,12 +14,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.context.jdbc.Sql;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -27,32 +22,16 @@ import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.Credentials;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 
-@Testcontainers
-@WireMockAppTestSuite(files = "classpath:/CredentialsIT/", classes = Application.class)
-public class CredentialsIT extends AbstractAppTest {
-
-	private static final String MARIADB_VERSION = "mariadb:10.6.12";
-
-	@Container
-	public static final MariaDBContainer<?> emaildb = new MariaDBContainer<>(DockerImageName.parse(MARIADB_VERSION))
-		.withDatabaseName("emailreader")
-		.withUsername("root")
-		.withPassword("")
-		.withInitScript("sql/init-db.sql");
+@WireMockAppTestSuite(files = "classpath:/CredentialsIT/",
+	classes = Application.class)
+@Sql(scripts = {
+	"/sql/truncate.sql",
+	"/sql/init-db.sql"
+})
+class CredentialsIT extends AbstractAppTest {
 
 	@Autowired
 	CredentialsRepository credentialsRepository;
-
-	/**
-	 * get the url, user and password from the container and set them in the context.
-	 */
-	@DynamicPropertySource
-	static void registerProperties(final DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url", emaildb::getJdbcUrl);
-		registry.add("spring.datasource.username", emaildb::getUsername);
-		registry.add("spring.datasource.password", emaildb::getPassword);
-	}
-
 
 	@Test
 	void test1_fetchCredentials() throws Exception {
@@ -71,8 +50,8 @@ public class CredentialsIT extends AbstractAppTest {
 				assertThat(credentials.municipalityId()).isEqualTo("2281");
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.username()).isEqualTo("someUsername");
-				assertThat(credentials.emailAdress()).hasSize(2)
-					.element(0).satisfies(emailAdress -> assertThat(emailAdress)
+				assertThat(credentials.emailAddress()).hasSize(2)
+					.element(0).satisfies(emailAddress -> assertThat(emailAddress)
 						.isEqualTo("inbox1@sundsvall.se"));
 				assertThat(credentials.password()).isNull();
 				assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
@@ -92,7 +71,7 @@ public class CredentialsIT extends AbstractAppTest {
 				{
 				  "username": "joe01doe",
 				  "password": "someSecretPassword",
-				        "emailAdress": [
+				        "emailAddress": [
 				          "myothersupportemail@sundsvall.se",
 				          "mysupportemail@sundsvall.se"
 				        ],
@@ -134,7 +113,7 @@ public class CredentialsIT extends AbstractAppTest {
 				  "username": "joe02doe",
 				  "password": "mySecretPassword",
 				  "domain": "https://mail.example.com/EWS/Exchange.asmx",
-				      "emailAdress": [
+				      "emailAddress": [
 				        "myotherupdatedsupportemail@sundsvall.se",
 				        "myupdatedsupportemail@sundsvall.se"
 				      ],
@@ -153,7 +132,6 @@ public class CredentialsIT extends AbstractAppTest {
 			.findFirst()
 			.orElseThrow();
 
-
 		assertThat(result.getUsername()).isEqualTo("joe02doe");
 		assertThat(result.getPassword()).isNotBlank().isNotEqualTo("mySecretPassword");
 		assertThat(result.getDomain()).isEqualTo("https://mail.example.com/EWS/Exchange.asmx");
@@ -161,11 +139,10 @@ public class CredentialsIT extends AbstractAppTest {
 		assertThat(result.getNamespace()).isEqualTo("updated.namespace");
 		assertThat(result.getDestinationFolder()).isEqualTo("updatedFolder");
 		assertThat(result.getId()).isNotNull();
-		assertThat(result.getEmailAdress()).isNotNull().hasSize(2).element(0).satisfies(emailAdress -> assertThat(emailAdress)
+		assertThat(result.getEmailAddress()).isNotNull().hasSize(2).element(0).satisfies(emailAddress -> assertThat(emailAddress)
 			.isEqualTo("myotherupdatedsupportemail@sundsvall.se"));
 
 	}
-
 
 	@Test
 	void test4_deleteCredentials() {

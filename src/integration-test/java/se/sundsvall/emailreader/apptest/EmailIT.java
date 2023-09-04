@@ -11,12 +11,7 @@ import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MariaDBContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
+import org.springframework.test.context.jdbc.Sql;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -24,32 +19,15 @@ import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 
-@Testcontainers
 @WireMockAppTestSuite(files = "classpath:/EmailIT/", classes = Application.class)
-public class EmailIT extends AbstractAppTest {
-
-
-	private static final String MARIADB_VERSION = "mariadb:10.6.12";
-
-	@Container
-	public static final MariaDBContainer<?> emaildb = new MariaDBContainer<>(DockerImageName.parse(MARIADB_VERSION))
-		.withDatabaseName("emailreader")
-		.withUsername("root")
-		.withPassword("")
-		.withInitScript("sql/init-db.sql");
+@Sql(scripts = {
+	"/sql/truncate.sql",
+	"/sql/init-db.sql"
+})
+class EmailIT extends AbstractAppTest {
 
 	@Autowired
 	EmailRepository emailRepository;
-
-	/**
-	 * get the url, user and password from the container and set them in the context.
-	 */
-	@DynamicPropertySource
-	static void registerProperties(final DynamicPropertyRegistry registry) {
-		registry.add("spring.datasource.url", emaildb::getJdbcUrl);
-		registry.add("spring.datasource.username", emaildb::getUsername);
-		registry.add("spring.datasource.password", emaildb::getPassword);
-	}
 
 	@Test
 	void test1_fetchEmails() throws Exception {
@@ -63,13 +41,12 @@ public class EmailIT extends AbstractAppTest {
 
 			});
 
-		assertThat(emaildb.isRunning()).isTrue();
 		assertThat(response).isNotNull().hasSize(1).element(0).satisfies(
 			email -> {
 				assertThat(email.id()).isEqualTo("81471222-5798-11e9-ae24-57fa13b361e1");
 				assertThat(email.subject()).isEqualTo("Sample subject");
 				assertThat(email.message()).isEqualTo("Hello, this is a sample email.");
-				assertThat(email.from()).isEqualTo("fromadress@sundsvall.se");
+				assertThat(email.from()).isEqualTo("fromaddress@sundsvall.se");
 				assertThat(email.to()).hasSize(2).element(0).satisfies(
 					to -> assertThat(to).isEqualTo("recipient1@sundsvall.se"));
 				assertThat(email.attachments()).hasSize(1).element(0).satisfies(

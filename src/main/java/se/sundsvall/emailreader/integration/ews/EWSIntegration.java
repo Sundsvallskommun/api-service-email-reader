@@ -51,7 +51,7 @@ public class EWSIntegration {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
 	}
 
-	public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAdress) {
+	public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress) {
 
 		// These properties should be replaced with credentials from the database in a later step
 		this.service.setCredentials(new WebCredentials(username, password));
@@ -64,7 +64,7 @@ public class EWSIntegration {
 
 
 		FindItemsResults<Item> findResults;
-		final var userMailbox = new Mailbox(emailAdress);
+		final var userMailbox = new Mailbox(emailAddress);
 		final var folderId = new FolderId(WellKnownFolderName.Inbox, userMailbox);
 
 		do {
@@ -93,11 +93,11 @@ public class EWSIntegration {
 		return emails;
 	}
 
-	public void moveEmail(final ItemId emailId, final String emailAdress, final String folderName) throws Exception {
+	public void moveEmail(final ItemId emailId, final String emailAddress, final String folderName) throws Exception {
 
 		final Folder destinationFolder;
 
-		destinationFolder = findFolder(emailAdress, folderName);
+		destinationFolder = findFolder(emailAddress, folderName);
 
 		final var email = service.bindToItem(emailId, new PropertySet());
 
@@ -108,9 +108,9 @@ public class EWSIntegration {
 		}
 	}
 
-	private Folder findFolder(final String emailAdress, final String folderName) throws Exception {
+	private Folder findFolder(final String emailAddress, final String folderName) throws Exception {
 
-		final var userMailbox = new Mailbox(emailAdress);
+		final var userMailbox = new Mailbox(emailAddress);
 		final var folderId = new FolderId(WellKnownFolderName.MsgFolderRoot, userMailbox);
 
 		// Max number of folders to retrieve

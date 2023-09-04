@@ -320,7 +320,7 @@ components:
       required:
         - destinationFolder
         - domain
-        - emailAdress
+        - emailAddress
         - namespace
         - password
         - username
@@ -340,7 +340,7 @@ components:
           description: password to use for authentication against the email server
           writeOnly: true
           example: mySecretPassword
-        emailAdress:
+        emailAddress:
           type: array
           description: List of email addresses to check for new emails. The provided
             user must have access to these email addresses.

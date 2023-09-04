@@ -44,7 +44,7 @@ class CredentialsEntityTest {
 			.withPassword("somePassword")
 			.withDomain("someDomain")
 			.withMunicipalityId("someMunicipalityId")
-			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withNamespace("someNamespace")
 			.withDestinationFolder("someDestinationFolder")
 			.withCreatedAt(LocalDateTime.now())

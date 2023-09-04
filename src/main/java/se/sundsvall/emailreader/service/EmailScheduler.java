@@ -52,10 +52,10 @@ public class EmailScheduler {
 	@Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
 	public void checkForNewEmails() {
 
-		credentialsRepository.findAll().forEach(credential -> credential.getEmailAdress().forEach(emailAdress -> {
+		credentialsRepository.findAll().forEach(credential -> credential.getEmailAddress().forEach(emailAddress -> {
 
 			final var result = ewsIntegration
-				.pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAdress);
+				.pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAddress);
 
 
 			result.forEach(email -> {
@@ -68,7 +68,7 @@ public class EmailScheduler {
 				}
 
 				try {
-					ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAdress, credential.getDestinationFolder());
+					ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
 				} catch (final Exception e) {
 					log.error("Failed to move email", e);
 				}
