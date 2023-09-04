@@ -1,74 +1,96 @@
 package se.sundsvall.emailreader.service;
 
 
+import java.text.MessageFormat;
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
+import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 
 @Component
-@EnableScheduling
 public class EmailScheduler {
 
-    private static final Logger log = LoggerFactory.getLogger(EmailScheduler.class);
+	private static final String EMAIL_SUBJECT = "[Warning] EmailReader has detected unhandled emails";
 
-    private final EWSIntegration ewsIntegration;
+	private static final Logger log = LoggerFactory.getLogger(EmailScheduler.class);
 
-    private final EmailRepository emailRepository;
+	private final EWSIntegration ewsIntegration;
 
-    private final CredentialsRepository credentialsRepository;
+	private final MessagingIntegration messagingIntegration;
 
-    private final EmailMapper emailMapper = new EmailMapper();
+	private final EmailRepository emailRepository;
 
-    private final EncryptionUtility encryptionUtility;
+	private final CredentialsRepository credentialsRepository;
 
-    public EmailScheduler(final EWSIntegration ewsIntegration, final EmailRepository emailRepository,
-        final CredentialsRepository credentialsRepository, final EncryptionUtility encryptionUtility) {
+	private final EmailMapper emailMapper = new EmailMapper();
 
-        this.ewsIntegration = ewsIntegration;
-        this.emailRepository = emailRepository;
-        this.credentialsRepository = credentialsRepository;
-        this.encryptionUtility = encryptionUtility;
-    }
+	private final EncryptionUtility encryptionUtility;
 
-    @Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
-    public void scheduleEmailReader() {
 
-        log.info("Starting scheduled email reader");
+	public EmailScheduler(final EWSIntegration ewsIntegration, final EmailRepository emailRepository,
+		final CredentialsRepository credentialsRepository, final EncryptionUtility encryptionUtility, final MessagingIntegration messagingIntegration) {
 
-        credentialsRepository.findAll().forEach(credential -> credential.getEmailAdress().forEach(emailAdress -> {
+		this.ewsIntegration = ewsIntegration;
+		this.emailRepository = emailRepository;
+		this.credentialsRepository = credentialsRepository;
+		this.encryptionUtility = encryptionUtility;
+		this.messagingIntegration = messagingIntegration;
+	}
 
-            final var result = ewsIntegration
-                .pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAdress);
+	@Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
+	public void checkForNewEmails() {
 
-            log.info("Found {} emails for mailbox {}", result.size(), emailAdress);
+		credentialsRepository.findAll().forEach(credential -> credential.getEmailAdress().forEach(emailAdress -> {
 
-            result.forEach(email -> {
+			final var result = ewsIntegration
+				.pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAdress);
 
-                try {
-                    emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId()));
-                } catch (final Exception e) {
-                    log.error("Failed to save email", e);
-                    return;
-                }
 
-                try {
-                    ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAdress, credential.getDestinationFolder());
-                } catch (final Exception e) {
-                    log.error("Failed to move email", e);
-                }
-            });
-        }));
-        log.info("Finished scheduled email reader");
-    }
+			result.forEach(email -> {
+
+				try {
+					emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId()));
+				} catch (final Exception e) {
+					log.error("Failed to save email", e);
+					return;
+				}
+
+				try {
+					ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAdress, credential.getDestinationFolder());
+				} catch (final Exception e) {
+					log.error("Failed to move email", e);
+				}
+			});
+		}));
+	}
+
+	@Scheduled(initialDelayString = "${scheduled.email-age-check.initial-delay}", fixedRateString = "${scheduled.email-age-check.fixed-rate}")
+	void checkForOldEmails() {
+
+		final var list = emailRepository.findAll().stream()
+			.filter(email -> email.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1)))
+			.toList();
+
+		if (!list.isEmpty()) {
+			final var message = MessageFormat
+				.format("EmailReader has detected unhandled emails with the following IDs: {0}", list.stream()
+					.map(EmailEntity::getId)
+					.toList());
+			messagingIntegration.sendEmail(message, EMAIL_SUBJECT);
+		}
+
+	}
 
 }

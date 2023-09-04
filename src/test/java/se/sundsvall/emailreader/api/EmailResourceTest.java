@@ -22,55 +22,55 @@ import se.sundsvall.emailreader.service.EmailService;
 @ExtendWith(MockitoExtension.class)
 class EmailResourceTest {
 
-    @InjectMocks
-    private EmailResource emailResource;
+	@InjectMocks
+	private EmailResource emailResource;
 
-    @Mock
-    private EmailService emailService;
+	@Mock
+	private EmailService emailService;
 
-    @Test
-    void testGetAllEmails() {
+	@Test
+	void testGetAllEmails() {
 
-        when(emailService.getAllEmails(any(String.class), any(String.class)))
-            .thenReturn(List.of(createEmail()));
+		when(emailService.getAllEmails(any(String.class), any(String.class)))
+			.thenReturn(List.of(createEmail()));
 
-        final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
+		final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        assertThat(result.getBody()).isNotNull().isNotEmpty().hasSize(1);
+		assertThat(result.getBody()).isNotNull().isNotEmpty().hasSize(1);
 
-        final var email = result.getBody().get(0);
+		final var email = result.getBody().get(0);
 
-        assertThat(email).isNotNull();
-        assertThat(email.id()).isEqualTo("someId");
-        assertThat(email.subject()).isEqualTo("someSubject");
-        assertThat(email.to()).hasSize(1).element(0)
-            .satisfies(to -> assertThat(to).isEqualTo("someTo"));
-        assertThat(email.from()).isEqualTo("someFrom");
-        assertThat(email.message()).isEqualTo("someMessage");
-        assertThat(email.attachments()).hasSize(1).element(0).satisfies(attachment -> {
-            assertThat(attachment.name()).isEqualTo("someName");
-            assertThat(attachment.contentType()).isEqualTo("someContentType");
-            assertThat(attachment.content()).isEqualTo("someContent");
-        });
+		assertThat(email).isNotNull();
+		assertThat(email.id()).isEqualTo("someId");
+		assertThat(email.subject()).isEqualTo("someSubject");
+		assertThat(email.to()).hasSize(1).element(0)
+			.satisfies(to -> assertThat(to).isEqualTo("someTo"));
+		assertThat(email.from()).isEqualTo("someFrom");
+		assertThat(email.message()).isEqualTo("someMessage");
+		assertThat(email.attachments()).hasSize(1).element(0).satisfies(attachment -> {
+			assertThat(attachment.name()).isEqualTo("someName");
+			assertThat(attachment.contentType()).isEqualTo("someContentType");
+			assertThat(attachment.content()).isEqualTo("someContent");
+		});
 
-        verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
-        verifyNoMoreInteractions(emailService);
+		verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
+		verifyNoMoreInteractions(emailService);
 
-    }
+	}
 
-    @Test
-    void testDeleteEmail() {
+	@Test
+	void testDeleteEmail() {
 
-        final var result = emailResource.deleteEmail("someMessageId");
+		final var result = emailResource.deleteEmail("someMessageId");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		assertThat(result).isNotNull();
+		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-        verify(emailService, times(1)).deleteEmail(any(String.class));
-        verifyNoMoreInteractions(emailService);
-    }
+		verify(emailService, times(1)).deleteEmail(any(String.class));
+		verifyNoMoreInteractions(emailService);
+	}
 
 }

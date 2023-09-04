@@ -1,16 +1,16 @@
 create table emailreader.attachment
 (
-    created_at   datetime(6)  null,
+    created_at   datetime(6) null,
     id           bigint auto_increment
         primary key,
     content_type varchar(255) null,
     name         varchar(255) null,
-    content      longtext     null
+    content      longtext null
 );
 
 create table emailreader.credentials
 (
-    created_at         datetime(6)  null,
+    created_at         datetime(6) null,
     destination_folder varchar(255) null,
     domain             varchar(255) null,
     id                 varchar(255) not null
@@ -31,14 +31,14 @@ create table emailreader.credentials_entity_email_adress
 
 create table emailreader.email
 (
-    created_at      datetime(6)  null,
+    created_at      datetime(6) null,
     email_from      varchar(255) null,
     id              varchar(255) not null
         primary key,
     municipality_id varchar(255) null,
     namespace       varchar(255) null,
     subject         varchar(255) null,
-    message         longtext     null
+    message         longtext null
 );
 
 create table emailreader.email_attachments
@@ -82,7 +82,8 @@ INSERT INTO emailreader.attachment (created_at, content_type, name, content)
 VALUES (CURRENT_TIMESTAMP, 'application/pdf', 'attachment_name.pdf', 'Attachment content');
 
 -- Get the ID of the inserted attachment
-SET @attachment_id = LAST_INSERT_ID();
+SET
+@attachment_id = LAST_INSERT_ID();
 
 -- Insert into emailreader.email_attachments
 INSERT INTO emailreader.email_attachments (attachments_id, email_entity_id)

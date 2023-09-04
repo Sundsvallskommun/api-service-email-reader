@@ -28,38 +28,38 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CredentialsEntity {
 
-    @Id
-    @UuidGenerator
-    @Column(name = "id")
-    private String id;
+	@Id
+	@UuidGenerator
+	@Column(name = "id")
+	private String id;
 
-    @Column(name = "username")
-    private String username;
+	@Column(name = "username")
+	private String username;
 
-    @Column(name = "password")
-    private String password;
+	@Column(name = "password")
+	private String password;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> emailAdress;
+	@ElementCollection(fetch = FetchType.EAGER)
+	private List<String> emailAdress;
 
-    @Column(name = "domain")
-    private String domain;
+	@Column(name = "domain")
+	private String domain;
 
-    @Column(name = "municipality_id")
-    private String municipalityId;
+	@Column(name = "municipality_id")
+	private String municipalityId;
 
-    @Column(name = "namespace")
-    private String namespace;
+	@Column(name = "namespace")
+	private String namespace;
 
-    @Column(name = "destination_folder")
-    private String destinationFolder;
+	@Column(name = "destination_folder")
+	private String destinationFolder;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+	@Column(name = "created_at")
+	private LocalDateTime createdAt;
 
-    @PrePersist
-    void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
+	@PrePersist
+	void prePersist() {
+		createdAt = LocalDateTime.now();
+	}
 
 }

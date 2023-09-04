@@ -22,37 +22,37 @@ import org.junit.jupiter.api.Test;
 
 class CredentialsEntityTest {
 
-    @Test
-    void testBean() {
+	@Test
+	void testBean() {
 
-        BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
+		BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
 
-        MatcherAssert.assertThat(CredentialsEntity.class, allOf(
-            hasValidBeanConstructor(),
-            hasValidGettersAndSetters(),
-            hasValidBeanHashCode(),
-            hasValidBeanEquals(),
-            hasValidBeanToString()));
-    }
+		MatcherAssert.assertThat(CredentialsEntity.class, allOf(
+			hasValidBeanConstructor(),
+			hasValidGettersAndSetters(),
+			hasValidBeanHashCode(),
+			hasValidBeanEquals(),
+			hasValidBeanToString()));
+	}
 
-    @Test
-    void testFields() {
+	@Test
+	void testFields() {
 
-        final var object = CredentialsEntity.builder()
-            .withId(String.valueOf(new Random().nextInt()))
-            .withUsername("someUsername")
-            .withPassword("somePassword")
-            .withDomain("someDomain")
-            .withMunicipalityId("someMunicipalityId")
-            .withEmailAdress(Collections.singletonList("someEmailAdress"))
-            .withNamespace("someNamespace")
-            .withDestinationFolder("someDestinationFolder")
-            .withCreatedAt(LocalDateTime.now())
-            .build();
+		final var object = CredentialsEntity.builder()
+			.withId(String.valueOf(new Random().nextInt()))
+			.withUsername("someUsername")
+			.withPassword("somePassword")
+			.withDomain("someDomain")
+			.withMunicipalityId("someMunicipalityId")
+			.withEmailAdress(Collections.singletonList("someEmailAdress"))
+			.withNamespace("someNamespace")
+			.withDestinationFolder("someDestinationFolder")
+			.withCreatedAt(LocalDateTime.now())
+			.build();
 
-        object.prePersist();
-        assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
-        Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
-    }
+		object.prePersist();
+		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+		Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+	}
 
 }

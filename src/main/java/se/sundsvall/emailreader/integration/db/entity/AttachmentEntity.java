@@ -27,26 +27,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class AttachmentEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
+	private Long id;
 
-    @Column(name = "name")
-    private String name;
+	@Column(name = "name")
+	private String name;
 
-    @Column(name = "content", length = Length.LONG32)
-    private String content;
+	@Column(name = "content", length = Length.LONG32)
+	private String content;
 
-    @Column(name = "content_type")
-    private String contentType;
+	@Column(name = "content_type")
+	private String contentType;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+	@Column(name = "created_at")
+	private LocalDateTime createdAt;
 
-    @PrePersist
-    void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
+	@PrePersist
+	void prePersist() {
+		createdAt = LocalDateTime.now();
+	}
 
 }

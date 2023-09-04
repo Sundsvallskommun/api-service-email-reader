@@ -22,40 +22,40 @@ import org.junit.jupiter.api.Test;
 
 class EmailEntityTest {
 
-    @Test
-    void testBean() {
+	@Test
+	void testBean() {
 
-        BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
+		BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
 
-        MatcherAssert.assertThat(EmailEntity.class, allOf(
-            hasValidBeanConstructor(),
-            hasValidGettersAndSetters(),
-            hasValidBeanHashCode(),
-            hasValidBeanEquals(),
-            hasValidBeanToString()));
-    }
+		MatcherAssert.assertThat(EmailEntity.class, allOf(
+			hasValidBeanConstructor(),
+			hasValidGettersAndSetters(),
+			hasValidBeanHashCode(),
+			hasValidBeanEquals(),
+			hasValidBeanToString()));
+	}
 
-    @Test
-    void testFields() {
+	@Test
+	void testFields() {
 
-        final var object = EmailEntity.builder()
-            .withId(String.valueOf(new Random().nextInt()))
-            .withNamespace("someNamespace")
-            .withMunicipalityId("someMunicipalityId")
-            .withTo(List.of("someTo"))
-            .withFrom("someFrom")
-            .withSubject("someSubject")
-            .withMessage("someMessage")
-            .withCreatedAt(LocalDateTime.now())
-            .withAttachments(List.of(AttachmentEntity.builder()
-                .withName("someName")
-                .withContent("someContent")
-                .withContentType("someContentType")
-                .build())).build();
-        
-        object.prePersist();
-        assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
-        Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
-    }
+		final var object = EmailEntity.builder()
+			.withId(String.valueOf(new Random().nextInt()))
+			.withNamespace("someNamespace")
+			.withMunicipalityId("someMunicipalityId")
+			.withTo(List.of("someTo"))
+			.withFrom("someFrom")
+			.withSubject("someSubject")
+			.withMessage("someMessage")
+			.withCreatedAt(LocalDateTime.now())
+			.withAttachments(List.of(AttachmentEntity.builder()
+				.withName("someName")
+				.withContent("someContent")
+				.withContentType("someContentType")
+				.build())).build();
+
+		object.prePersist();
+		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+		Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+	}
 
 }

@@ -15,46 +15,46 @@ import microsoft.exchange.webservices.data.property.complex.FileAttachment;
 
 public class EWSMapper {
 
-    private final Logger log = LoggerFactory.getLogger(EWSMapper.class);
+	private final Logger log = LoggerFactory.getLogger(EWSMapper.class);
 
-    Email toEmail(final EmailMessage emailMessage) throws ServiceLocalException {
+	Email toEmail(final EmailMessage emailMessage) throws ServiceLocalException {
 
-        final var recipients = emailMessage.getToRecipients().getItems().stream()
-            .map(EmailAddress::getAddress)
-            .toList();
+		final var recipients = emailMessage.getToRecipients().getItems().stream()
+			.map(EmailAddress::getAddress)
+			.toList();
 
-        final var attachments = emailMessage.getAttachments().getItems().stream()
-            .filter(FileAttachment.class::isInstance)
-            .map(FileAttachment.class::cast)
-            .map(this::toAttachment)
-            .toList();
+		final var attachments = emailMessage.getAttachments().getItems().stream()
+			.filter(FileAttachment.class::isInstance)
+			.map(FileAttachment.class::cast)
+			.map(this::toAttachment)
+			.toList();
 
-        return Email.builder()
-            .withId(emailMessage.getId().getUniqueId())
-            .withSubject(emailMessage.getSubject())
-            .withFrom(emailMessage.getFrom().getAddress())
-            .withTo(recipients)
-            .withMessage(emailMessage.getBody().toString())
-            .withId(String.valueOf(emailMessage.getId()))
-            .withAttachments(attachments)
-            .build();
-    }
+		return Email.builder()
+			.withId(emailMessage.getId().getUniqueId())
+			.withSubject(emailMessage.getSubject())
+			.withFrom(emailMessage.getFrom().getAddress())
+			.withTo(recipients)
+			.withMessage(emailMessage.getBody().toString())
+			.withId(String.valueOf(emailMessage.getId()))
+			.withAttachments(attachments)
+			.build();
+	}
 
-    private Email.Attachment toAttachment(final FileAttachment fileAttachment) {
+	private Email.Attachment toAttachment(final FileAttachment fileAttachment) {
 
-        try {
-            fileAttachment.load();
-            return Email.Attachment.builder()
-                .withName(fileAttachment.getName())
-                .withContent(Base64.getEncoder().encodeToString(fileAttachment.getContent()))
-                .withContentType(fileAttachment.getContentType())
-                .build();
-        } catch (final Exception e) {
-            log.warn("Could not load attachment", e);
-            return null;
+		try {
+			fileAttachment.load();
+			return Email.Attachment.builder()
+				.withName(fileAttachment.getName())
+				.withContent(Base64.getEncoder().encodeToString(fileAttachment.getContent()))
+				.withContentType(fileAttachment.getContentType())
+				.build();
+		} catch (final Exception e) {
+			log.warn("Could not load attachment", e);
+			return null;
 
-        }
+		}
 
-    }
+	}
 
 }
