@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.api.model;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -28,6 +29,8 @@ public record Email(
 	@Schema(description = "E-mail message id", example = "74531aac-ffea-42cc-8a0a-52715bb27850")
 	String id,
 
+	@Schema(description = "The date and time the email was received", example = "2021-09-01T12:00:00+02:00")
+	OffsetDateTime receivedAt,
 	@ArraySchema(schema = @Schema(implementation = Attachment.class))
 	List<Attachment> attachments) {
 

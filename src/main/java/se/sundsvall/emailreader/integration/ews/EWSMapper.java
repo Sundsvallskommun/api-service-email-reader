@@ -1,6 +1,7 @@
 package se.sundsvall.emailreader.integration.ews;
 
 
+import java.time.ZoneId;
 import java.util.Base64;
 
 import org.slf4j.Logger;
@@ -37,7 +38,10 @@ public class EWSMapper {
 			.withMessage(emailMessage.getBody().toString())
 			.withId(String.valueOf(emailMessage.getId()))
 			.withAttachments(attachments)
+			.withReceivedAt(emailMessage.getDateTimeReceived().toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime())
 			.build();
+
+
 	}
 
 	private Email.Attachment toAttachment(final FileAttachment fileAttachment) {

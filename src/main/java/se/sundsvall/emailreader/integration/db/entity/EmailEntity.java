@@ -2,6 +2,7 @@ package se.sundsvall.emailreader.integration.db.entity;
 
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -56,6 +57,9 @@ public class EmailEntity {
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<AttachmentEntity> attachments;
+
+	@Column(name = "received_at")
+	private OffsetDateTime receivedAt;
 
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

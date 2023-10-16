@@ -1,0 +1,2 @@
+ALTER TABLE email
+    ADD COLUMN received_at DATETIME(6) DEFAULT NULL
