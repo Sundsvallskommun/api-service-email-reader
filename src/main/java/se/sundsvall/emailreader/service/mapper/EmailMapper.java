@@ -1,6 +1,7 @@
 package se.sundsvall.emailreader.service.mapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Component;
@@ -34,12 +35,13 @@ public class EmailMapper {
 			.withMessage(emailEntity.getMessage())
 			.withId(emailEntity.getId())
 			.withAttachments(attachments)
+			.withMetadata(emailEntity.getMetadata())
 			.build();
 	}
 
-	public EmailEntity toEmailEntity(final Email email, final String namespace, final String municipalityId) {
+	public EmailEntity toEmailEntity(final Email email, final String namespace, final String municipalityId, final Map<String, String> metadata) {
 
-		final var attachmentEntites = Optional.ofNullable(email.attachments())
+		final var attachmentEntities = Optional.ofNullable(email.attachments())
 			.orElse(List.of()).stream()
 			.map(this::toAttachmentEntity)
 			.toList();
@@ -49,9 +51,10 @@ public class EmailMapper {
 			.withTo(email.to())
 			.withFrom(email.from())
 			.withMessage(email.message())
-			.withAttachments(attachmentEntites)
+			.withAttachments(attachmentEntities)
 			.withMunicipalityId(municipalityId)
 			.withNamespace(namespace)
+			.withMetadata(metadata)
 			.build();
 	}
 

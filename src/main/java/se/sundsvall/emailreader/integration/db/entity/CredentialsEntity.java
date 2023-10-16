@@ -3,12 +3,16 @@ package se.sundsvall.emailreader.integration.db.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
@@ -27,6 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CredentialsEntity {
+
 
 	@Id
 	@UuidGenerator
@@ -56,6 +61,13 @@ public class CredentialsEntity {
 
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
+
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "credentials_metadata",
+		joinColumns = @JoinColumn(name = "credentials_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_credentials_metadata_credentials_id")))
+	private Map<String, String> metadata;
 
 	@PrePersist
 	void prePersist() {

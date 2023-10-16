@@ -19,5 +19,9 @@ TRUNCATE TABLE credentials;
 -- Truncate the 'attachment' table
 TRUNCATE TABLE attachment;
 
+TRUNCATE TABLE email_metadata;
+
+TRUNCATE TABLE credentials_metadata;
+
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;

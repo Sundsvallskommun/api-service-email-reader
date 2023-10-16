@@ -3,12 +3,16 @@ package se.sundsvall.emailreader.integration.db.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -59,6 +63,14 @@ public class EmailEntity {
 
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
+
+	@ElementCollection
+	@CollectionTable(
+		name = "email_metadata",
+		joinColumns = @JoinColumn(name = "email_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_email_metadata_email_id")))
+	private Map<String, String> metadata;
 
 	@PrePersist
 	void prePersist() {

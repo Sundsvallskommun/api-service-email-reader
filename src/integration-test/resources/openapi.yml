@@ -38,15 +38,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -58,6 +49,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -81,15 +81,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -101,6 +92,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -128,15 +128,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Credentials'
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -148,6 +139,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -169,15 +169,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -189,6 +180,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -227,15 +227,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Email'
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -247,6 +238,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -287,15 +287,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
         "500":
           description: Internal Server Error
           content:
@@ -307,6 +298,15 @@ paths:
                 $ref: '#/components/schemas/Problem'
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -361,6 +361,14 @@ components:
           type: string
           description: Namespace
           example: my.namespace
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: Metadata to add to the email
+            example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+          description: Metadata to add to the email
+          example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
         destinationFolder:
           type: string
           description: The folder to move emails to after processing
@@ -420,6 +428,14 @@ components:
           type: string
           description: E-mail message id
           example: 74531aac-ffea-42cc-8a0a-52715bb27850
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: Metadata for the email
+            example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+          description: Metadata for the email
+          example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
         attachments:
           type: array
           items:
