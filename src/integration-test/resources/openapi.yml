@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "0.1"
 servers:
-  - url: http://localhost:8080
+  - url: http://127.0.0.1:8080
     description: Generated server url
 tags:
   - name: Email
@@ -38,8 +38,8 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -56,8 +56,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -81,8 +81,8 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -99,8 +99,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -128,8 +128,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Credentials'
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -146,8 +146,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -169,8 +169,8 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -187,8 +187,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -227,8 +227,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Email'
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -245,8 +245,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -287,8 +287,8 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -305,8 +305,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -361,6 +361,16 @@ components:
           type: string
           description: Namespace
           example: my.namespace
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: Metadata to add to the email
+            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
+          description: Metadata to add to the email
+          example:
+            casetype: myCaseType
+            key2: value2
         destinationFolder:
           type: string
           description: The folder to move emails to after processing
@@ -388,11 +398,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     Email:
       type: object
       properties:
@@ -420,6 +430,16 @@ components:
           type: string
           description: E-mail message id
           example: 74531aac-ffea-42cc-8a0a-52715bb27850
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+            description: Metadata for the email
+            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
+          description: Metadata for the email
+          example:
+            casetype: myCaseType
+            key2: value2
         attachments:
           type: array
           items:

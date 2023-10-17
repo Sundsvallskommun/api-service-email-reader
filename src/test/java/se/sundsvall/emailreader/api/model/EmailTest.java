@@ -3,6 +3,7 @@ package se.sundsvall.emailreader.api.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +19,7 @@ class EmailTest {
 			.withTo(List.of("someTo"))
 			.withFrom("someFrom")
 			.withMessage("someMessage")
+			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(Email.Attachment.builder()
 				.withName("someName")
 				.withContent("someContent")
@@ -32,6 +34,7 @@ class EmailTest {
 			assertThat(to).isEqualTo("someTo"));
 		assertThat(result.from()).isEqualTo("someFrom");
 		assertThat(result.message()).isEqualTo("someMessage");
+		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> {
 			assertThat(attachment.name()).isEqualTo("someName");
 			assertThat(attachment.contentType()).isEqualTo("someContentType");

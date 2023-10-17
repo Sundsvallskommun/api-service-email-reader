@@ -61,7 +61,7 @@ public class EmailScheduler {
 			result.forEach(email -> {
 
 				try {
-					emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId()));
+					emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
 				} catch (final Exception e) {
 					log.error("Failed to save email", e);
 					return;

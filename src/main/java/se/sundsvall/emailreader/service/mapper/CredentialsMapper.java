@@ -17,6 +17,7 @@ public class CredentialsMapper {
 			.withEmailAddress(credentials.emailAddress())
 			.withDestinationFolder(credentials.destinationFolder())
 			.withPassword(credentials.password())
+			.withMetadata(credentials.metadata())
 			.build();
 	}
 
@@ -28,6 +29,7 @@ public class CredentialsMapper {
 			.withMunicipalityId(entity.getMunicipalityId())
 			.withNamespace(entity.getNamespace())
 			.withUsername(entity.getUsername())
+			.withMetadata(entity.getMetadata())
 			.withDestinationFolder(entity.getDestinationFolder())
 			.build();
 	}
@@ -48,6 +50,7 @@ public class CredentialsMapper {
 		entity.setDestinationFolder(credentials.destinationFolder());
 		entity.setPassword(credentials.password());
 		entity.setEmailAddress(credentials.emailAddress());
+		entity.setMetadata(credentials.metadata());
 
 	}
 
