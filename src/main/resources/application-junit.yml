@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.12:///
+  jpa:
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              action: update
+            scripts:
+              action: create
+              create-target: target/database/generated-schema.sql
+            create-source: metadata
+      hibernate:
+        hbm2ddl:
+          schema-generation:
+            script:
+              append: false
+        format_sql: true
+        
+integration:
+  messaging:
+    base-url: https://api.localhost.se/messaging
+    recipient-adress: someadress@sundsvall.se
+    token-uri: https://api.localhost.se/oauth/token
+    client-id: some-client-id
+    client-secret: some-client-secret

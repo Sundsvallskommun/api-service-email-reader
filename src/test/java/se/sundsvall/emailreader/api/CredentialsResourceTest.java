@@ -48,6 +48,7 @@ class CredentialsResourceTest {
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
 				assertThat(credentials.username()).isEqualTo("someUsername");
+				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(credentials.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
 					assertThat(emailAddress).isEqualTo("someEmailAddress"));
 				assertThat(credentials.password()).isNull();

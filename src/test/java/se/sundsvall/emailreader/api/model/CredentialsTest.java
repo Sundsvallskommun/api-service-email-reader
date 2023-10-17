@@ -18,6 +18,7 @@ class CredentialsTest {
 			.withMunicipalityId("someMunicipalityId")
 			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withUsername("someUsername")
+			.withMetadata(Collections.singletonMap("someKey", "someValue"))
 			.withPassword("somePassword")
 			.withId("someId").build();
 
@@ -29,6 +30,7 @@ class CredentialsTest {
 		assertThat(result.municipalityId()).isEqualTo("someMunicipalityId");
 		assertThat(result.username()).isEqualTo("someUsername");
 		assertThat(result.password()).isEqualTo("somePassword");
+		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
 			assertThat(emailAddress).isEqualTo("someEmailAddress"));
 
@@ -46,6 +48,7 @@ class CredentialsTest {
 			.withUsername("someUsername")
 			.withPassword("somePassword")
 			.withEmailAddress(Collections.singletonList("someEmailAddress"))
+			.withMetadata(Collections.singletonMap("someKey", "someValue"))
 			.withId("someId");
 
 		assertThat(result).isNotNull();
@@ -54,6 +57,7 @@ class CredentialsTest {
 		assertThat(result.domain()).isEqualTo("someDomain");
 		assertThat(result.namespace()).isEqualTo("someNamespace");
 		assertThat(result.municipalityId()).isEqualTo("someMunicipalityId");
+		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.username()).isEqualTo("someUsername");
 		assertThat(result.password()).isEqualTo("somePassword");
 		assertThat(result.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->

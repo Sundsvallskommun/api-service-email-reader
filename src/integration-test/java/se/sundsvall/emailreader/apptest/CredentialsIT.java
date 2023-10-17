@@ -50,6 +50,7 @@ class CredentialsIT extends AbstractAppTest {
 				assertThat(credentials.municipalityId()).isEqualTo("2281");
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.username()).isEqualTo("someUsername");
+				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(credentials.emailAddress()).hasSize(2)
 					.element(0).satisfies(emailAddress -> assertThat(emailAddress)
 						.isEqualTo("inbox1@sundsvall.se"));
@@ -78,7 +79,10 @@ class CredentialsIT extends AbstractAppTest {
 				  "domain": "https://mail.example.com/EWS/Exchange.asmx",
 				  "municipalityId": "2281",
 				  "namespace": "created.namespace",
-				  "destinationFolder": "createdFolder"
+				  "destinationFolder": "createdFolder",
+				  "metadata": {
+				    "someKey": "someValue"
+				  }
 				}"""
 			)
 			.withExpectedResponseStatus(NO_CONTENT)
@@ -95,6 +99,7 @@ class CredentialsIT extends AbstractAppTest {
 		assertThat(result.getDomain()).isEqualTo("https://mail.example.com/EWS/Exchange.asmx");
 		assertThat(result.getMunicipalityId()).isEqualTo("2281");
 		assertThat(result.getNamespace()).isEqualTo("created.namespace");
+		assertThat(result.getMetadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.getDestinationFolder()).isEqualTo("createdFolder");
 		assertThat(result.getId()).isNotNull();
 
@@ -119,7 +124,10 @@ class CredentialsIT extends AbstractAppTest {
 				      ],
 				  "municipalityId": "2281",
 				  "namespace": "updated.namespace",
-				  "destinationFolder": "updatedFolder"
+				  "destinationFolder": "updatedFolder",
+				  "metadata": {
+				    "someKey": "updatedValue"
+				  }
 				}"""
 			)
 			.withExpectedResponseStatus(NO_CONTENT)
@@ -139,6 +147,7 @@ class CredentialsIT extends AbstractAppTest {
 		assertThat(result.getNamespace()).isEqualTo("updated.namespace");
 		assertThat(result.getDestinationFolder()).isEqualTo("updatedFolder");
 		assertThat(result.getId()).isNotNull();
+		assertThat(result.getMetadata()).hasSize(1).containsEntry("someKey", "updatedValue");
 		assertThat(result.getEmailAddress()).isNotNull().hasSize(2).element(0).satisfies(emailAddress -> assertThat(emailAddress)
 			.isEqualTo("myotherupdatedsupportemail@sundsvall.se"));
 

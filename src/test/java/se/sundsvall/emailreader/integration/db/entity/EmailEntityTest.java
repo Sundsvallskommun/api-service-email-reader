@@ -14,6 +14,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.code.beanmatchers.BeanMatchers;
@@ -50,6 +51,7 @@ class EmailEntityTest {
 			.withMessage("someMessage")
 			.withReceivedAt(OffsetDateTime.now())
 			.withCreatedAt(LocalDateTime.now())
+			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(AttachmentEntity.builder()
 				.withName("someName")
 				.withContent("someContent")

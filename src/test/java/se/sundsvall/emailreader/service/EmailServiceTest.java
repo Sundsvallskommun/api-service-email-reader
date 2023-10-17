@@ -55,6 +55,7 @@ class EmailServiceTest {
 			assertThat(to).isEqualTo("someTo"));
 		assertThat(email.from()).isEqualTo("someFrom");
 		assertThat(email.message()).isEqualTo("someMessage");
+		assertThat(email.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 
 		verify(mapper, times(1)).toEmails(anyList());
 		verify(mapper, times(1)).toEmail(any(EmailEntity.class));

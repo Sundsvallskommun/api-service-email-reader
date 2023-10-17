@@ -50,6 +50,7 @@ class CredentialsServiceTest {
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
 				assertThat(credentials.username()).isEqualTo("someUsername");
+				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(credentials.password()).isNull();
 			}
 		);

@@ -4,6 +4,7 @@ package se.sundsvall.emailreader.api.model;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -50,6 +51,9 @@ public record Credentials(
 	@NotEmpty
 	@Schema(description = "Namespace", example = "my.namespace")
 	String namespace,
+
+	@Schema(description = "Metadata to add to the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}")
+	Map<String, String> metadata,
 
 	@NotBlank
 	@Schema(description = "The folder to move emails to after processing", example = "Processed")

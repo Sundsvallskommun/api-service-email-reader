@@ -13,6 +13,7 @@ import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Random;
 
 import com.google.code.beanmatchers.BeanMatchers;
@@ -48,6 +49,7 @@ class CredentialsEntityTest {
 			.withNamespace("someNamespace")
 			.withDestinationFolder("someDestinationFolder")
 			.withCreatedAt(LocalDateTime.now())
+			.withMetadata(Map.of("someKey", "someValue"))
 			.build();
 
 		object.prePersist();
