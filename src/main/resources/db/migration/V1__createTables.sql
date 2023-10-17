@@ -1,78 +1,88 @@
--- Create the 'attachment' table
-CREATE TABLE `attachment`
+create table attachment
 (
-    `created_at`   datetime(6)  DEFAULT NULL,
-    `id`           bigint(20) NOT NULL AUTO_INCREMENT,
-    `content_type` varchar(255) DEFAULT NULL,
-    `name`         varchar(255) DEFAULT NULL,
-    `content`      longtext     DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    created_at   datetime(6),
+    id           bigint not null auto_increment,
+    content_type varchar(255),
+    email_id     varchar(255),
+    name         varchar(255),
+    content      longtext,
+    primary key (id)
+) engine = InnoDB;
 
--- Create the 'credentials' table
-CREATE TABLE `credentials`
+create table credentials
 (
-    `created_at`         datetime(6)  DEFAULT NULL,
-    `destination_folder` varchar(255) DEFAULT NULL,
-    `domain`             varchar(255) DEFAULT NULL,
-    `id`                 varchar(255) NOT NULL,
-    `municipality_id`    varchar(255) DEFAULT NULL,
-    `namespace`          varchar(255) DEFAULT NULL,
-    `password`           varchar(255) DEFAULT NULL,
-    `username`           varchar(255) DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    created_at         datetime(6),
+    destination_folder varchar(255),
+    domain             varchar(255),
+    id                 varchar(255) not null,
+    municipality_id    varchar(255),
+    namespace          varchar(255),
+    password           varchar(255),
+    username           varchar(255),
+    primary key (id)
+) engine = InnoDB;
 
--- Create the 'credentials_entity_email_address' table
-CREATE TABLE `credentials_entity_email_address`
+create table credentials_email_address
 (
-    `credentials_entity_id` varchar(255) NOT NULL,
-    `email_address`         varchar(255) DEFAULT NULL,
-    KEY `fk_credentials_entity` (`credentials_entity_id`),
-    CONSTRAINT `fk_credentials_entity` FOREIGN KEY (`credentials_entity_id`) REFERENCES `credentials` (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    credentials_id varchar(255) not null,
+    email_address  varchar(255)
+) engine = InnoDB;
 
--- Create the 'email' table
-CREATE TABLE `email`
+create table credentials_metadata
 (
-    `created_at`      datetime(6)  DEFAULT NULL,
-    `email_from`      varchar(255) DEFAULT NULL,
-    `id`              varchar(255) NOT NULL,
-    `municipality_id` varchar(255) DEFAULT NULL,
-    `namespace`       varchar(255) DEFAULT NULL,
-    `subject`         varchar(255) DEFAULT NULL,
-    `message`         longtext     DEFAULT NULL,
-    PRIMARY KEY (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    credentials_id varchar(255) not null,
+    metadata       varchar(255),
+    metadata_key   varchar(255) not null,
+    primary key (credentials_id, metadata_key)
+) engine = InnoDB;
 
--- Create the 'email_attachments' table
-CREATE TABLE `email_attachments`
+create table email
 (
-    `attachments_id`  bigint(20)   NOT NULL,
-    `email_entity_id` varchar(255) NOT NULL,
-    UNIQUE KEY `uk_attachment` (`attachments_id`),
-    KEY `fk_email_entity` (`email_entity_id`),
-    CONSTRAINT `fk_attachment` FOREIGN KEY (`attachments_id`) REFERENCES `attachment` (`id`),
-    CONSTRAINT `fk_email_entity` FOREIGN KEY (`email_entity_id`) REFERENCES `email` (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    created_at      datetime(6),
+    email_from      varchar(255),
+    id              varchar(255) not null,
+    municipality_id varchar(255),
+    namespace       varchar(255),
+    subject         varchar(255),
+    message         longtext,
+    primary key (id)
+) engine = InnoDB;
 
--- Create the 'email_entity_to' table
-CREATE TABLE `email_entity_to`
+create table email_metadata
 (
-    `email_entity_id` varchar(255) NOT NULL,
-    `email_to`        varchar(255) DEFAULT NULL,
-    KEY `fk_email_entity_to` (`email_entity_id`),
-    CONSTRAINT `fk_email_entity_to` FOREIGN KEY (`email_entity_id`) REFERENCES `email` (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+    email_id     varchar(255) not null,
+    metadata     varchar(255),
+    metadata_key varchar(255) not null,
+    primary key (email_id, metadata_key)
+) engine = InnoDB;
+
+create table email_to
+(
+    email_id varchar(255) not null,
+    `to`     varchar(255)
+) engine = InnoDB;
+
+alter table if exists attachment
+    add constraint fk_email_attachment_email_id
+        foreign key (email_id)
+            references email (id);
+
+alter table if exists credentials_email_address
+    add constraint fk_credentials_email_address_credentials_id
+        foreign key (credentials_id)
+            references credentials (id);
+
+alter table if exists credentials_metadata
+    add constraint fk_credentials_metadata_credentials_id
+        foreign key (credentials_id)
+            references credentials (id);
+
+alter table if exists email_metadata
+    add constraint fk_email_metadata_email_id
+        foreign key (email_id)
+            references email (id);
+
+alter table if exists email_to
+    add constraint fk_email_to
+        foreign key (email_id)
+            references email (id);

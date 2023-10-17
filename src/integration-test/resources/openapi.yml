@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "0.1"
 servers:
-  - url: http://localhost:8080
+  - url: http://127.0.0.1:8080
     description: Generated server url
 tags:
   - name: Email
@@ -38,8 +38,8 @@ paths:
       responses:
         "204":
           description: No content
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -47,8 +47,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -81,8 +81,8 @@ paths:
       responses:
         "204":
           description: No content
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -90,8 +90,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -128,8 +128,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Credentials'
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -137,8 +137,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -169,8 +169,8 @@ paths:
       responses:
         "204":
           description: No content
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -178,8 +178,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -227,8 +227,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Email'
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -236,8 +236,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -287,8 +287,8 @@ paths:
       responses:
         "204":
           description: No content
-        "500":
-          description: Internal Server Error
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -296,8 +296,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -366,9 +366,11 @@ components:
           additionalProperties:
             type: string
             description: Metadata to add to the email
-            example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
           description: Metadata to add to the email
-          example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+          example:
+            casetype: myCaseType
+            key2: value2
         destinationFolder:
           type: string
           description: The folder to move emails to after processing
@@ -396,11 +398,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     Email:
       type: object
       properties:
@@ -433,9 +435,11 @@ components:
           additionalProperties:
             type: string
             description: Metadata for the email
-            example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
           description: Metadata for the email
-          example: "{\"casetype\":\"myCaseType\", :\"value2\"}"
+          example:
+            casetype: myCaseType
+            key2: value2
         attachments:
           type: array
           items:

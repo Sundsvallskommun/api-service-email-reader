@@ -31,8 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CredentialsEntity {
-
-
+	
 	@Id
 	@UuidGenerator
 	@Column(name = "id")
@@ -45,6 +44,10 @@ public class CredentialsEntity {
 	private String password;
 
 	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "credentials_email_address",
+		joinColumns = @JoinColumn(name = "credentials_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_credentials_email_address_credentials_id")))
 	private List<String> emailAddress;
 
 	@Column(name = "domain")

@@ -40,7 +40,11 @@ public class EmailEntity {
 	private String id;
 
 	@ElementCollection
-	@Column(name = "email_to")
+	@CollectionTable(
+		name = "email_to",
+		joinColumns = @JoinColumn(name = "email_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_email_to")))
 	private List<String> to;
 
 	@Column(name = "email_from")
@@ -59,6 +63,8 @@ public class EmailEntity {
 	private String namespace;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "email_id", referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = "fk_email_attachment_email_id"))
 	private List<AttachmentEntity> attachments;
 
 	@Column(name = "created_at")
