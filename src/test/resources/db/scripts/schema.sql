@@ -35,6 +35,7 @@
 
     create table email (
         created_at datetime(6),
+        received_at datetime(6),
         email_from varchar(255),
         id varchar(255) not null,
         municipality_id varchar(255),

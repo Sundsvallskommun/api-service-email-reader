@@ -1,7 +1,10 @@
 package se.sundsvall.emailreader.api.model;
 
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +22,7 @@ class EmailTest {
 			.withTo(List.of("someTo"))
 			.withFrom("someFrom")
 			.withMessage("someMessage")
+			.withReceivedAt(OffsetDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(Email.Attachment.builder()
 				.withName("someName")
@@ -35,6 +39,7 @@ class EmailTest {
 		assertThat(result.from()).isEqualTo("someFrom");
 		assertThat(result.message()).isEqualTo("someMessage");
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
+		assertThat(result.receivedAt()).isNotNull().isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
 		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> {
 			assertThat(attachment.name()).isEqualTo("someName");
 			assertThat(attachment.contentType()).isEqualTo("someContentType");

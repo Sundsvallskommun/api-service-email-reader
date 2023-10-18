@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.api.model;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ public record Email(
 	@Schema(description = "Metadata for the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}")
 	Map<String, String> metadata,
 
+	@Schema(description = "The date and time the email was received", example = "2021-09-01T12:00:00+02:00")
+	OffsetDateTime receivedAt,
 	@ArraySchema(schema = @Schema(implementation = Attachment.class))
 	List<Attachment> attachments) {
 

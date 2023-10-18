@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -27,6 +28,7 @@ class EmailEntityTest {
 	void testBean() {
 
 		BeanMatchers.registerValueGenerator(LocalDateTime::now, LocalDateTime.class);
+		BeanMatchers.registerValueGenerator(OffsetDateTime::now, OffsetDateTime.class);
 
 		MatcherAssert.assertThat(EmailEntity.class, allOf(
 			hasValidBeanConstructor(),
@@ -47,6 +49,7 @@ class EmailEntityTest {
 			.withFrom("someFrom")
 			.withSubject("someSubject")
 			.withMessage("someMessage")
+			.withReceivedAt(OffsetDateTime.now())
 			.withCreatedAt(LocalDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(AttachmentEntity.builder()
@@ -57,6 +60,7 @@ class EmailEntityTest {
 
 		object.prePersist();
 		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+		assertThat(object.getReceivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
 		Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
 	}
 

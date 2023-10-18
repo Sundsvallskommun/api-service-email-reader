@@ -19,3 +19,11 @@ spring:
             script:
               append: false
         format_sql: true
+        
+integration:
+  messaging:
+    base-url: https://api.localhost.se/messaging
+    recipient-adress: someadress@sundsvall.se
+    token-uri: https://api.localhost.se/oauth/token
+    client-id: some-client-id
+    client-secret: some-client-secret

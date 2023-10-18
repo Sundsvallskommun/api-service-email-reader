@@ -2,6 +2,7 @@ package se.sundsvall.emailreader.integration.db.entity;
 
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,9 @@ public class EmailEntity {
 	@JoinColumn(name = "email_id", referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = "fk_email_attachment_email_id"))
 	private List<AttachmentEntity> attachments;
+
+	@Column(name = "received_at")
+	private OffsetDateTime receivedAt;
 
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;

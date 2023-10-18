@@ -35,6 +35,7 @@ public class EmailMapper {
 			.withMessage(emailEntity.getMessage())
 			.withId(emailEntity.getId())
 			.withAttachments(attachments)
+			.withReceivedAt(emailEntity.getReceivedAt())
 			.withMetadata(emailEntity.getMetadata())
 			.build();
 	}
@@ -54,6 +55,7 @@ public class EmailMapper {
 			.withAttachments(attachmentEntities)
 			.withMunicipalityId(municipalityId)
 			.withNamespace(namespace)
+			.withReceivedAt(email.receivedAt())
 			.withMetadata(metadata)
 			.build();
 	}
