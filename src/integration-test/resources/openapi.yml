@@ -1,34 +1,34 @@
 openapi: 3.0.1
 info:
   title: api-email-reader
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "1.0"
 servers:
-  - url: http://localhost:8080
-    description: Generated server url
+- url: http://localhost:8080
+  description: Generated server url
 tags:
-  - name: Email
-    description: Email
-  - name: Credentials
-    description: Credentials
+- name: Email
+  description: Email
+- name: Credentials
+  description: Credentials
 paths:
   /credentials/{id}:
     put:
       tags:
-        - Credentials
+      - Credentials
       summary: Update credentials
       operationId: update
       parameters:
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       requestBody:
         content:
           application/json:
@@ -67,17 +67,17 @@ paths:
                 $ref: '#/components/schemas/Problem'
     delete:
       tags:
-        - Credentials
+      - Credentials
       summary: Delete credentials by id
       operationId: delete
       parameters:
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
           description: No content
@@ -111,7 +111,7 @@ paths:
   /credentials:
     get:
       tags:
-        - Credentials
+      - Credentials
       summary: Get a list of credentials
       operationId: getAll
       responses:
@@ -157,7 +157,7 @@ paths:
                 $ref: '#/components/schemas/Problem'
     post:
       tags:
-        - Credentials
+      - Credentials
       summary: Create credentials
       operationId: create
       requestBody:
@@ -199,20 +199,20 @@ paths:
   /email:
     get:
       tags:
-        - Email
+      - Email
       summary: Get a list of emails
       operationId: getAllEmails
       parameters:
-        - name: municipalityId
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: namespace
-          in: query
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: namespace
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Ok
@@ -257,7 +257,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -273,17 +273,17 @@ paths:
   /email/{id}:
     delete:
       tags:
-        - Email
+      - Email
       summary: Delete an email by messageID
       operationId: deleteEmail
       parameters:
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
           description: No content
@@ -318,12 +318,12 @@ components:
   schemas:
     Credentials:
       required:
-        - destinationFolder
-        - domain
-        - emailAddress
-        - namespace
-        - password
-        - username
+      - destinationFolder
+      - domain
+      - emailAddress
+      - namespace
+      - password
+      - username
       type: object
       properties:
         id:
@@ -345,8 +345,8 @@ components:
           description: List of email addresses to check for new emails. The provided
             user must have access to these email addresses.
           example:
-            - myothersupportemail@sundsvall.se
-            - mysupportemail@sundsvall.se
+          - myothersupportemail@sundsvall.se
+          - mysupportemail@sundsvall.se
           items:
             type: string
         domain:
@@ -398,23 +398,23 @@ components:
     StatusType:
       type: object
       properties:
+        reasonPhrase:
+          type: string
         statusCode:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     Email:
       type: object
       properties:
-        to:
+        recipients:
           type: array
-          description: My description
+          description: Recipient E-Mail addresses
           example:
-            - myothersupportemail@sundsvall.se
-            - mysupportemail@sundsvall.se
+          - myothersupportemail@sundsvall.se
+          - mysupportemail@sundsvall.se
           items:
             type: string
-        from:
+        sender:
           type: string
           description: Sender E-Mail address
           example: sender@sundsvall.se
@@ -467,4 +467,4 @@ components:
           description: The attachment (file) content as a BASE64-encoded string
           example: aGVsbG8gd29ybGQK
       description: Attachment
-  securitySchemes: { }
+  securitySchemes: {}

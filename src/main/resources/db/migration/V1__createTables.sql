@@ -39,7 +39,7 @@ create table credentials_metadata
 create table email
 (
     created_at      datetime(6),
-    email_from      varchar(255),
+    sender          varchar(255),
     id              varchar(255) not null,
     municipality_id varchar(255),
     namespace       varchar(255),
@@ -56,10 +56,10 @@ create table email_metadata
     primary key (email_id, metadata_key)
 ) engine = InnoDB;
 
-create table email_to
+create table email_recipient
 (
-    email_id varchar(255) not null,
-    `to`     varchar(255)
+    email_id   varchar(255) not null,
+    recipients varchar(255)
 ) engine = InnoDB;
 
 alter table if exists attachment
@@ -82,7 +82,7 @@ alter table if exists email_metadata
         foreign key (email_id)
             references email (id);
 
-alter table if exists email_to
-    add constraint fk_email_to
+alter table if exists email_recipient
+    add constraint fk_email_recipient_email_id
         foreign key (email_id)
             references email (id);

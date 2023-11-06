@@ -19,8 +19,8 @@ class EmailTest {
 		final var result = Email.builder()
 			.withId("someId")
 			.withSubject("someSubject")
-			.withTo(List.of("someTo"))
-			.withFrom("someFrom")
+			.withRecipients(List.of("someRecipient"))
+			.withSender("someSender")
 			.withMessage("someMessage")
 			.withReceivedAt(OffsetDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
@@ -34,9 +34,9 @@ class EmailTest {
 		assertThat(result).isNotNull();
 		assertThat(result.id()).isEqualTo("someId");
 		assertThat(result.subject()).isEqualTo("someSubject");
-		assertThat(result.to()).hasSize(1).element(0).satisfies(to ->
-			assertThat(to).isEqualTo("someTo"));
-		assertThat(result.from()).isEqualTo("someFrom");
+		assertThat(result.recipients()).hasSize(1).element(0).satisfies(recipient ->
+			assertThat(recipient).isEqualTo("someRecipient"));
+		assertThat(result.sender()).isEqualTo("someSender");
 		assertThat(result.message()).isEqualTo("someMessage");
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.receivedAt()).isNotNull().isCloseTo(OffsetDateTime.now(), within(1, SECONDS));

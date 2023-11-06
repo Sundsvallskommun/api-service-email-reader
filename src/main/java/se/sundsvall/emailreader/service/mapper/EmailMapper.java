@@ -30,8 +30,8 @@ public class EmailMapper {
 
 		return Email.builder()
 			.withSubject(emailEntity.getSubject())
-			.withTo(emailEntity.getTo())
-			.withFrom(emailEntity.getFrom())
+			.withRecipients(emailEntity.getRecipients())
+			.withSender(emailEntity.getSender())
 			.withMessage(emailEntity.getMessage())
 			.withId(emailEntity.getId())
 			.withAttachments(attachments)
@@ -49,8 +49,8 @@ public class EmailMapper {
 
 		return EmailEntity.builder()
 			.withSubject(email.subject())
-			.withTo(email.to())
-			.withFrom(email.from())
+			.withRecipients(email.recipients())
+			.withSender(email.sender())
 			.withMessage(email.message())
 			.withAttachments(attachmentEntities)
 			.withMunicipalityId(municipalityId)

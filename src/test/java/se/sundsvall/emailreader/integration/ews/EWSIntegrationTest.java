@@ -76,12 +76,12 @@ class EWSIntegrationTest {
 			"someUsername", "somePassword", "someDomain", "someEmailAdress");
 
 		assertThat(result).isNotNull().hasSize(1);
-		assertThat(result.get(0).from()).isEqualTo("someFrom");
+		assertThat(result.get(0).sender()).isEqualTo("someSender");
 		assertThat(result.get(0).subject()).isEqualTo("someSubject");
 		assertThat(result.get(0).message()).isEqualTo("someMessage");
 		assertThat(result.get(0).id()).isNotEmpty();
-		assertThat(result.get(0).to()).hasSize(1).satisfies(to -> {
-			assertThat(to.get(0)).isEqualTo("someTo");
+		assertThat(result.get(0).recipients()).hasSize(1).satisfies(recipient -> {
+			assertThat(recipient.get(0)).isEqualTo("someRecipient");
 		});
 		assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
 			assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");

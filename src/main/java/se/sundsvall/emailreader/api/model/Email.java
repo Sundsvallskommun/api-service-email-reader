@@ -14,12 +14,12 @@ public record Email(
 
 	@ArraySchema(arraySchema = @Schema(
 		implementation = String.class,
-		description = "My description",
+		description = "Recipient E-Mail addresses",
 		example = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]"))
-	List<String> to,
+	List<String> recipients,
 
 	@Schema(description = "Sender E-Mail address", example = "sender@sundsvall.se")
-	String from,
+	String sender,
 
 	@Schema(description = "E-mail subject", example = "E-mail subject")
 	String subject,

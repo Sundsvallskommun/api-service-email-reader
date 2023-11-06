@@ -1,5 +1,5 @@
 -- Insert into email
-INSERT INTO email (created_at, email_from, id, municipality_id, namespace, subject, message)
+INSERT INTO email (created_at, sender, id, municipality_id, namespace, subject, message)
 VALUES (CURRENT_TIMESTAMP,
         'fromaddress@sundsvall.se',
         '81471222-5798-11e9-ae24-57fa13b361e1',
@@ -9,9 +9,9 @@ VALUES (CURRENT_TIMESTAMP,
         'Hello, this is a sample email.');
 
 -- Insert into email_entity_to
-INSERT INTO email_to (email_id, `to`)
+INSERT INTO email_recipient (email_id, recipients)
 VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'recipient1@sundsvall.se');
-INSERT INTO email_to (email_id, `to`)
+INSERT INTO email_recipient (email_id, recipients)
 VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'recipient2@sundsvall.se');
 
 -- Insert into attachment

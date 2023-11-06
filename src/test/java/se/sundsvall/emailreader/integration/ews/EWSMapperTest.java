@@ -53,9 +53,9 @@ class EWSMapperTest {
 
 		final var result = mapper.toEmail(emailMessage);
 
-		assertThat(result.from()).isEqualTo("sender@example.com");
-		assertThat(result.to()).hasSize(1).satisfies(
-			to -> assertThat(to.get(0)).isEqualTo("recipient@example.com"));
+		assertThat(result.sender()).isEqualTo("sender@example.com");
+		assertThat(result.recipients()).hasSize(1).satisfies(
+			recipient -> assertThat(recipient.get(0)).isEqualTo("recipient@example.com"));
 		assertThat(result.subject()).isEqualTo("Test Email Subject");
 		assertThat(result.message()).isEqualTo("Mocked email body");
 		assertThat(result.receivedAt()).isCloseTo(OffsetDateTime.now(), within(1, java.time.temporal.ChronoUnit.SECONDS));
@@ -93,9 +93,9 @@ class EWSMapperTest {
 
 		final var result = mapper.toEmail(emailMessage);
 
-		assertThat(result.from()).isEqualTo("sender@example.com");
-		assertThat(result.to()).hasSize(1).satisfies(
-			to -> assertThat(to.get(0)).isEqualTo("recipient@example.com"));
+		assertThat(result.sender()).isEqualTo("sender@example.com");
+		assertThat(result.recipients()).hasSize(1).satisfies(
+			recipient -> assertThat(recipient.get(0)).isEqualTo("recipient@example.com"));
 		assertThat(result.subject()).isEqualTo("Test Email Subject");
 		assertThat(result.message()).isEqualTo("Mocked email body");
 		assertThat(result.receivedAt()).isNull();

@@ -1,6 +1,6 @@
 -- Disable foreign key checks
 SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE email_to;
+TRUNCATE TABLE email_recipient;
 TRUNCATE TABLE email;
 TRUNCATE TABLE credentials_email_address;
 TRUNCATE TABLE credentials;

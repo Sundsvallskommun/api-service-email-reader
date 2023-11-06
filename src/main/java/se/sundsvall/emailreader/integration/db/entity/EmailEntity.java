@@ -42,14 +42,14 @@ public class EmailEntity {
 
 	@ElementCollection
 	@CollectionTable(
-		name = "email_to",
+		name = "email_recipient",
 		joinColumns = @JoinColumn(name = "email_id",
 			referencedColumnName = "id",
-			foreignKey = @ForeignKey(name = "fk_email_to")))
-	private List<String> to;
+			foreignKey = @ForeignKey(name = "fk_email_recipient_email_id")))
+	private List<String> recipients;
 
-	@Column(name = "email_from")
-	private String from;
+	@Column(name = "sender")
+	private String sender;
 
 	@Column(name = "subject")
 	private String subject;

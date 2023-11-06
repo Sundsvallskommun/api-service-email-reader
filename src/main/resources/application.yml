@@ -10,6 +10,11 @@ openapi:
 spring:
   application:
     name: api-email-reader
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
   security:
     oauth2:
       client:
@@ -24,3 +29,15 @@ spring:
             token-uri: ${integration.messaging.token-url}
   flyway:
     enabled: true
+
+scheduled:
+  initial-delay: 10000
+  fixed-rate: 10000
+
+  email-age-check:
+    initial-delay: 10000
+    fixed-rate: 1000
+
+properties:
+  credentials:
+    secret-key: ${SECRET_KEY}

@@ -51,6 +51,7 @@ public class EmailScheduler {
 
 	@Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
 	public void checkForNewEmails() {
+		log.info("Checking for new emails");
 
 		credentialsRepository.findAll().forEach(credential -> credential.getEmailAddress().forEach(emailAddress -> {
 

@@ -46,9 +46,9 @@ class EmailResourceTest {
 		assertThat(email).isNotNull();
 		assertThat(email.id()).isEqualTo("someId");
 		assertThat(email.subject()).isEqualTo("someSubject");
-		assertThat(email.to()).hasSize(1).element(0)
-			.satisfies(to -> assertThat(to).isEqualTo("someTo"));
-		assertThat(email.from()).isEqualTo("someFrom");
+		assertThat(email.recipients()).hasSize(1).element(0)
+			.satisfies(recipient -> assertThat(recipient).isEqualTo("someRecipient"));
+		assertThat(email.sender()).isEqualTo("someSender");
 		assertThat(email.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(email.message()).isEqualTo("someMessage");
 		assertThat(email.attachments()).hasSize(1).element(0).satisfies(attachment -> {
