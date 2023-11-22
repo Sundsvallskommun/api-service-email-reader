@@ -5,7 +5,7 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
-import static java.time.LocalDateTime.now;
+import static java.time.OffsetDateTime.now;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -49,8 +49,8 @@ class EmailEntityTest {
 			.withSender("someSender")
 			.withSubject("someSubject")
 			.withMessage("someMessage")
-			.withReceivedAt(OffsetDateTime.now())
-			.withCreatedAt(LocalDateTime.now())
+			.withReceivedAt(now())
+			.withCreatedAt(now())
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(AttachmentEntity.builder()
 				.withName("someName")
@@ -60,7 +60,7 @@ class EmailEntityTest {
 
 		object.prePersist();
 		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
-		assertThat(object.getReceivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
+		assertThat(object.getReceivedAt()).isCloseTo(now(), within(1, SECONDS));
 		Assertions.assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
 	}
 

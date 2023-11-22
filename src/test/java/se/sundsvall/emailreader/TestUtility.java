@@ -1,6 +1,6 @@
 package se.sundsvall.emailreader;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +11,7 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 
-public class TestUtility {
-
+public final class TestUtility {
 
 	public static Credentials createCredentials() {
 		return createCredentialsWithPassword(null);
@@ -72,7 +71,7 @@ public class TestUtility {
 			.withRecipients(List.of("someRecipient"))
 			.withSender("someSender").withMessage("someMessage")
 			.withId("someId")
-			.withCreatedAt(LocalDateTime.now())
+			.withCreatedAt(OffsetDateTime.now())
 			.withNamespace("someNamespace")
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withMunicipalityId("someMunicipalityId")

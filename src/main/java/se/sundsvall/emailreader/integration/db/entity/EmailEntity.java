@@ -1,7 +1,6 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class EmailEntity {
 	private OffsetDateTime receivedAt;
 
 	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	private OffsetDateTime createdAt;
 
 	@ElementCollection
 	@CollectionTable(
@@ -84,7 +83,7 @@ public class EmailEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = LocalDateTime.now();
+		createdAt = OffsetDateTime.now();
 	}
 
 }
