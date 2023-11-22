@@ -35,7 +35,7 @@ public class EWSMapper {
 
 		final var receivedAt = Optional.ofNullable(emailMessage.getDateTimeReceived())
 			.map(Date::toInstant)
-			.map(instant -> instant.atZone(ZoneId.systemDefault()))
+			.map(instant -> instant.atZone(ZoneId.of("Europe/Stockholm")))
 			.map(OffsetDateTime::from)
 			.orElse(null);
 
