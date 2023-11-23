@@ -1,7 +1,8 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
 
-import java.time.LocalDateTime;
+import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
+
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 import org.hibernate.Length;
+import org.hibernate.annotations.TimeZoneStorage;
 import org.hibernate.annotations.UuidGenerator;
 
 import lombok.AccessLevel;
@@ -69,10 +71,12 @@ public class EmailEntity {
 	private List<AttachmentEntity> attachments;
 
 	@Column(name = "received_at")
+	@TimeZoneStorage(NORMALIZE)
 	private OffsetDateTime receivedAt;
 
 	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	@TimeZoneStorage(NORMALIZE)
+	private OffsetDateTime createdAt;
 
 	@ElementCollection
 	@CollectionTable(
@@ -84,7 +88,7 @@ public class EmailEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = LocalDateTime.now();
+		createdAt = OffsetDateTime.now();
 	}
 
 }

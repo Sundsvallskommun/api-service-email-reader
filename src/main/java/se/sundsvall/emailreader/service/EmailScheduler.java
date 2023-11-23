@@ -2,7 +2,7 @@ package se.sundsvall.emailreader.service;
 
 
 import java.text.MessageFormat;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class EmailScheduler {
 	void checkForOldEmails() {
 
 		final var list = emailRepository.findAll().stream()
-			.filter(email -> email.getCreatedAt().isBefore(LocalDateTime.now().minusDays(1)))
+			.filter(email -> email.getCreatedAt().isBefore(OffsetDateTime.now().minusDays(1)))
 			.toList();
 
 		if (!list.isEmpty()) {
