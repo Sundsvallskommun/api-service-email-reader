@@ -23,7 +23,6 @@
 		<!-- Generated sources properties -->
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
-		<openapi-generator-maven-plugin>7.1.0</openapi-generator-maven-plugin>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
 	<dependencies>
@@ -49,10 +48,6 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
@@ -92,7 +87,6 @@
 			<plugin>
 				<groupId>org.openapitools</groupId>
 				<artifactId>openapi-generator-maven-plugin</artifactId>
-				<version>${openapi-generator-maven-plugin}</version>
 				<executions>
 					<execution>
 						<id>email-sender-api</id>
