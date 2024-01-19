@@ -4,6 +4,7 @@ package se.sundsvall.emailreader.service;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -50,6 +51,7 @@ public class EmailScheduler {
 	}
 
 	@Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
+	@SchedulerLock(name = "checkForNewEmails", lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}")
 	public void checkForNewEmails() {
 		log.info("Checking for new emails");
 
