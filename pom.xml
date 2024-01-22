@@ -23,6 +23,7 @@
 		<!-- Generated sources properties -->
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
+		<shedlock.version>5.10.2</shedlock.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
 	<dependencies>
@@ -53,6 +54,17 @@
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-spring</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.javacrumbs.shedlock</groupId>
+			<artifactId>shedlock-provider-jdbc-template</artifactId>
+			<version>${shedlock.version}</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
