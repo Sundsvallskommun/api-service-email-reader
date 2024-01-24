@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "1.1"
 servers:
-  - url: http://localhost:51655
+  - url: http://localhost:54012
     description: Generated server url
 tags:
   - name: Email
@@ -398,11 +398,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     Email:
       type: object
       properties:
@@ -450,10 +450,28 @@ components:
           additionalProperties:
             type: array
             description: The email headers
+            example:
+              IN_REPLY_TO:
+                - reply-to@example.com
+              REFERENCES:
+                - reference1
+                - reference2
+              MESSAGE_ID:
+                - "123456789"
             items:
               type: string
               description: The email headers
+              example: "{\"IN_REPLY_TO\":[\"reply-to@example.com\"],\"REFERENCES\"\
+                :[\"reference1\",\"reference2\"],\"MESSAGE_ID\":[\"123456789\"]}"
           description: The email headers
+          example:
+            IN_REPLY_TO:
+              - reply-to@example.com
+            REFERENCES:
+              - reference1
+              - reference2
+            MESSAGE_ID:
+              - "123456789"
         attachments:
           type: array
           items:
