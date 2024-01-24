@@ -123,7 +123,7 @@ public class EWSIntegration {
 			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
 		}
 
-		return findFoldersResults.getFolders().get(0);
+		return findFoldersResults.getFolders().getFirst();
 	}
 
 }

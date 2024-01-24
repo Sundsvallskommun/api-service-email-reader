@@ -17,6 +17,7 @@ import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 
 @WireMockAppTestSuite(files = "classpath:/EmailIT/", classes = Application.class)
@@ -56,6 +57,7 @@ class EmailIT extends AbstractAppTest {
 						assertThat(attachment.name()).isEqualTo("attachment_name.pdf");
 						assertThat(attachment.contentType()).isEqualTo("application/pdf");
 					});
+				assertThat(email.headers()).hasSize(1).containsEntry(Header.REFERENCES, List.of("someValue", "someOtherValue"));
 			}
 		);
 	}
