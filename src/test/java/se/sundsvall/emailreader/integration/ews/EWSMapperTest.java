@@ -88,11 +88,11 @@ class EWSMapperTest {
 		assertThat(result.headers()).hasSize(3).satisfies(
 			headers -> {
 				assertThat(headers.get(MESSAGE_ID)).hasSize(3).satisfies(
-					messageId -> assertThat(messageId).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					messageId -> assertThat(messageId).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(IN_REPLY_TO)).hasSize(3).satisfies(
-					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(REFERENCES)).hasSize(3).satisfies(
-					references -> assertThat(references).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 			});
 	}
 
@@ -149,11 +149,11 @@ class EWSMapperTest {
 		assertThat(result.headers()).hasSize(3).satisfies(
 			headers -> {
 				assertThat(headers.get(MESSAGE_ID)).hasSize(3).satisfies(
-					messageId -> assertThat(messageId).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					messageId -> assertThat(messageId).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(IN_REPLY_TO)).hasSize(3).satisfies(
-					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(REFERENCES)).hasSize(3).satisfies(
-					references -> assertThat(references).isEqualTo(List.of("Test1@Test1.se", "Test2@Test2.se", "Test3@Test3.se")));
+					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 			});
 	}
 

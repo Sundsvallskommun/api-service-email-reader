@@ -9,8 +9,10 @@ create table email_header
 
 create table email_header_value
 (
-    header_id varchar(255) not null,
-    value     varchar(255)
+    order_index integer      not null,
+    value       varchar(2048),
+    header_id   varchar(255) not null,
+    primary key (order_index, header_id)
 ) engine = InnoDB;
 
 alter table if exists email_header

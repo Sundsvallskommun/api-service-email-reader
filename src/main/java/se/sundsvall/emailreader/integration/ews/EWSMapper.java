@@ -109,7 +109,6 @@ public class EWSMapper {
 		return Optional.ofNullable(input)
 			.map(inputString -> Pattern.compile(" ")
 				.splitAsStream(inputString)
-				.map(string -> string.replaceAll("[<>]", ""))
 				.toList())
 			.orElse(Collections.emptyList());
 	}

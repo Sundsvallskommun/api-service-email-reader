@@ -58,6 +58,6 @@ VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', '81471222-5798-11e9-ae24-57fa13b
         'REFERENCES');
 
 -- Insert into email_header_value
-INSERT INTO email_header_value (header_id, value)
-VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someValue'),
-       ('81471222-5798-11e9-ae24-57fa13b361e1', 'someOtherValue');
+INSERT INTO email_header_value (header_id, value, order_index)
+VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someValue', 0),
+       ('81471222-5798-11e9-ae24-57fa13b361e1', 'someOtherValue', 1);

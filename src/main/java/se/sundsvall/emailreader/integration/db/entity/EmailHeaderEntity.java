@@ -11,6 +11,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
 import org.hibernate.annotations.UuidGenerator;
@@ -43,7 +44,8 @@ public class EmailHeaderEntity {
 	@ElementCollection
 	@CollectionTable(name = "email_header_value", joinColumns = @JoinColumn(name = "header_id", referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = "fk_header_value_header_id")))
-	@Column(name = "value")
+	@Column(name = "value", length = 2048)
+	@OrderColumn(name = "order_index")
 	private List<String> values;
 
 }
