@@ -51,3 +51,13 @@ VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'inbox2@sundsvall.se');
 
 INSERT INTO credentials_metadata (credentials_id, metadata_key, metadata)
 VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someKey', 'someValue');
+
+-- Insert into email_header
+INSERT INTO email_header (email_id, id, header_key)
+VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', '81471222-5798-11e9-ae24-57fa13b361e1',
+        'REFERENCES');
+
+-- Insert into email_header_value
+INSERT INTO email_header_value (header_id, value, order_index)
+VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someValue', 0),
+       ('81471222-5798-11e9-ae24-57fa13b361e1', 'someOtherValue', 1);

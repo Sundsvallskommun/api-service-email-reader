@@ -34,8 +34,13 @@ public record Email(
 
 	@Schema(description = "The date and time the email was received", example = "2021-09-01T12:00:00+02:00")
 	OffsetDateTime receivedAt,
+
+	@Schema(description = "The email headers", example = "{\"IN_REPLY_TO\": [\"reply-to@example.com\"], \"REFERENCES\": [\"reference1\", \"reference2\"], \"MESSAGE_ID\": [\"123456789\"]}")
+	Map<Header, List<String>> headers,
+
 	@ArraySchema(schema = @Schema(implementation = Attachment.class))
 	List<Attachment> attachments) {
+
 
 	@Builder(setterPrefix = "with")
 	@Schema(name = "EmailAttachment", description = "Attachment")
@@ -51,5 +56,6 @@ public record Email(
 		String content) {
 
 	}
+
 
 }

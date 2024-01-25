@@ -76,17 +76,16 @@ class EWSIntegrationTest {
 			"someUsername", "somePassword", "someDomain", "someEmailAdress");
 
 		assertThat(result).isNotNull().hasSize(1);
-		assertThat(result.get(0).sender()).isEqualTo("someSender");
-		assertThat(result.get(0).subject()).isEqualTo("someSubject");
-		assertThat(result.get(0).message()).isEqualTo("someMessage");
-		assertThat(result.get(0).id()).isNotEmpty();
-		assertThat(result.get(0).recipients()).hasSize(1).satisfies(recipient -> {
-			assertThat(recipient.get(0)).isEqualTo("someRecipient");
-		});
-		assertThat(result.get(0).attachments()).hasSize(1).satisfies(attachment -> {
-			assertThat(attachment.get(0).contentType()).isEqualTo("someContentType");
-			assertThat(attachment.get(0).name()).isEqualTo("someName");
-			assertThat(attachment.get(0).content()).isEqualTo("someContent");
+		assertThat(result.getFirst().sender()).isEqualTo("someSender");
+		assertThat(result.getFirst().subject()).isEqualTo("someSubject");
+		assertThat(result.getFirst().message()).isEqualTo("someMessage");
+		assertThat(result.getFirst().id()).isNotEmpty();
+		assertThat(result.getFirst().recipients()).hasSize(1).satisfies(recipient ->
+			assertThat(recipient.getFirst()).isEqualTo("someRecipient"));
+		assertThat(result.getFirst().attachments()).hasSize(1).satisfies(attachment -> {
+			assertThat(attachment.getFirst().contentType()).isEqualTo("someContentType");
+			assertThat(attachment.getFirst().name()).isEqualTo("someName");
+			assertThat(attachment.getFirst().content()).isEqualTo("someContent");
 		});
 
 	}
@@ -108,7 +107,7 @@ class EWSIntegrationTest {
 
 
 	@Test
-	void pageThroughEntireInbox_cantFindFolder(final CapturedOutput output) throws Exception {
+	void pageThroughEntireInbox_cantFindFolder() throws Exception {
 
 		when(mockedService.findFolders(any(FolderId.class),
 			any(SearchFilter.class), any(FolderView.class)))

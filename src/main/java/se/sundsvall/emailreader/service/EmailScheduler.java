@@ -4,7 +4,6 @@ package se.sundsvall.emailreader.service;
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,6 +18,7 @@ import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
 import microsoft.exchange.webservices.data.property.complex.ItemId;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class EmailScheduler {
@@ -34,8 +34,6 @@ public class EmailScheduler {
 	private final EmailRepository emailRepository;
 
 	private final CredentialsRepository credentialsRepository;
-
-	private final EmailMapper emailMapper = new EmailMapper();
 
 	private final EncryptionUtility encryptionUtility;
 
@@ -64,7 +62,7 @@ public class EmailScheduler {
 			result.forEach(email -> {
 
 				try {
-					emailRepository.save(emailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
+					emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
 				} catch (final Exception e) {
 					log.error("Failed to save email", e);
 					return;

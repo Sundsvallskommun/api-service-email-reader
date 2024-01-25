@@ -86,6 +86,11 @@ public class EmailEntity {
 			foreignKey = @ForeignKey(name = "fk_email_metadata_email_id")))
 	private Map<String, String> metadata;
 
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "email_id", referencedColumnName = "id",
+		foreignKey = @ForeignKey(name = "fk_email_header_email_id"))
+	private List<EmailHeaderEntity> headers;
+
 	@PrePersist
 	void prePersist() {
 		createdAt = OffsetDateTime.now();
