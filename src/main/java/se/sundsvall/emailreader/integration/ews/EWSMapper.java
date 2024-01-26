@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,15 +91,13 @@ public class EWSMapper {
 	private Map<Header, List<String>> toHeaders(final EmailMessage emailMessage) {
 
 		try {
-			final var messageId = extractValues(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName()).getValue());
-			final var references = extractValues(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName()).getValue());
-			final var inReplyTo = extractValues(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName()).getValue());
+			final var headers = new EnumMap<Header, List<String>>(Header.class);
 
-			return Map.of(
-				MESSAGE_ID, messageId,
-				REFERENCES, references,
-				IN_REPLY_TO, inReplyTo
-			);
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresent(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.put(REFERENCES, extractValues(value.getValue())));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.put(IN_REPLY_TO, extractValues(value.getValue())));
+
+			return headers;
 		} catch (final Exception e) {
 			log.warn("Could not load headers", e);
 			return Collections.emptyMap();
