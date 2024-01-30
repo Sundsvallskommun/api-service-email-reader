@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import microsoft.exchange.webservices.data.property.complex.ItemId;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
@@ -16,9 +18,6 @@ import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
-
-import microsoft.exchange.webservices.data.property.complex.ItemId;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class EmailScheduler {
@@ -78,6 +77,7 @@ public class EmailScheduler {
 	}
 
 	@Scheduled(initialDelayString = "${scheduled.email-age-check.initial-delay}", fixedRateString = "${scheduled.email-age-check.fixed-rate}")
+	@SchedulerLock(name = "checkForOldEmails", lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}")
 	void checkForOldEmails() {
 
 		final var list = emailRepository.findAll().stream()
