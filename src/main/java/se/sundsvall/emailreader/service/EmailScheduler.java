@@ -3,6 +3,9 @@ package se.sundsvall.emailreader.service;
 
 import java.text.MessageFormat;
 import java.time.OffsetDateTime;
+import java.util.List;
+
+import jakarta.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +14,11 @@ import org.springframework.stereotype.Component;
 
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+
+import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
@@ -57,23 +63,24 @@ public class EmailScheduler {
 			final var result = ewsIntegration
 				.pageThroughEntireInbox(credential.getUsername(), encryptionUtility.decrypt(credential.getPassword()), credential.getDomain(), emailAddress);
 
-
-			result.forEach(email -> {
-
-				try {
-					emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
-				} catch (final Exception e) {
-					log.error("Failed to save email", e);
-					return;
-				}
-
-				try {
-					ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
-				} catch (final Exception e) {
-					log.error("Failed to move email", e);
-				}
-			});
+			handleNewEmails(result, emailAddress, credential);
 		}));
+	}
+
+	void handleNewEmails(final List<Email> emails, final String emailAddress, final CredentialsEntity credential){
+		for(var email : emails){
+			var newEmail = new EmailEntity();
+			try {
+				newEmail = emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
+				if(newEmail.getId() != null){
+					ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
+				}
+			} catch (final Exception e) {
+				log.error("Failed to save email", e);
+				emailRepository.deleteById(newEmail.getId());
+				return;
+			}
+		}
 	}
 
 	@Scheduled(initialDelayString = "${scheduled.email-age-check.initial-delay}", fixedRateString = "${scheduled.email-age-check.fixed-rate}")
