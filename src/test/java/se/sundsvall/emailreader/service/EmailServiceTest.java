@@ -70,8 +70,7 @@ class EmailServiceTest {
 				.containsEntry(Header.IN_REPLY_TO, List.of("someReplyToValue"));
 		});
 
-		verify(mockEmailRepository, times(1))
-			.findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace");
+		verify(mockEmailRepository).findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace");
 		verifyNoMoreInteractions(mockEmailRepository);
 		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
 	}
@@ -93,7 +92,7 @@ class EmailServiceTest {
 
 		assertThat(credentials).hasSize(1);
 
-		verify(mockCredentialsRepository, times(1)).findAll();
+		verify(mockCredentialsRepository).findAll();
 		verifyNoMoreInteractions(mockCredentialsRepository);
 		verifyNoInteractions(mockEmailRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
 	}
@@ -111,7 +110,7 @@ class EmailServiceTest {
 
 		assertThat(emails).hasSize(1);
 
-		verify(mockEwsIntegration, times(1)).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress);
+		verify(mockEwsIntegration).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress);
 		verifyNoMoreInteractions(mockEwsIntegration);
 		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration);
 	}
@@ -127,7 +126,7 @@ class EmailServiceTest {
 
 		assertThat(emails).hasSize(1);
 
-		verify(mockEmailRepository, times(1)).findAll();
+		verify(mockEmailRepository).findAll();
 		verifyNoMoreInteractions(mockEmailRepository);
 		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
 	}
@@ -142,13 +141,23 @@ class EmailServiceTest {
 
 		spy.sendReport();
 
-		verify(spy, times(1)).getOldEmails();
-		verify(spy, times(1)).sendReport();
-		verify(mockEmailRepository, times(1)).findAll();
-		verify(mockMessagingIntegration, times(1)).sendEmail(
+		verify(spy).getOldEmails();
+		verify(spy).sendReport();
+		verify(mockEmailRepository).findAll();
+		verify(mockMessagingIntegration).sendEmail(
 			"EmailReader has detected unhandled emails with the following IDs: [Test!]",
 			"[Warning] EmailReader has detected unhandled emails");
 		verifyNoMoreInteractions(mockMessagingIntegration);
 		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockEncryptionUtility);
+	}
+
+	@Test
+	void saveAndMoveEmail() throws Exception {
+		emailService.saveAndMoveEmail(createEmail(), "someEmail", createCredentialsEntity());
+
+		verify(mockEmailRepository).save(any());
+		verify(mockEwsIntegration).moveEmail(any(), any(), any());
+		verifyNoMoreInteractions(mockEmailRepository, mockEwsIntegration);
+		verifyNoInteractions(mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
 	}
 }

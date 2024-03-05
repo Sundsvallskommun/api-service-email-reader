@@ -18,11 +18,7 @@ public class EmailScheduler {
 		this.emailService = emailService;
 	}
 
-	/**
-	 * This method is scheduled to run at a fixed rate to check for new emails and save them to the
-	 * database. It is also responsible for moving the emails to the processed folder.
-	 */
-	@Scheduled(initialDelayString = "${scheduled.initial-delay}", fixedRateString = "${scheduled.fixed-rate}")
+	@Scheduled(cron = "${scheduled.check-for-new-emails.cron}")
 	@SchedulerLock(name = "checkForNewEmails", lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}")
 	public void checkForNewEmails() {
 		log.info("Checking for new emails");
@@ -39,11 +35,7 @@ public class EmailScheduler {
 		}
 	}
 
-	/**
-	 * This method is scheduled to run at a fixed rate to check for old emails and send a report if
-	 * any old emails are found.
-	 */
-	@Scheduled(initialDelayString = "${scheduled.email-age-check.initial-delay}", fixedRateString = "${scheduled.email-age-check.fixed-rate}")
+	@Scheduled(cron = "${scheduled.check-for-old-emails.cron}")
 	@SchedulerLock(name = "checkForOldEmails", lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}")
 	void checkForOldEmailsAndSendReport() {
 		emailService.sendReport();

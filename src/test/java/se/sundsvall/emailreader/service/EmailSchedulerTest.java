@@ -1,6 +1,9 @@
 package se.sundsvall.emailreader.service;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -37,10 +40,35 @@ class EmailSchedulerTest {
 
 		emailScheduler.checkForNewEmails();
 
-		verify(emailService, times(1)).getAllCredentials();
-		verify(emailService, times(1)).getAllEmailsInInbox(credential, emailAddresses);
-		verify(emailService, times(1)).saveAndMoveEmail(email, emailAddresses, credential);
+		verify(emailService).getAllCredentials();
+		verify(emailService).getAllEmailsInInbox(credential, emailAddresses);
+		verify(emailService).saveAndMoveEmail(email, emailAddresses, credential);
 		verifyNoMoreInteractions(emailService);
+	}
+
+	@Test
+	void checkForNewEmails_noCredentials() throws Exception {
+		when(emailService.getAllCredentials()).thenReturn(List.of());
+
+		emailScheduler.checkForNewEmails();
+
+		verify(emailService).getAllCredentials();
+		verify(emailService, never()).getAllEmailsInInbox(any(), any());
+		verify(emailService, never()).saveAndMoveEmail(any(), any(), any());
+		verifyNoMoreInteractions(emailService);
+	}
+
+	@Test
+	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
+		when(emailService.getAllCredentials()).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
+		when(emailService.getAllEmailsInInbox(any(), any())).thenReturn(List.of(createEmail(), createEmail()));
+		doThrow(new Exception()).when(emailService).saveAndMoveEmail(any(), any(), any());
+
+		emailScheduler.checkForNewEmails();
+
+		verify(emailService, times(1)).getAllCredentials();
+		verify(emailService, times(2)).getAllEmailsInInbox(any(), any());
+		verify(emailService, times(4)).saveAndMoveEmail(any(), any(), any());
 	}
 
 	@Test
@@ -49,7 +77,7 @@ class EmailSchedulerTest {
 
 		emailScheduler.checkForOldEmailsAndSendReport();
 
-		verify(emailService, times(1)).sendReport();
+		verify(emailService).sendReport();
 		verifyNoMoreInteractions(emailService);
 	}
 }

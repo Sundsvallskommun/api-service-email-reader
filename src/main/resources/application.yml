@@ -31,13 +31,13 @@ spring:
     enabled: true
 
 scheduled:
-  initial-delay: 10000
-  fixed-rate: 10000
-
-  email-age-check:
-    initial-delay: 10000
-    fixed-rate: 1000
   shedlock-lock-at-most-for: PT2M
+  check-for-new-emails:
+    cron: "-"
+  check-for-old-emails:
+    cron: "-"
+
+
 properties:
   credentials:
     secret-key: ${SECRET_KEY}
