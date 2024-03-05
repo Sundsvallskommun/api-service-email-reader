@@ -70,7 +70,6 @@ public final class TestUtility {
 	}
 
 	public static EmailEntity createEmailEntity() {
-
 		return EmailEntity.builder()
 			.withSubject("someSubject")
 			.withRecipients(List.of("someRecipient"))
