@@ -19,7 +19,7 @@ spring:
             script:
               append: false
         format_sql: true
-        
+
 integration:
   messaging:
     base-url: https://api.localhost.se/messaging
@@ -27,3 +27,9 @@ integration:
     token-uri: https://api.localhost.se/oauth/token
     client-id: some-client-id
     client-secret: some-client-secret
+
+scheduled:
+  check-for-new-emails:
+    cron: "-"
+  check-for-old-emails:
+    cron: "-"

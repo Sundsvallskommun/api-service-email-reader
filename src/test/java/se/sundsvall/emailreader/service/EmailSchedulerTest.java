@@ -2,9 +2,7 @@ package se.sundsvall.emailreader.service;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -56,19 +54,6 @@ class EmailSchedulerTest {
 		verify(emailService, never()).getAllEmailsInInbox(any(), any());
 		verify(emailService, never()).saveAndMoveEmail(any(), any(), any());
 		verifyNoMoreInteractions(emailService);
-	}
-
-	@Test
-	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
-		when(emailService.getAllCredentials()).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
-		when(emailService.getAllEmailsInInbox(any(), any())).thenReturn(List.of(createEmail(), createEmail()));
-		doThrow(new Exception()).when(emailService).saveAndMoveEmail(any(), any(), any());
-
-		emailScheduler.checkForNewEmails();
-
-		verify(emailService, times(1)).getAllCredentials();
-		verify(emailService, times(2)).getAllEmailsInInbox(any(), any());
-		verify(emailService, times(4)).saveAndMoveEmail(any(), any(), any());
 	}
 
 	@Test

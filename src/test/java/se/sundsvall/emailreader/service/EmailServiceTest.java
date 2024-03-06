@@ -14,6 +14,8 @@ import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,11 +23,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
+import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,6 +121,22 @@ class EmailServiceTest {
 	}
 
 	@Test
+	void getALlEmailsInInbox_decryptionException() {
+		var credentials = createCredentialsEntity();
+		var emailAddress = "someEmailAddress";
+
+		when(mockEncryptionUtility.decrypt("somePassword")).thenThrow(new EncryptionException("someMessage"));
+
+		var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
+
+		assertThat(emails).isEmpty();
+
+		verify(mockEncryptionUtility).decrypt("somePassword");
+		verifyNoMoreInteractions(mockEncryptionUtility);
+		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration);
+	}
+
+	@Test
 	void getOldEmails() {
 		var emailEntity = createEmailEntity();
 		emailEntity.setCreatedAt(emailEntity.getCreatedAt().minusDays(2));
@@ -159,5 +180,11 @@ class EmailServiceTest {
 		verify(mockEwsIntegration).moveEmail(any(), any(), any());
 		verifyNoMoreInteractions(mockEmailRepository, mockEwsIntegration);
 		verifyNoInteractions(mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
+	}
+
+	@Test
+	void hasTransactionalAnnotation() throws Exception {
+		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", Email.class, String.class, CredentialsEntity.class);
+		assertThat(method.getAnnotation(Transactional.class)).isNotNull();
 	}
 }

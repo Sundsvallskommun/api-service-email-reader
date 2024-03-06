@@ -29,15 +29,8 @@ spring:
             token-uri: ${integration.messaging.token-url}
   flyway:
     enabled: true
-
 scheduled:
   shedlock-lock-at-most-for: PT2M
-  check-for-new-emails:
-    cron: "-"
-  check-for-old-emails:
-    cron: "-"
-
-
 properties:
   credentials:
     secret-key: ${SECRET_KEY}
