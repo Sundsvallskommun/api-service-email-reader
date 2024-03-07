@@ -45,11 +45,11 @@ import se.sundsvall.emailreader.service.CredentialsService;
 	responseCode = "502",
 	description = "Bad Gateway",
 	content = @Content(schema = @Schema(implementation = Problem.class)))
-public class CredentialsResource {
+class CredentialsResource {
 
 	private final CredentialsService credentialsService;
 
-	public CredentialsResource(final CredentialsService credentialsService) {
+	CredentialsResource(final CredentialsService credentialsService) {
 		this.credentialsService = credentialsService;
 	}
 

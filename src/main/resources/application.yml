@@ -29,14 +29,7 @@ spring:
             token-uri: ${integration.messaging.token-url}
   flyway:
     enabled: true
-
 scheduled:
-  initial-delay: 10000
-  fixed-rate: 10000
-
-  email-age-check:
-    initial-delay: 10000
-    fixed-rate: 1000
   shedlock-lock-at-most-for: PT2M
 properties:
   credentials:

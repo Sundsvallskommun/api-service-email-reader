@@ -6,5 +6,24 @@ spring:
           schema-generation:
             database:
               action: validate
+  datasource:
+    url: jdbc:tc:mariadb:10.6.12:///
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   flyway:
     enabled: true
+
+integration:
+  messaging:
+    base-url: https://api.localhost.se/messaging
+    recipient-adress: someadress@sundsvall.se
+    token-uri: https://api.localhost.se/oauth/token
+    client-id: some-client-id
+    client-secret: some-client-secret
+scheduled:
+  check-for-new-emails:
+    cron: "-"
+  check-for-old-emails:
+    cron: "-"
+properties:
+  credentials:
+    secret-key: tY2$9dHiu*%EqRLhgUM8X446AF4*eSWV

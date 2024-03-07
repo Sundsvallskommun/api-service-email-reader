@@ -1,16 +1,15 @@
 package se.sundsvall.emailreader.service;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
-import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import java.util.List;
 
@@ -20,154 +19,65 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import se.sundsvall.emailreader.integration.db.CredentialsRepository;
-import se.sundsvall.emailreader.integration.db.EmailRepository;
-import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
-import se.sundsvall.emailreader.integration.ews.EWSIntegration;
-import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
-import se.sundsvall.emailreader.utility.EncryptionUtility;
-
-import microsoft.exchange.webservices.data.property.complex.ItemId;
-
-
 @ExtendWith(MockitoExtension.class)
 class EmailSchedulerTest {
 
-
 	@Mock
-	EncryptionUtility encryptionUtility;
-
-	@Mock
-	private MessagingIntegration messagingIntegration;
-
-	@Mock
-	private EWSIntegration ewsIntegration;
-
-	@Mock
-	private EmailRepository emailRepository;
-
-	@Mock
-	private CredentialsRepository credentialsRepository;
+	private EmailService emailService;
 
 	@InjectMocks
 	private EmailScheduler emailScheduler;
 
-
 	@Test
 	void checkForNewEmails() throws Exception {
+		final var credential = createCredentialsEntity();
+		final var emailAddresses = "someEmailAddress";
+		final var email = createEmail();
 
-		when(credentialsRepository.findAll()).thenReturn(List.of(createCredentialsEntity()));
-
-		when(ewsIntegration.pageThroughEntireInbox(any(String.class),
-			any(String.class), any(String.class), any(String.class)))
-			.thenReturn(List.of(createEmail()));
-
-		when(encryptionUtility.decrypt(any(String.class))).thenReturn("somePassword");
-
-		emailScheduler.checkForNewEmails();
-
-		verify(ewsIntegration, times(1))
-			.pageThroughEntireInbox(
-				any(String.class), any(String.class), any(String.class), any(String.class));
-
-		verify(ewsIntegration, times(1))
-			.moveEmail(any(ItemId.class), any(String.class), any(String.class));
-
-		verify(emailRepository, times(1)).save(any(EmailEntity.class));
-		verify(credentialsRepository, times(1)).findAll();
-		verify(encryptionUtility, times(1)).decrypt(any(String.class));
-		verifyNoMoreInteractions(emailRepository, ewsIntegration, credentialsRepository, encryptionUtility);
-		verifyNoInteractions(messagingIntegration);
-
-	}
-
-	@Test
-	void checkForNewEmailsWithNoCredentials() {
-
-		when(credentialsRepository.findAll()).thenReturn(List.of());
+		when(emailService.getAllCredentials()).thenReturn(List.of(credential));
+		when(emailService.getAllEmailsInInbox(credential, emailAddresses)).thenReturn(List.of(email));
+		doNothing().when(emailService).saveAndMoveEmail(email, emailAddresses, credential);
 
 		emailScheduler.checkForNewEmails();
 
-		verify(credentialsRepository, times(1)).findAll();
-		verifyNoMoreInteractions(emailRepository, ewsIntegration, credentialsRepository, encryptionUtility);
-		verifyNoInteractions(messagingIntegration);
-
+		verify(emailService).getAllCredentials();
+		verify(emailService).getAllEmailsInInbox(credential, emailAddresses);
+		verify(emailService).saveAndMoveEmail(email, emailAddresses, credential);
+		verifyNoMoreInteractions(emailService);
 	}
 
 	@Test
-	void checkForNewEmailsWithDatabaseFault() {
-
-		given(emailRepository.save(any(EmailEntity.class))).willThrow(new RuntimeException("Database error"));
-
-		when(credentialsRepository.findAll()).thenReturn(List.of(createCredentialsEntity()));
-
-		when(ewsIntegration.pageThroughEntireInbox(any(String.class),
-			any(String.class), any(String.class), any(String.class)))
-			.thenReturn(List.of(createEmail()));
-
-		when(encryptionUtility.decrypt(any(String.class))).thenReturn("somePassword");
+	void checkForNewEmails_noCredentials() throws Exception {
+		when(emailService.getAllCredentials()).thenReturn(List.of());
 
 		emailScheduler.checkForNewEmails();
 
-		verify(ewsIntegration, times(1))
-			.pageThroughEntireInbox(
-				any(String.class), any(String.class), any(String.class), any(String.class));
-
-		verify(emailRepository, times(1)).save(any(EmailEntity.class));
-		verify(credentialsRepository, times(1)).findAll();
-		verify(encryptionUtility, times(1)).decrypt(any(String.class));
-		verifyNoMoreInteractions(emailRepository, ewsIntegration, credentialsRepository, encryptionUtility);
-		verifyNoInteractions(messagingIntegration);
+		verify(emailService).getAllCredentials();
+		verify(emailService, never()).getAllEmailsInInbox(any(), any());
+		verify(emailService, never()).saveAndMoveEmail(any(), any(), any());
+		verifyNoMoreInteractions(emailService);
 	}
 
 	@Test
-	void checkForNewEmailsWithMoveFault() throws Exception {
-
-		willAnswer(invocation -> {
-			throw new RuntimeException("Move error");
-		}).given(ewsIntegration).moveEmail(any(ItemId.class), any(String.class), any(String.class));
-
-		when(credentialsRepository.findAll()).thenReturn(List.of(createCredentialsEntity()));
-
-		when(ewsIntegration.pageThroughEntireInbox(any(String.class),
-			any(String.class), any(String.class), any(String.class)))
-			.thenReturn(List.of(createEmail()));
-
-		when(encryptionUtility.decrypt(any(String.class))).thenReturn("somePassword");
+	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
+		when(emailService.getAllCredentials()).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
+		when(emailService.getAllEmailsInInbox(any(), any())).thenReturn(List.of(createEmail(), createEmail()));
+		doThrow(new Exception()).when(emailService).saveAndMoveEmail(any(), any(), any());
 
 		emailScheduler.checkForNewEmails();
 
-		verify(ewsIntegration, times(1))
-			.pageThroughEntireInbox(
-				any(String.class), any(String.class), any(String.class), any(String.class));
-
-		verify(ewsIntegration, times(1))
-			.moveEmail(any(ItemId.class), any(String.class), any(String.class));
-
-		verify(emailRepository, times(1)).save(any(EmailEntity.class));
-		verify(credentialsRepository, times(1)).findAll();
-		verify(encryptionUtility, times(1)).decrypt(any(String.class));
-		verifyNoMoreInteractions(emailRepository, ewsIntegration, credentialsRepository, encryptionUtility);
-		verifyNoInteractions(messagingIntegration);
+		verify(emailService, times(1)).getAllCredentials();
+		verify(emailService, times(2)).getAllEmailsInInbox(any(), any());
+		verify(emailService, times(4)).saveAndMoveEmail(any(), any(), any());
 	}
 
 	@Test
-	void checkForOldEmails() {
+	void checkForOldEmailsAndSendReport() {
+		doNothing().when(emailService).sendReport();
 
-		final var email = createEmailEntity();
-		email.setCreatedAt(email.getCreatedAt().minusDays(2));
+		emailScheduler.checkForOldEmailsAndSendReport();
 
-		final var email2 = createEmailEntity();
-		email2.setCreatedAt(email2.getCreatedAt().minusDays(1));
-		email2.setId("someOtherId");
-		when(emailRepository.findAll()).thenReturn(List.of(email, email2));
-
-		emailScheduler.checkForOldEmails();
-
-		verify(messagingIntegration, times(1)).sendEmail(any(String.class), any(String.class));
-		verify(emailRepository, times(1)).findAll();
-		verifyNoMoreInteractions(messagingIntegration, emailRepository);
-		verifyNoInteractions(ewsIntegration, credentialsRepository, encryptionUtility);
+		verify(emailService).sendReport();
+		verifyNoMoreInteractions(emailService);
 	}
-
 }

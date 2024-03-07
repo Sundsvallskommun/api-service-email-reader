@@ -42,11 +42,11 @@ import se.sundsvall.emailreader.service.EmailService;
 	responseCode = "502",
 	description = "Bad Gateway",
 	content = @Content(schema = @Schema(implementation = Problem.class)))
-public class EmailResource {
+class EmailResource {
 
 	private final EmailService service;
 
-	public EmailResource(final EmailService service) {
+	EmailResource(final EmailService service) {
 		this.service = service;
 	}
 
