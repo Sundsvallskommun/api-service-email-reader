@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
@@ -16,13 +17,18 @@ import java.util.List;
 
 import jakarta.transaction.Transactional;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -34,7 +40,20 @@ import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
 @ExtendWith(MockitoExtension.class)
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = NONE)
+@ActiveProfiles("junit")
+@Sql({
+	"/db/scripts/truncate.sql",
+	"/db/scripts/testdata-junit.sql"
+})
 class EmailServiceTest {
+
+	@Autowired
+	private EmailRepository emailRepository;
+
+	@Autowired
+	private CredentialsRepository credentialsRepository;
 
 	@Mock
 	private EmailRepository mockEmailRepository;
@@ -51,8 +70,12 @@ class EmailServiceTest {
 	@Mock
 	private EncryptionUtility mockEncryptionUtility;
 
-	@InjectMocks
 	private EmailService emailService;
+
+	@BeforeEach
+	void init() {
+		emailService = new EmailService(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
+	}
 
 	@Test
 	void getAllEmails() {
@@ -180,6 +203,23 @@ class EmailServiceTest {
 		verify(mockEwsIntegration).moveEmail(any(), any(), any());
 		verifyNoMoreInteractions(mockEmailRepository, mockEwsIntegration);
 		verifyNoInteractions(mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
+	}
+
+	@Test
+	void saveAndMoveEmailWithoutMockedDB() throws Exception {
+
+		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isEmpty();
+		var service = new EmailService(emailRepository, credentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
+		var credentialsEntity = credentialsRepository.findAll().getFirst();
+
+		service.saveAndMoveEmail(createEmail(), "someEmail", credentialsEntity);
+
+		assertThat(credentialsRepository.findAll().getFirst().getMetadata()).isNotEmpty();
+		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isNotEmpty();
+
+		verify(mockEwsIntegration).moveEmail(any(), any(), any());
+		verifyNoMoreInteractions(mockEwsIntegration);
+		verifyNoInteractions(mockMessagingIntegration, mockEncryptionUtility);
 	}
 
 	@Test
