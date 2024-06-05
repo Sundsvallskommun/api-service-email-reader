@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import jakarta.transaction.Transactional;
@@ -95,7 +96,7 @@ public class EmailService {
 
 	@Transactional
 	public void saveAndMoveEmail(final Email email, final String emailAddress, final CredentialsEntity credential) throws Exception {
-		emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), credential.getMetadata()));
+		emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), new HashMap<>(credential.getMetadata())));
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
 	}
 }
