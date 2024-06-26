@@ -52,4 +52,5 @@ class AttachmentEntityTest {
 		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
 		assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
 	}
+
 }

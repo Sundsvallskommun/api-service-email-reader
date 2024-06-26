@@ -29,15 +29,19 @@ import microsoft.exchange.webservices.data.property.complex.ItemId;
 
 @Service
 public class EmailService {
+
 	private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
 	private static final String EMAIL_SUBJECT = "[Warning] EmailReader has detected unhandled emails";
+
 	private static final String EMAIL_MESSAGE = "EmailReader has detected unhandled emails with the following IDs: {0}";
 
 	private final EmailRepository emailRepository;
+
 	private final CredentialsRepository credentialsRepository;
 
 	private final MessagingIntegration messagingIntegration;
+
 	private final EWSIntegration ewsIntegration;
 
 	private final EncryptionUtility encryptionUtility;
@@ -69,11 +73,11 @@ public class EmailService {
 
 	public List<Email> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress) {
 		try {
-			var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
+			final var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
 			return ewsIntegration.pageThroughEntireInbox(
 				credential.getUsername(), decryptedPassword,
 				credential.getDomain(), emailAddress);
-		} catch (EncryptionException e) {
+		} catch (final EncryptionException e) {
 			log.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
 		}
 		return emptyList();
@@ -99,4 +103,5 @@ public class EmailService {
 		emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), new HashMap<>(credential.getMetadata())));
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
 	}
+
 }

@@ -80,4 +80,5 @@ class EmailSchedulerTest {
 		verify(emailService).sendReport();
 		verifyNoMoreInteractions(emailService);
 	}
+
 }

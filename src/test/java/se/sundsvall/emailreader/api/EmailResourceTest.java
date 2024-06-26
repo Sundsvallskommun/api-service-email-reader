@@ -41,7 +41,7 @@ class EmailResourceTest {
 
 		assertThat(result.getBody()).isNotNull().isNotEmpty().hasSize(1);
 
-		final var email = result.getBody().get(0);
+		final var email = result.getBody().getFirst();
 
 		assertThat(email).isNotNull();
 		assertThat(email.id()).isEqualTo("someId");
