@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class CredentialsEntity {
-	
+
 	@Id
 	@UuidGenerator
 	@Column(name = "id")

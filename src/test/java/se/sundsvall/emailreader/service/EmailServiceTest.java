@@ -23,12 +23,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -116,7 +116,7 @@ class EmailServiceTest {
 	void getAllCredentials() {
 		when(mockCredentialsRepository.findAll()).thenReturn(List.of(createCredentialsEntity()));
 
-		var credentials = emailService.getAllCredentials();
+		final var credentials = emailService.getAllCredentials();
 
 		assertThat(credentials).hasSize(1);
 
@@ -127,14 +127,14 @@ class EmailServiceTest {
 
 	@Test
 	void getAllEmailsInInbox() {
-		var credentials = createCredentialsEntity();
-		var emailAddress = "someEmailAddress";
+		final var credentials = createCredentialsEntity();
+		final var emailAddress = "someEmailAddress";
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenReturn("somePassword");
 		when(mockEwsIntegration.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
 			.thenReturn(List.of(createEmail()));
 
-		var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
+		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
 
 		assertThat(emails).hasSize(1);
 
@@ -145,12 +145,12 @@ class EmailServiceTest {
 
 	@Test
 	void getALlEmailsInInbox_decryptionException() {
-		var credentials = createCredentialsEntity();
-		var emailAddress = "someEmailAddress";
+		final var credentials = createCredentialsEntity();
+		final var emailAddress = "someEmailAddress";
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenThrow(new EncryptionException("someMessage"));
 
-		var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
+		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
 
 		assertThat(emails).isEmpty();
 
@@ -161,12 +161,12 @@ class EmailServiceTest {
 
 	@Test
 	void getOldEmails() {
-		var emailEntity = createEmailEntity();
+		final var emailEntity = createEmailEntity();
 		emailEntity.setCreatedAt(emailEntity.getCreatedAt().minusDays(2));
 
 		when(mockEmailRepository.findAll()).thenReturn(List.of(emailEntity, createEmailEntity(), createEmailEntity()));
 
-		var emails = emailService.getOldEmails();
+		final var emails = emailService.getOldEmails();
 
 		assertThat(emails).hasSize(1);
 
@@ -177,8 +177,8 @@ class EmailServiceTest {
 
 	@Test
 	void sendReport() {
-		var spy = Mockito.spy(emailService);
-		var emailEntity = createEmailEntity();
+		final var spy = Mockito.spy(emailService);
+		final var emailEntity = createEmailEntity();
 		emailEntity.setId("Test!");
 		when(spy.getOldEmails()).thenReturn(List.of(emailEntity));
 		doNothing().when(mockMessagingIntegration).sendEmail(any(), any());
@@ -209,8 +209,8 @@ class EmailServiceTest {
 	void saveAndMoveEmailWithoutMockedDB() throws Exception {
 
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isEmpty();
-		var service = new EmailService(emailRepository, credentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
-		var credentialsEntity = credentialsRepository.findAll().getFirst();
+		final var service = new EmailService(emailRepository, credentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
+		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
 		service.saveAndMoveEmail(createEmail(), "someEmail", credentialsEntity);
 
@@ -227,4 +227,5 @@ class EmailServiceTest {
 		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", Email.class, String.class, CredentialsEntity.class);
 		assertThat(method.getAnnotation(Transactional.class)).isNotNull();
 	}
+
 }

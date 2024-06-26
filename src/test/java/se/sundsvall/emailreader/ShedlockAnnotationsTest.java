@@ -1,7 +1,7 @@
 package se.sundsvall.emailreader;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Fail.fail;
 import static org.zalando.fauxpas.FauxPas.throwingFunction;
 
 import java.lang.reflect.Method;
@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class ShedlockAnnotationsTest {
 			.forEach(set -> this.verifyAnnotations(hasEnableSchedulerLock, set));
 	}
 
-	private boolean hasEnableSchedulerLock(Set<BeanDefinition> candidates) {
+	private boolean hasEnableSchedulerLock(final Set<BeanDefinition> candidates) {
 		return candidates.stream()
 			.map(BeanDefinition::getBeanClassName)
 			.map(throwingFunction(Class::forName))
@@ -42,7 +43,7 @@ class ShedlockAnnotationsTest {
 			.anyMatch(matches -> matches.length > 0);
 	}
 
-	private void verifyAnnotations(boolean hasEnableSchedulerLockAnnotation, Entry<String, List<Method>> entrySet) {
+	private void verifyAnnotations(final boolean hasEnableSchedulerLockAnnotation, final Entry<String, List<Method>> entrySet) {
 		entrySet.getValue().forEach(method -> {
 			// Verify that method annotated with Scheduled is also annotated with SchedulerLock
 			assertThat(method.isAnnotationPresent(SchedulerLock.class))
@@ -70,10 +71,11 @@ class ShedlockAnnotationsTest {
 				// move to the upper class in the hierarchy in search for more methods
 				klazz = klazz.getSuperclass();
 			}
-			return Map.of(candidate.getBeanClassName(), methods);
-		} catch (ClassNotFoundException e) {
+			return Map.of(Objects.requireNonNull(candidate.getBeanClassName()), methods);
+		} catch (final ClassNotFoundException e) {
 			fail("Couldn't traverse class methods as class %s could not be found".formatted(candidate.getBeanClassName()));
 			return Collections.emptyMap();
 		}
 	}
+
 }

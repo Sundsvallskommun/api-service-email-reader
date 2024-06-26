@@ -22,4 +22,5 @@ public class MessagingConfiguration {
 			.withRetryableOAuth2InterceptorForClientRegistration(clientRepository.findByRegistrationId(CLIENT_ID))
 			.composeCustomizersToOne();
 	}
+
 }

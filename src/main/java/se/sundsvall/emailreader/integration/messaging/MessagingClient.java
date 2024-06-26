@@ -13,4 +13,5 @@ public interface MessagingClient {
 
 	@PostMapping("/email")
 	ResponseEntity<Void> sendEmail(EmailRequest request);
+
 }

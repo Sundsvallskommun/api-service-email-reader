@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import se.sundsvall.emailreader.api.model.Email;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
@@ -30,9 +31,13 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
+import okhttp3.internal.connection.Exchange;
 
-
+/**
+ * Exchange Web Services Integration
+ */
 @Service
+@CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
 
 

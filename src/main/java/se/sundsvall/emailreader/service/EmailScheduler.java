@@ -27,7 +27,7 @@ public class EmailScheduler {
 				for (final var email : emailService.getAllEmailsInInbox(credential, address)) {
 					try {
 						emailService.saveAndMoveEmail(email, address, credential);
-					} catch (Exception e) {
+					} catch (final Exception e) {
 						log.error("Failed to handle email with subject: {}", email.subject(), e);
 					}
 				}
@@ -40,4 +40,5 @@ public class EmailScheduler {
 	void checkForOldEmailsAndSendReport() {
 		emailService.sendReport();
 	}
+
 }
