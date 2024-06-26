@@ -31,8 +31,11 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
+import okhttp3.internal.connection.Exchange;
 
-//Exchange Web Services Integration
+/**
+ * Exchange Web Services Integration
+ */
 @Service
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
