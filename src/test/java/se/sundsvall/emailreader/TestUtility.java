@@ -17,7 +17,6 @@ public final class TestUtility {
 
 	public static Credentials createCredentials() {
 		return createCredentialsWithPassword(null);
-
 	}
 
 	public static Credentials createCredentialsWithPassword(final String password) {
@@ -25,7 +24,6 @@ public final class TestUtility {
 			.withDestinationFolder("someDestinationFolder")
 			.withDomain("someDomain")
 			.withNamespace("someNamespace")
-			.withMunicipalityId("someMunicipalityId")
 			.withUsername("someUsername")
 			.withEmailAddress(Collections.singletonList("someEmailAddress"))
 			.withId("someId")

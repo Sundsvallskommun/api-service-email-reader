@@ -2,6 +2,7 @@ package se.sundsvall.emailreader.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -105,9 +106,9 @@ class EmailServiceTest {
 
 	@Test
 	void deleteEmail() {
-		emailService.deleteEmail("someId");
+		emailService.deleteEmail("2281", "someId");
 
-		verify(mockEmailRepository, times(1)).deleteById("someId");
+		verify(mockEmailRepository, times(1)).deleteByMunicipalityIdAndId("2281", "someId");
 		verifyNoMoreInteractions(mockEmailRepository);
 		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
 	}
@@ -181,7 +182,7 @@ class EmailServiceTest {
 		final var emailEntity = createEmailEntity();
 		emailEntity.setId("Test!");
 		when(spy.getOldEmails()).thenReturn(List.of(emailEntity));
-		doNothing().when(mockMessagingIntegration).sendEmail(any(), any());
+		doNothing().when(mockMessagingIntegration).sendEmail(eq("someMunicipalityId"), any(), any());
 
 		spy.sendReport();
 
@@ -189,6 +190,7 @@ class EmailServiceTest {
 		verify(spy).sendReport();
 		verify(mockEmailRepository).findAll();
 		verify(mockMessagingIntegration).sendEmail(
+			"someMunicipalityId",
 			"EmailReader has detected unhandled emails with the following IDs: [Test!]",
 			"[Warning] EmailReader has detected unhandled emails");
 		verifyNoMoreInteractions(mockMessagingIntegration);

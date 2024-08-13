@@ -2,6 +2,7 @@ package se.sundsvall.emailreader.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -65,12 +66,12 @@ class EmailResourceTest {
 	@Test
 	void testDeleteEmail() {
 
-		final var result = emailResource.deleteEmail("someMessageId");
+		final var result = emailResource.deleteEmail("2281", "someMessageId");
 
 		assertThat(result).isNotNull();
 		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
 
-		verify(emailService, times(1)).deleteEmail(any(String.class));
+		verify(emailService, times(1)).deleteEmail(eq("2281"), any(String.class));
 		verifyNoMoreInteractions(emailService);
 	}
 

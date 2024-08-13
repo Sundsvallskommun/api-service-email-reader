@@ -7,16 +7,16 @@ import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 
 public class CredentialsMapper {
 
-	public CredentialsEntity toEntity(final Credentials credentials) {
+	public CredentialsEntity toEntity(final String municipalityId, final Credentials credentials, final String password) {
 
 		return CredentialsEntity.builder()
 			.withDomain(credentials.domain())
-			.withMunicipalityId(credentials.municipalityId())
+			.withMunicipalityId(municipalityId)
 			.withNamespace(credentials.namespace())
 			.withUsername(credentials.username())
 			.withEmailAddress(credentials.emailAddress())
 			.withDestinationFolder(credentials.destinationFolder())
-			.withPassword(credentials.password())
+			.withPassword(password)
 			.withMetadata(credentials.metadata())
 			.build();
 	}
@@ -26,7 +26,6 @@ public class CredentialsMapper {
 			.withId(entity.getId())
 			.withDomain(entity.getDomain())
 			.withEmailAddress(entity.getEmailAddress())
-			.withMunicipalityId(entity.getMunicipalityId())
 			.withNamespace(entity.getNamespace())
 			.withUsername(entity.getUsername())
 			.withMetadata(entity.getMetadata())
@@ -41,14 +40,13 @@ public class CredentialsMapper {
 			.toList();
 	}
 
-	public void updateEntity(final CredentialsEntity entity, final Credentials credentials) {
+	public void updateEntity(final CredentialsEntity entity, final Credentials credentials, final String password) {
 
 		entity.setDomain(credentials.domain());
 		entity.setNamespace(credentials.namespace());
-		entity.setMunicipalityId(credentials.municipalityId());
 		entity.setUsername(credentials.username());
 		entity.setDestinationFolder(credentials.destinationFolder());
-		entity.setPassword(credentials.password());
+		entity.setPassword(password);
 		entity.setEmailAddress(credentials.emailAddress());
 		entity.setMetadata(credentials.metadata());
 

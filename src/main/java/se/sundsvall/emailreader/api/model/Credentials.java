@@ -9,8 +9,6 @@ import java.util.Map;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
-import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -43,10 +41,6 @@ public record Credentials(
 	@NotBlank
 	@Schema(description = "domain for the email server", example = "https://mail.example.com/EWS/Exchange.asmx")
 	String domain,
-
-	@ValidMunicipalityId
-	@Schema(description = "Municipality id", example = "2281")
-	String municipalityId,
 
 	@NotEmpty
 	@Schema(description = "Namespace", example = "my.namespace")

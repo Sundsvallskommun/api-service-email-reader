@@ -63,8 +63,9 @@ public class EmailService {
 		return toEmails(result);
 	}
 
-	public void deleteEmail(final String id) {
-		emailRepository.deleteById(id);
+	@Transactional
+	public void deleteEmail(final String municipalityId, final String id) {
+		emailRepository.deleteByMunicipalityIdAndId(municipalityId, id);
 	}
 
 	public List<CredentialsEntity> getAllCredentials() {
@@ -90,11 +91,23 @@ public class EmailService {
 	}
 
 	public void sendReport() {
-		final var oldEmailIds = getOldEmails().stream()
-			.map(EmailEntity::getId)
-			.toList();
-		if (!oldEmailIds.isEmpty()) {
-			messagingIntegration.sendEmail(format(EMAIL_MESSAGE, oldEmailIds), EMAIL_SUBJECT);
+		final var oldEmails = getOldEmails();
+
+		if (!oldEmails.isEmpty()) {
+			final var municipalityIds = oldEmails.stream()
+				.map(EmailEntity::getMunicipalityId)
+				.distinct()
+				.toList();
+
+			municipalityIds.forEach(municipalityId -> {
+				final var oldEmailIds = oldEmails.stream()
+					.filter(email -> email.getMunicipalityId().equals(municipalityId))
+					.map(EmailEntity::getId)
+					.toList();
+				if (!oldEmailIds.isEmpty()) {
+					messagingIntegration.sendEmail(municipalityId, format(EMAIL_MESSAGE, oldEmailIds), EMAIL_SUBJECT);
+				}
+			});
 		}
 	}
 
