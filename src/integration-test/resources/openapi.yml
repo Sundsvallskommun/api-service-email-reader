@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "1.1"
+  version: "2.0"
 servers:
-  - url: http://localhost:54012
+  - url: http://localhost:55919
     description: Generated server url
 tags:
   - name: Email
@@ -15,13 +15,20 @@ tags:
   - name: Credentials
     description: Credentials
 paths:
-  /credentials/{id}:
+  /{municipalityId}/credentials/{id}:
     put:
       tags:
         - Credentials
-      summary: Update credentials
+      description: Update credentials
       operationId: update
       parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
@@ -33,7 +40,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Credentials'
+              $ref: "#/components/schemas/Credentials"
         required: true
       responses:
         "204":
@@ -43,34 +50,41 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
     delete:
       tags:
         - Credentials
-      summary: Delete credentials by id
+      description: Delete credentials by id
       operationId: delete
       parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
@@ -86,35 +100,70 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-  /credentials:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/credentials:
     get:
       tags:
         - Credentials
-      summary: Get a list of credentials
-      operationId: getAll
+      description: Get a list of credentials
+      operationId: getAllByMunicipalityId
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
       responses:
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
         "200":
           description: Ok
           content:
@@ -122,49 +171,30 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Credentials'
+                  $ref: "#/components/schemas/Credentials"
             application/problem+json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Credentials'
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                  $ref: "#/components/schemas/Credentials"
     post:
       tags:
         - Credentials
-      summary: Create credentials
+      description: Create credentials
       operationId: create
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Credentials'
+              $ref: "#/components/schemas/Credentials"
         required: true
       responses:
         "204":
@@ -174,86 +204,90 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-  /email:
-    get:
-      tags:
-        - Email
-      summary: Get a list of emails
-      operationId: getAllEmails
-      parameters:
-        - name: municipalityId
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: namespace
-          in: query
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          description: Ok
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Email'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Email'
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/email/{namespace}:
+    get:
+      tags:
+        - Email
+      description: Get a list of emails
+      operationId: getAllEmails
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: namespace
+          in: path
+          description: A specific namespace
+          required: true
+          schema:
+            type: string
+          example: CONTACTCENTER
+      responses:
         "500":
           description: Internal Server Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Email"
+            application/problem+json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Email"
   /api-docs:
     get:
       tags:
@@ -270,13 +304,20 @@ paths:
       x-auth-type: None
       x-throttling-tier: Unlimited
       x-wso2-mutual-ssl: Optional
-  /email/{id}:
+  /{municipalityId}/email/{id}:
     delete:
       tags:
         - Email
-      summary: Delete an email by messageID
+      description: Delete an email by id
       operationId: deleteEmail
       parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
@@ -292,28 +333,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Problem'
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                $ref: '#/components/schemas/Problem'
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
 components:
   schemas:
     Credentials:
@@ -353,10 +394,6 @@ components:
           type: string
           description: domain for the email server
           example: https://mail.example.com/EWS/Exchange.asmx
-        municipalityId:
-          type: string
-          description: Municipality id
-          example: "2281"
         namespace:
           type: string
           description: Namespace
@@ -389,12 +426,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
@@ -475,7 +512,7 @@ components:
         attachments:
           type: array
           items:
-            $ref: '#/components/schemas/EmailAttachment'
+            $ref: "#/components/schemas/EmailAttachment"
       description: Email
       readOnly: true
     EmailAttachment:

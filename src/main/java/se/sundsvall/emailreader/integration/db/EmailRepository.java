@@ -11,6 +11,8 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 @CircuitBreaker(name = "emailRepository")
 public interface EmailRepository extends JpaRepository<EmailEntity, String> {
 
-	List<EmailEntity> findByMunicipalityIdAndNamespace(String municipalityId, String namespace);
+	List<EmailEntity> findByMunicipalityIdAndNamespace(final String municipalityId, final String namespace);
+
+	void deleteByMunicipalityIdAndId(final String municipalityId, final String id);
 
 }

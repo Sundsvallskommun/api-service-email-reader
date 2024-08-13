@@ -2,7 +2,7 @@ package se.sundsvall.emailreader.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -26,6 +26,8 @@ import se.sundsvall.emailreader.utility.EncryptionUtility;
 @ExtendWith(MockitoExtension.class)
 class CredentialsServiceTest {
 
+	private static final String MUNICIPALITY_ID = "2281";
+
 	@Mock
 	EncryptionUtility encryptionUtility;
 
@@ -36,11 +38,11 @@ class CredentialsServiceTest {
 	private CredentialsService service;
 
 	@Test
-	void getAllCredentials() {
+	void getCredentialsByMunicipalityId() {
 
-		when(repository.findAll()).thenReturn(List.of(createCredentialsEntity()));
+		when(repository.findAllByMunicipalityId(MUNICIPALITY_ID)).thenReturn(List.of(createCredentialsEntity()));
 
-		final var result = service.getAllCredentials();
+		final var result = service.getCredentialsByMunicipalityId(MUNICIPALITY_ID);
 
 		assertThat(result).isNotNull().isNotEmpty().element(0).satisfies(
 			credentials -> {
@@ -48,7 +50,6 @@ class CredentialsServiceTest {
 				assertThat(credentials.destinationFolder()).isEqualTo("someDestinationFolder");
 				assertThat(credentials.domain()).isEqualTo("someDomain");
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
-				assertThat(credentials.municipalityId()).isEqualTo("someMunicipalityId");
 				assertThat(credentials.username()).isEqualTo("someUsername");
 				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(credentials.password()).isNull();
@@ -63,7 +64,7 @@ class CredentialsServiceTest {
 		when(encryptionUtility.encrypt(any(byte[].class))).thenReturn("someEncryptedPassword");
 
 		final var result = createCredentialsWithPassword("somePassword");
-		service.create(result);
+		service.create(MUNICIPALITY_ID, result);
 
 		verify(encryptionUtility).encrypt(any(byte[].class));
 		verify(repository).save(any(CredentialsEntity.class));
@@ -74,9 +75,9 @@ class CredentialsServiceTest {
 	@Test
 	void delete() {
 
-		service.delete("someId");
+		service.delete(MUNICIPALITY_ID, "someId");
 
-		verify(repository, times(1)).deleteById(any());
+		verify(repository).deleteByMunicipalityIdAndId(eq(MUNICIPALITY_ID), any());
 		verifyNoMoreInteractions(repository);
 		verifyNoInteractions(encryptionUtility);
 	}
@@ -84,13 +85,13 @@ class CredentialsServiceTest {
 	@Test
 	void update() {
 
-		when(repository.findById(any())).thenReturn(java.util.Optional.of(createCredentialsEntity()));
+		when(repository.findByMunicipalityIdAndId(eq(MUNICIPALITY_ID), any())).thenReturn(java.util.Optional.of(createCredentialsEntity()));
 
-		service.update("someId", createCredentialsWithPassword("somePassword"));
+		service.update(MUNICIPALITY_ID, "someId", createCredentialsWithPassword("somePassword"));
 
-		verify(repository, times(1)).findById(any());
-		verify(repository, times(1)).save(any());
-		verify(encryptionUtility, times(1)).encrypt(any());
+		verify(repository).findByMunicipalityIdAndId(eq(MUNICIPALITY_ID), any());
+		verify(repository).save(any());
+		verify(encryptionUtility).encrypt(any());
 		verifyNoMoreInteractions(repository, encryptionUtility);
 	}
 

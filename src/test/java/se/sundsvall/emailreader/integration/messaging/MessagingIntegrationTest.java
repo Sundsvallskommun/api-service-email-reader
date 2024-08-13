@@ -1,7 +1,7 @@
 package se.sundsvall.emailreader.integration.messaging;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -31,11 +31,9 @@ class MessagingIntegrationTest {
 
 		when(properties.getRecipientAdress()).thenReturn("someAddress");
 
-		messagingIntegration.sendEmail("some message", "someSubject");
+		messagingIntegration.sendEmail("2281", "some message", "someSubject");
 
-		verify(messagingClient, times(1))
-			.sendEmail(any(EmailRequest.class));
-
+		verify(messagingClient).sendEmail(eq("2281"), any(EmailRequest.class));
 		verifyNoMoreInteractions(messagingClient);
 	}
 

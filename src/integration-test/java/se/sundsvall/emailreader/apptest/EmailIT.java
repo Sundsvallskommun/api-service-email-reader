@@ -27,6 +27,8 @@ import se.sundsvall.emailreader.integration.db.EmailRepository;
 })
 class EmailIT extends AbstractAppTest {
 
+	private static final String EMAIL_PATH_TEMPLATE = "/%s/email/%s";
+
 	@Autowired
 	EmailRepository emailRepository;
 
@@ -34,7 +36,7 @@ class EmailIT extends AbstractAppTest {
 	void test1_fetchEmails() throws Exception {
 
 		final var response = setupCall()
-			.withServicePath("/email?municipalityId=2281&namespace=myNamespace")
+			.withServicePath(EMAIL_PATH_TEMPLATE.formatted("2281", "myNamespace"))
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse()
@@ -66,7 +68,7 @@ class EmailIT extends AbstractAppTest {
 	void test2_deleteEmail() {
 
 		setupCall()
-			.withServicePath("/email/81471222-5798-11e9-ae24-57fa13b361e1")
+			.withServicePath(EMAIL_PATH_TEMPLATE.formatted("2281", "81471222-5798-11e9-ae24-57fa13b361e1"))
 			.withHttpMethod(DELETE)
 			.withExpectedResponseStatus(NO_CONTENT)
 			.sendRequestAndVerifyResponse();

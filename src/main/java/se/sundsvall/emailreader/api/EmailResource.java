@@ -5,8 +5,6 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 
 import java.util.List;
 
-import jakarta.websocket.server.PathParam;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 
+import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
@@ -30,7 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @Validated
 @Tag(name = "Email", description = "Email")
-@RequestMapping(path = "/email",
+@RequestMapping(path = "/{municipalityId}/email",
 	produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE})
 @ApiResponse(
 	responseCode = "400",
@@ -52,30 +51,26 @@ class EmailResource {
 		this.service = service;
 	}
 
-	@Operation(
-		summary = "Get a list of emails",
-		responses = {
-			@ApiResponse(
-				responseCode = "200",
-				description = "Ok",
-				useReturnTypeSchema = true)
-		})
-	@GetMapping()
-	public ResponseEntity<List<Email>> getAllEmails(@PathParam("municipalityId") final String municipalityId, @PathParam("namespace") final String namespace) {
+	@Operation(description = "Get a list of emails")
+	@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
+	@GetMapping("/{namespace}")
+	ResponseEntity<List<Email>> getAllEmails(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281")
+		@PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "namespace", description = "A specific namespace", example = "CONTACTCENTER")
+		@PathVariable("namespace") final String namespace) {
 		return ResponseEntity.ok(service.getAllEmails(municipalityId, namespace));
 	}
 
-	@Operation(
-		summary = "Delete an email by messageID",
-		responses = {
-			@ApiResponse(
-				responseCode = "204",
-				description = "No content")
-		})
-	@DeleteMapping(path = "{id}")
-	public ResponseEntity<Void> deleteEmail(
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid @PathVariable("id") final String id) {
-		service.deleteEmail(id);
+	@Operation(description = "Delete an email by id")
+	@ApiResponse(responseCode = "204", description = "No content")
+	@DeleteMapping(path = "/{id}")
+	ResponseEntity<Void> deleteEmail(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281")
+		@PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1")
+		@PathVariable("id") @ValidUuid final String id) {
+		service.deleteEmail(municipalityId, id);
 		return ResponseEntity.noContent().build();
 	}
 

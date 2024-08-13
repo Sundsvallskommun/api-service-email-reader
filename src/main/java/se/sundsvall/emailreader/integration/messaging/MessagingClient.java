@@ -4,14 +4,18 @@ import static se.sundsvall.emailreader.integration.messaging.MessagingConfigurat
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import generated.se.sundsvall.messaging.EmailRequest;
 
-@FeignClient(name = CLIENT_ID, url = "${integration.messaging.base-url}", configuration = MessagingConfiguration.class)
+@FeignClient(
+	name = CLIENT_ID,
+	url = "${integration.messaging.base-url}",
+	configuration = MessagingConfiguration.class)
 public interface MessagingClient {
 
-	@PostMapping("/email")
-	ResponseEntity<Void> sendEmail(EmailRequest request);
+	@PostMapping("/{municipalityId}/email")
+	ResponseEntity<Void> sendEmail(@PathVariable final String municipalityId, EmailRequest request);
 
 }

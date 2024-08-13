@@ -3,6 +3,8 @@ package se.sundsvall.emailreader.service;
 
 import java.util.List;
 
+import jakarta.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import se.sundsvall.emailreader.api.model.Credentials;
@@ -24,32 +26,30 @@ public class CredentialsService {
 		this.credentialsRepository = credentialsRepository;
 	}
 
-	public List<Credentials> getAllCredentials() {
+	public List<Credentials> getCredentialsByMunicipalityId(final String municipalityId) {
 
-		return credentialsMapper.toDtos(credentialsRepository.findAll());
+		return credentialsMapper.toDtos(credentialsRepository.findAllByMunicipalityId(municipalityId));
 	}
 
-	public void create(Credentials credentials) {
+	public void create(final String municipalityId, final Credentials credentials) {
+		final var encryptedPassword = encryptionUtility.encrypt(credentials.password().getBytes());
+
+		credentialsRepository.save(credentialsMapper.toEntity(municipalityId, credentials, encryptedPassword));
+	}
+
+	@Transactional
+	public void delete(final String municipalityId, final String id) {
+
+		credentialsRepository.deleteByMunicipalityIdAndId(municipalityId, id);
+	}
+
+	public void update(final String municipalityId, final String id, final Credentials credentials) {
+
+		final var entity = credentialsRepository.findByMunicipalityIdAndId(municipalityId, id).orElseThrow();
 
 		final var encryptedPassword = encryptionUtility.encrypt(credentials.password().getBytes());
-		credentials = credentials.withPassword(encryptedPassword);
 
-		credentialsRepository.save(credentialsMapper.toEntity(credentials));
-	}
-
-	public void delete(final String id) {
-
-		credentialsRepository.deleteById(id);
-	}
-
-	public void update(final String id, Credentials credentials) {
-
-		final var entity = credentialsRepository.findById(id).orElseThrow();
-
-		final var encryptedPassword = encryptionUtility.encrypt(credentials.password().getBytes());
-		credentials = credentials.withPassword(encryptedPassword);
-
-		credentialsMapper.updateEntity(entity, credentials);
+		credentialsMapper.updateEntity(entity, credentials, encryptedPassword);
 
 		credentialsRepository.save(entity);
 

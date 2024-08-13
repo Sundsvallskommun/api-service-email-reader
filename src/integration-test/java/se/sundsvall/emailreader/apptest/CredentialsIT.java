@@ -30,6 +30,9 @@ import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 })
 class CredentialsIT extends AbstractAppTest {
 
+	private static final String CREDENTIALS_PATH_TEMPLATE = "/%s/credentials%s";
+
+
 	@Autowired
 	CredentialsRepository credentialsRepository;
 
@@ -37,7 +40,7 @@ class CredentialsIT extends AbstractAppTest {
 	void test1_fetchCredentials() throws Exception {
 
 		final var response = setupCall()
-			.withServicePath("/credentials?municipalityId=2281&namespace=someNamespace")
+			.withServicePath(CREDENTIALS_PATH_TEMPLATE.formatted("2281", ""))
 			.withHttpMethod(GET)
 			.withExpectedResponseStatus(OK)
 			.sendRequestAndVerifyResponse()
@@ -47,7 +50,6 @@ class CredentialsIT extends AbstractAppTest {
 
 		assertThat(response).hasSize(1).element(0).satisfies(
 			credentials -> {
-				assertThat(credentials.municipalityId()).isEqualTo("2281");
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.username()).isEqualTo("someUsername");
 				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
@@ -66,7 +68,7 @@ class CredentialsIT extends AbstractAppTest {
 	void test2_createCredentials() {
 
 		setupCall()
-			.withServicePath("/credentials")
+			.withServicePath(CREDENTIALS_PATH_TEMPLATE.formatted("2281", ""))
 			.withHttpMethod(POST)
 			.withRequest("""
 				{
@@ -77,7 +79,6 @@ class CredentialsIT extends AbstractAppTest {
 				          "mysupportemail@sundsvall.se"
 				        ],
 				  "domain": "https://mail.example.com/EWS/Exchange.asmx",
-				  "municipalityId": "2281",
 				  "namespace": "created.namespace",
 				  "destinationFolder": "createdFolder",
 				  "metadata": {
@@ -111,7 +112,7 @@ class CredentialsIT extends AbstractAppTest {
 	void test3_updateCredentials() {
 
 		setupCall()
-			.withServicePath("/credentials/81471222-5798-11e9-ae24-57fa13b361e1")
+			.withServicePath(CREDENTIALS_PATH_TEMPLATE.formatted("2281", "/81471222-5798-11e9-ae24-57fa13b361e1"))
 			.withHttpMethod(PUT)
 			.withRequest("""
 				{
@@ -122,7 +123,6 @@ class CredentialsIT extends AbstractAppTest {
 				        "myotherupdatedsupportemail@sundsvall.se",
 				        "myupdatedsupportemail@sundsvall.se"
 				      ],
-				  "municipalityId": "2281",
 				  "namespace": "updated.namespace",
 				  "destinationFolder": "updatedFolder",
 				  "metadata": {
@@ -157,7 +157,7 @@ class CredentialsIT extends AbstractAppTest {
 	void test4_deleteCredentials() {
 
 		setupCall()
-			.withServicePath("/credentials/81471222-5798-11e9-ae24-57fa13b361e1")
+			.withServicePath(CREDENTIALS_PATH_TEMPLATE.formatted("2281", "/81471222-5798-11e9-ae24-57fa13b361e1"))
 			.withHttpMethod(DELETE)
 			.withExpectedResponseStatus(NO_CONTENT)
 			.sendRequestAndVerifyResponse()

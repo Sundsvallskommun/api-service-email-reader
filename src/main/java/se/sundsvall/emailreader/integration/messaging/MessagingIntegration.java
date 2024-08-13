@@ -14,9 +14,9 @@ public class MessagingIntegration {
 		this.properties = properties;
 	}
 
-	public void sendEmail(final String message, final String emailSubject) {
+	public void sendEmail(final String municipalityId, final String message, final String emailSubject) {
 
-		messagingClient.sendEmail(MessagingIntegrationMapper.toRequest(properties.getRecipientAdress(), message, emailSubject));
+		messagingClient.sendEmail(municipalityId, MessagingIntegrationMapper.toRequest(properties.getRecipientAdress(), message, emailSubject));
 	}
 
 }
