@@ -20,6 +20,7 @@ import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,7 +55,9 @@ class EmailResource {
 	@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
 	@GetMapping("/{namespace}")
 	ResponseEntity<List<Email>> getAllEmails(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281")
 		@PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "namespace", description = "A specific namespace", example = "CONTACTCENTER")
 		@PathVariable("namespace") final String namespace) {
 		return ResponseEntity.ok(service.getAllEmails(municipalityId, namespace));
 	}
@@ -63,8 +66,10 @@ class EmailResource {
 	@ApiResponse(responseCode = "204", description = "No content")
 	@DeleteMapping(path = "/{id}")
 	ResponseEntity<Void> deleteEmail(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281")
 		@PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@PathVariable("id") @Schema(description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @ValidUuid final String id) {
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1")
+		@PathVariable("id") @ValidUuid final String id) {
 		service.deleteEmail(municipalityId, id);
 		return ResponseEntity.noContent().build();
 	}

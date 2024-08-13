@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.0"
 servers:
-  - url: http://localhost:55042
+  - url: http://localhost:55919
     description: Generated server url
 tags:
   - name: Email
@@ -24,17 +24,17 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
           required: true
           schema:
             type: string
-            description: Email message ID
-            example: 81471222-5798-11e9-ae24-57fa13b361e1
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       requestBody:
         content:
@@ -54,8 +54,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -63,8 +63,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -80,17 +80,17 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
           required: true
           schema:
             type: string
-            description: Email message ID
-            example: 81471222-5798-11e9-ae24-57fa13b361e1
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
@@ -104,8 +104,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -113,8 +113,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -131,9 +131,11 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
       responses:
         "500":
           description: Internal Server Error
@@ -144,8 +146,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -153,8 +155,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -183,9 +185,11 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
       requestBody:
         content:
           application/json:
@@ -204,8 +208,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -213,8 +217,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -231,14 +235,18 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
         - name: namespace
           in: path
+          description: A specific namespace
           required: true
           schema:
             type: string
+          example: CONTACTCENTER
       responses:
         "500":
           description: Internal Server Error
@@ -249,8 +257,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -258,8 +266,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
@@ -305,17 +313,17 @@ paths:
       parameters:
         - name: municipalityId
           in: path
+          description: Municipality id
           required: true
           schema:
             type: string
+          example: 2281
         - name: id
           in: path
           description: Email message ID
           required: true
           schema:
             type: string
-            description: Email message ID
-            example: 81471222-5798-11e9-ae24-57fa13b361e1
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
@@ -329,8 +337,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -338,8 +346,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "400":
-          description: Bad Request
+        "502":
+          description: Bad Gateway
           content:
             application/json:
               schema:
