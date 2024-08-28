@@ -14,6 +14,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -93,7 +94,7 @@ public class EWSMapper {
 		try {
 			final var headers = new EnumMap<Header, List<String>>(Header.class);
 
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresent(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())), () -> headers.put(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>")));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.put(REFERENCES, extractValues(value.getValue())));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.put(IN_REPLY_TO, extractValues(value.getValue())));
 
