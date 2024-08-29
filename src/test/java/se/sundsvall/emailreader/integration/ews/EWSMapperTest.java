@@ -171,6 +171,7 @@ class EWSMapperTest {
 		when(emailMessage.getSubject()).thenReturn("Test Email Subject");
 		when(emailMessage.getFrom()).thenReturn(new EmailAddress("test", "sender@example.com"));
 		when(emailMessage.getDateTimeReceived()).thenReturn(Date.from(Instant.now()));
+		when(emailMessage.getInternetMessageHeaders()).thenReturn(new InternetMessageHeaderCollection());
 
 
 		// Act
@@ -187,7 +188,7 @@ class EWSMapperTest {
 		assertThat(result.receivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
 		assertThat(result.id()).isNotNull().isNotEmpty();
 		assertThat(result.attachments()).isEmpty();
-		assertThat(result.headers()).isEmpty();
+		assertThat(result.headers()).hasSize(1);
 	}
 
 	@Test
