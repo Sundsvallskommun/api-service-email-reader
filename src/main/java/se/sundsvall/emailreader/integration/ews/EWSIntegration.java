@@ -1,5 +1,7 @@
 package se.sundsvall.emailreader.integration.ews;
 
+import static microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode.HardDelete;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +112,13 @@ public class EWSIntegration {
 			message.setIsRead(true);
 			message.update(ConflictResolutionMode.AutoResolve);
 			message.move(destinationFolder.getId());
+		}
+	}
+
+	public void deleteEmail(final ItemId emailId) throws Exception {
+		final var email = service.bindToItem(emailId, new PropertySet());
+		if (email instanceof final EmailMessage message) {
+			message.delete(HardDelete);
 		}
 	}
 

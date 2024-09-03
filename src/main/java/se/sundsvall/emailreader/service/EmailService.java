@@ -2,11 +2,13 @@ package se.sundsvall.emailreader.service;
 
 import static java.text.MessageFormat.format;
 import static java.util.Collections.emptyList;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.transaction.Transactional;
 
@@ -113,8 +115,20 @@ public class EmailService {
 
 	@Transactional
 	public void saveAndMoveEmail(final Email email, final String emailAddress, final CredentialsEntity credential) throws Exception {
+
+		if(isAutoReply(email)){
+			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.id()));
+			return;
+		}
 		emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), new HashMap<>(credential.getMetadata())));
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
+	}
+
+	boolean isAutoReply(final Email email) {
+		return email.headers().entrySet().stream()
+			.filter(entry -> AUTO_SUBMITTED.getName().equals(entry.getKey().getName()))
+			.flatMap(entry -> entry.getValue().stream())
+			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
 
 }

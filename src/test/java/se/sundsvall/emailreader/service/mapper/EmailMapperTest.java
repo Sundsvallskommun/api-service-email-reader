@@ -84,7 +84,7 @@ class EmailMapperTest {
 	void toEmailEntity() {
 
 		// Arrange
-		final var email = createEmail();
+		final var email = createEmail(null);
 		final var metadata = Map.of("someKey", "someValue");
 		// Act
 		final var result = EmailMapper.toEmailEntity(email, "someNamespace", "someMunicipalityId", metadata);

@@ -32,7 +32,7 @@ class EmailSchedulerTest {
 	void checkForNewEmails() throws Exception {
 		final var credential = createCredentialsEntity();
 		final var emailAddresses = "someEmailAddress";
-		final var email = createEmail();
+		final var email = createEmail(null);
 
 		when(emailService.getAllCredentials()).thenReturn(List.of(credential));
 		when(emailService.getAllEmailsInInbox(credential, emailAddresses)).thenReturn(List.of(email));
@@ -61,7 +61,7 @@ class EmailSchedulerTest {
 	@Test
 	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
 		when(emailService.getAllCredentials()).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
-		when(emailService.getAllEmailsInInbox(any(), any())).thenReturn(List.of(createEmail(), createEmail()));
+		when(emailService.getAllEmailsInInbox(any(), any())).thenReturn(List.of(createEmail(null), createEmail(null)));
 		doThrow(new Exception()).when(emailService).saveAndMoveEmail(any(), any(), any());
 
 		emailScheduler.checkForNewEmails();
