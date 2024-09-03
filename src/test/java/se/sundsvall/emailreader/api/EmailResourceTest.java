@@ -33,7 +33,7 @@ class EmailResourceTest {
 	void testGetAllEmails() {
 
 		when(emailService.getAllEmails(any(String.class), any(String.class)))
-			.thenReturn(List.of(createEmail()));
+			.thenReturn(List.of(createEmail(null)));
 
 		final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
 

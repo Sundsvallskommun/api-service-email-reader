@@ -19,7 +19,9 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import microsoft.exchange.webservices.data.core.ExchangeService;
+import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
+import microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode;
 import microsoft.exchange.webservices.data.core.exception.http.HttpErrorException;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
@@ -70,7 +72,7 @@ class EWSIntegrationTest {
 
 		when(mapper.toEmail(
 			any(EmailMessage.class)))
-			.thenReturn(createEmail());
+			.thenReturn(createEmail(null));
 
 		final var result = ewsIntegration.pageThroughEntireInbox(
 			"someUsername", "somePassword", "someDomain", "someEmailAdress");
@@ -140,6 +142,22 @@ class EWSIntegrationTest {
 
 		verify(mockedService, times(1)).bindToItem(any(ItemId.class), any());
 		verifyNoMoreInteractions(mockedService);
+	}
+
+	@Test
+	void testDeleteEmail() throws Exception {
+		// Arrange
+		final var emailId = new ItemId("123");
+		final var emailMessage = mock(EmailMessage.class);
+
+		when(mockedService.bindToItem(any(ItemId.class), any(PropertySet.class)))
+			.thenReturn(emailMessage);
+
+		// Act
+		ewsIntegration.deleteEmail(emailId);
+
+		// Assert
+		verify(emailMessage, times(1)).delete(DeleteMode.HardDelete);
 	}
 
 	private FindFoldersResults setUpFindFolderResults() throws Exception {

@@ -2,8 +2,10 @@ package se.sundsvall.emailreader;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import se.sundsvall.emailreader.api.model.Credentials;
 import se.sundsvall.emailreader.api.model.Email;
@@ -47,7 +49,13 @@ public final class TestUtility {
 			.build();
 	}
 
-	public static Email createEmail() {
+	public static Email createEmail(final Map<Header, List<String>> headers) {
+
+		final var headerMap = new HashMap<>(Objects.requireNonNullElse(headers, Map.of(
+			Header.MESSAGE_ID, List.of("someValue"),
+			Header.REFERENCES, List.of("someReferenceValue"),
+			Header.IN_REPLY_TO, List.of("someReplyToValue")
+		)));
 
 		return Email.builder()
 			.withId("someId")
@@ -55,9 +63,7 @@ public final class TestUtility {
 			.withRecipients(List.of("someRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
-			.withHeaders(Map.of(Header.MESSAGE_ID, List.of("someValue"),
-				Header.REFERENCES, List.of("someReferenceValue"),
-				Header.IN_REPLY_TO, List.of("someReplyToValue")))
+			.withHeaders(headerMap)
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(Email.Attachment.builder()
 				.withName("someName")

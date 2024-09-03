@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum Header {
 	IN_REPLY_TO("In-Reply-To"),
 	REFERENCES("References"),
-	MESSAGE_ID("Message-ID");
+	MESSAGE_ID("Message-ID"),
+	AUTO_SUBMITTED("Auto-Submitted");
 
 	private final String name;
 

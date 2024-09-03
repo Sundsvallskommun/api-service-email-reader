@@ -14,7 +14,9 @@ import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.transaction.Transactional;
 
@@ -133,7 +135,7 @@ class EmailServiceTest {
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenReturn("somePassword");
 		when(mockEwsIntegration.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
-			.thenReturn(List.of(createEmail()));
+			.thenReturn(List.of(createEmail(null)));
 
 		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
 
@@ -199,7 +201,7 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
-		emailService.saveAndMoveEmail(createEmail(), "someEmail", createCredentialsEntity());
+		emailService.saveAndMoveEmail(createEmail(null), "someEmail", createCredentialsEntity());
 
 		verify(mockEmailRepository).save(any());
 		verify(mockEwsIntegration).moveEmail(any(), any(), any());
@@ -214,7 +216,7 @@ class EmailServiceTest {
 		final var service = new EmailService(emailRepository, credentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
-		service.saveAndMoveEmail(createEmail(), "someEmail", credentialsEntity);
+		service.saveAndMoveEmail(createEmail(null), "someEmail", credentialsEntity);
 
 		assertThat(credentialsRepository.findAll().getFirst().getMetadata()).isNotEmpty();
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isNotEmpty();
@@ -222,6 +224,18 @@ class EmailServiceTest {
 		verify(mockEwsIntegration).moveEmail(any(), any(), any());
 		verifyNoMoreInteractions(mockEwsIntegration);
 		verifyNoInteractions(mockMessagingIntegration, mockEncryptionUtility);
+	}
+
+	@Test
+	void saveAndMoveEmailWithAutoReply() throws Exception {
+
+		final var headers = Map.of(Header.AUTO_SUBMITTED, List.of("auto-replied"));
+		final var email = createEmail(headers);
+		emailService.saveAndMoveEmail(email, "someEmail", createCredentialsEntity());
+
+		verify(mockEwsIntegration).deleteEmail(any());
+		verifyNoMoreInteractions(mockEwsIntegration);
+		verifyNoInteractions(mockEmailRepository,mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
 	}
 
 	@Test
