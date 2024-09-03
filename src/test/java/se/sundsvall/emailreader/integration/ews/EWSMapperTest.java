@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
@@ -85,13 +86,15 @@ class EWSMapperTest {
 				assertThat(attachment.getFirst().contentType()).isEqualTo("text/plain");
 				assertThat(attachment.getFirst().content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
 			});
-		assertThat(result.headers()).hasSize(3).satisfies(
+		assertThat(result.headers()).hasSize(4).satisfies(
 			headers -> {
 				assertThat(headers.get(MESSAGE_ID)).hasSize(3).satisfies(
 					messageId -> assertThat(messageId).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(IN_REPLY_TO)).hasSize(3).satisfies(
 					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(REFERENCES)).hasSize(3).satisfies(
+					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
+				assertThat(headers.get(AUTO_SUBMITTED)).hasSize(3).satisfies(
 					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 			});
 	}
@@ -146,13 +149,15 @@ class EWSMapperTest {
 				assertThat(attachment.getFirst().contentType()).isEqualTo("text/plain");
 				assertThat(attachment.getFirst().content()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
 			});
-		assertThat(result.headers()).hasSize(3).satisfies(
+		assertThat(result.headers()).hasSize(4).satisfies(
 			headers -> {
 				assertThat(headers.get(MESSAGE_ID)).hasSize(3).satisfies(
 					messageId -> assertThat(messageId).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(IN_REPLY_TO)).hasSize(3).satisfies(
 					inReplyTo -> assertThat(inReplyTo).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 				assertThat(headers.get(REFERENCES)).hasSize(3).satisfies(
+					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
+				assertThat(headers.get(AUTO_SUBMITTED)).hasSize(3).satisfies(
 					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 			});
 	}

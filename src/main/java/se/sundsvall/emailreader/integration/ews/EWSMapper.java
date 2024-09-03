@@ -1,6 +1,7 @@
 package se.sundsvall.emailreader.integration.ews;
 
 
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
@@ -97,6 +98,7 @@ public class EWSMapper {
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())), () -> headers.put(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>")));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.put(REFERENCES, extractValues(value.getValue())));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.put(IN_REPLY_TO, extractValues(value.getValue())));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(AUTO_SUBMITTED.getName())).ifPresent(value -> headers.put(AUTO_SUBMITTED, extractValues(value.getValue())));
 
 			return headers;
 		} catch (final Exception e) {
