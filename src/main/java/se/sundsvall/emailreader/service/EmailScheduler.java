@@ -24,6 +24,7 @@ public class EmailScheduler {
 		log.info("Checking for new emails");
 		for (final var credential : emailService.getAllCredentials()) {
 			for (final var address : credential.getEmailAddress()) {
+				log.info("Fetch mails for address '{}'", address);
 				for (final var email : emailService.getAllEmailsInInbox(credential, address)) {
 					try {
 						emailService.saveAndMoveEmail(email, address, credential);
