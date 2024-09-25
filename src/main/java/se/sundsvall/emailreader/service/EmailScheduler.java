@@ -10,7 +10,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 @Component
 public class EmailScheduler {
 
-	private static final Logger log = LoggerFactory.getLogger(EmailScheduler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EmailScheduler.class);
 
 	private final EmailService emailService;
 
@@ -21,15 +21,15 @@ public class EmailScheduler {
 	@Scheduled(cron = "${scheduled.check-for-new-emails.cron}")
 	@SchedulerLock(name = "checkForNewEmails", lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}")
 	public void checkForNewEmails() {
-		log.info("Checking for new emails");
+		LOG.info("Checking for new emails");
 		for (final var credential : emailService.getAllCredentials()) {
 			for (final var address : credential.getEmailAddress()) {
-				log.info("Fetch mails for address '{}'", address);
+				LOG.info("Fetch mails for address '{}'", address);
 				for (final var email : emailService.getAllEmailsInInbox(credential, address)) {
 					try {
 						emailService.saveAndMoveEmail(email, address, credential);
 					} catch (final Exception e) {
-						log.error("Failed to handle email with subject: {}", email.subject(), e);
+						LOG.error("Failed to handle email with subject: {}", email.subject(), e);
 					}
 				}
 			}
@@ -41,5 +41,4 @@ public class EmailScheduler {
 	void checkForOldEmailsAndSendReport() {
 		emailService.sendReport();
 	}
-
 }

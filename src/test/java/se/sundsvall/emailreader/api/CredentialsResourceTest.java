@@ -50,11 +50,9 @@ class CredentialsResourceTest {
 				assertThat(credentials.namespace()).isEqualTo("someNamespace");
 				assertThat(credentials.username()).isEqualTo("someUsername");
 				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
-				assertThat(credentials.emailAddress()).hasSize(1).element(0).satisfies(emailAddress ->
-					assertThat(emailAddress).isEqualTo("someEmailAddress"));
+				assertThat(credentials.emailAddress()).hasSize(1).element(0).satisfies(emailAddress -> assertThat(emailAddress).isEqualTo("someEmailAddress"));
 				assertThat(credentials.password()).isNull();
-			}
-		);
+			});
 
 		verify(service).getCredentialsByMunicipalityId(MUNICIPALITY_ID);
 		verifyNoMoreInteractions(service);
@@ -105,6 +103,4 @@ class CredentialsResourceTest {
 		verify(service).delete(eq(MUNICIPALITY_ID), any(String.class));
 		verifyNoMoreInteractions(service);
 	}
-
-
 }

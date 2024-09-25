@@ -8,10 +8,11 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -30,7 +31,7 @@ class EmailIT extends AbstractAppTest {
 	private static final String EMAIL_PATH_TEMPLATE = "/%s/email/%s";
 
 	@Autowired
-	EmailRepository emailRepository;
+	private EmailRepository emailRepository;
 
 	@Test
 	void test1_fetchEmails() throws Exception {
@@ -60,8 +61,7 @@ class EmailIT extends AbstractAppTest {
 						assertThat(attachment.contentType()).isEqualTo("application/pdf");
 					});
 				assertThat(email.headers()).hasSize(1).containsEntry(Header.REFERENCES, List.of("someValue", "someOtherValue"));
-			}
-		);
+			});
 	}
 
 	@Test
@@ -76,7 +76,6 @@ class EmailIT extends AbstractAppTest {
 		final var result = emailRepository.findAll();
 
 		assertThat(result).isEmpty();
-
 	}
 
 }

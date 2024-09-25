@@ -12,7 +12,6 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 
-
 public final class EmailMapper {
 
 	private EmailMapper() {
@@ -20,7 +19,6 @@ public final class EmailMapper {
 	}
 
 	public static List<Email> toEmails(final List<EmailEntity> emailEntities) {
-
 		return emailEntities.stream()
 			.map(EmailMapper::toEmail)
 			.toList();

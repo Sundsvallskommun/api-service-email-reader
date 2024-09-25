@@ -10,8 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import se.sundsvall.emailreader.api.model.Email;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
@@ -33,7 +31,7 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
-import okhttp3.internal.connection.Exchange;
+import se.sundsvall.emailreader.api.model.Email;
 
 /**
  * Exchange Web Services Integration
@@ -41,7 +39,6 @@ import okhttp3.internal.connection.Exchange;
 @Service
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
-
 
 	private final EWSMapper mapper = new EWSMapper();
 
@@ -51,8 +48,7 @@ public class EWSIntegration {
 
 	private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
 
-	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties,
-		ItemSchema.Body);
+	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
 
 	public EWSIntegration() {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
@@ -68,7 +64,6 @@ public class EWSIntegration {
 
 		final var pageSize = 50;
 		final var view = new ItemView(pageSize);
-
 
 		FindItemsResults<Item> findResults;
 		final var userMailbox = new Mailbox(emailAddress);
@@ -133,7 +128,7 @@ public class EWSIntegration {
 		final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
 		final var findFoldersResults = service.findFolders(folderId, searchFilter, folderView);
 
-		if (findFoldersResults == null || findFoldersResults.getFolders().size() != 1) {
+		if ((findFoldersResults == null) || (findFoldersResults.getFolders().size() != 1)) {
 			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
 		}
 
