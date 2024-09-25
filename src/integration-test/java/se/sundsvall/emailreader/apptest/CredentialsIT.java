@@ -1,6 +1,5 @@
 package se.sundsvall.emailreader.apptest;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -11,10 +10,11 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -32,9 +32,8 @@ class CredentialsIT extends AbstractAppTest {
 
 	private static final String CREDENTIALS_PATH_TEMPLATE = "/%s/credentials%s";
 
-
 	@Autowired
-	CredentialsRepository credentialsRepository;
+	private CredentialsRepository credentialsRepository;
 
 	@Test
 	void test1_fetchCredentials() throws Exception {
@@ -84,14 +83,13 @@ class CredentialsIT extends AbstractAppTest {
 				  "metadata": {
 				    "someKey": "someValue"
 				  }
-				}"""
-			)
+				}""")
 			.withExpectedResponseStatus(NO_CONTENT)
 			.sendRequestAndVerifyResponse()
 			.withExpectedResponseBodyIsNull();
 
 		final var result = credentialsRepository.findAll().stream()
-			.filter(credentials -> credentials.getNamespace().equals("created.namespace"))
+			.filter(credentials -> "created.namespace".equals(credentials.getNamespace()))
 			.findFirst()
 			.orElseThrow();
 
@@ -128,15 +126,13 @@ class CredentialsIT extends AbstractAppTest {
 				  "metadata": {
 				    "someKey": "updatedValue"
 				  }
-				}"""
-			)
+				}""")
 			.withExpectedResponseStatus(NO_CONTENT)
 			.sendRequestAndVerifyResponse()
 			.withExpectedResponseBodyIsNull();
 
-
 		final var result = credentialsRepository.findAll().stream()
-			.filter(credentials -> credentials.getNamespace().equals("updated.namespace"))
+			.filter(credentials -> "updated.namespace".equals(credentials.getNamespace()))
 			.findFirst()
 			.orElseThrow();
 
@@ -150,7 +146,6 @@ class CredentialsIT extends AbstractAppTest {
 		assertThat(result.getMetadata()).hasSize(1).containsEntry("someKey", "updatedValue");
 		assertThat(result.getEmailAddress()).isNotNull().hasSize(2).element(0).satisfies(emailAddress -> assertThat(emailAddress)
 			.isEqualTo("myotherupdatedsupportemail@sundsvall.se"));
-
 	}
 
 	@Test
@@ -168,5 +163,4 @@ class CredentialsIT extends AbstractAppTest {
 		assertThat(result).isEmpty();
 
 	}
-
 }

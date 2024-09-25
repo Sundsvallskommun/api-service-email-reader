@@ -14,11 +14,8 @@ import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.transaction.Transactional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +29,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
+import jakarta.transaction.Transactional;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -235,7 +233,7 @@ class EmailServiceTest {
 
 		verify(mockEwsIntegration).deleteEmail(any());
 		verifyNoMoreInteractions(mockEwsIntegration);
-		verifyNoInteractions(mockEmailRepository,mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
+		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
 	}
 
 	@Test

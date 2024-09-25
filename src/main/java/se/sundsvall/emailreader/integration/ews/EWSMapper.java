@@ -1,6 +1,7 @@
 package se.sundsvall.emailreader.integration.ews;
 
-
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
@@ -9,7 +10,6 @@ import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.List;
@@ -23,13 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import se.sundsvall.emailreader.api.model.Email;
-import se.sundsvall.emailreader.api.model.Header;
-
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.FileAttachment;
+import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.api.model.Header;
 
 @Component
 public class EWSMapper {
@@ -86,7 +85,6 @@ public class EWSMapper {
 		} catch (final Exception e) {
 			log.warn("Could not load attachment", e);
 			return null;
-
 		}
 	}
 
@@ -95,7 +93,8 @@ public class EWSMapper {
 		try {
 			final var headers = new EnumMap<Header, List<String>>(Header.class);
 
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())), () -> headers.put(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>")));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())), () -> headers.put(MESSAGE_ID, List.of("<" + UUID.randomUUID()
+				+ "@randomly-generated>")));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.put(REFERENCES, extractValues(value.getValue())));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.put(IN_REPLY_TO, extractValues(value.getValue())));
 			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(AUTO_SUBMITTED.getName())).ifPresent(value -> headers.put(AUTO_SUBMITTED, extractValues(value.getValue())));
@@ -103,7 +102,7 @@ public class EWSMapper {
 			return headers;
 		} catch (final Exception e) {
 			log.warn("Could not load headers", e);
-			return Collections.emptyMap();
+			return emptyMap();
 		}
 	}
 
@@ -112,7 +111,6 @@ public class EWSMapper {
 			.map(inputString -> Pattern.compile(" ")
 				.splitAsStream(inputString)
 				.toList())
-			.orElse(Collections.emptyList());
+			.orElse(emptyList());
 	}
-
 }

@@ -22,5 +22,4 @@ class HeaderTest {
 		assertThat(MESSAGE_ID.getName()).isEqualTo("Message-ID");
 		assertThat(AUTO_SUBMITTED.getName()).isEqualTo("Auto-Submitted");
 	}
-
 }

@@ -11,12 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import se.sundsvall.emailreader.configuration.CredentialsProperties;
 
-
 @ExtendWith(MockitoExtension.class)
 class EncryptionUtilityTest {
 
 	@Mock
-	CredentialsProperties credentialsProperties;
+	private CredentialsProperties credentialsProperties;
 
 	@InjectMocks
 	private EncryptionUtility encryptionUtility;
@@ -34,5 +33,4 @@ class EncryptionUtilityTest {
 		assertThat(decodedResult).isEqualTo(input);
 
 	}
-
 }

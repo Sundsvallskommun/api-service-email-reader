@@ -22,17 +22,16 @@ import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
-
 @ExtendWith(MockitoExtension.class)
 class CredentialsServiceTest {
 
 	private static final String MUNICIPALITY_ID = "2281";
 
 	@Mock
-	EncryptionUtility encryptionUtility;
+	private EncryptionUtility encryptionUtility;
 
 	@Mock
-	CredentialsRepository repository;
+	private CredentialsRepository repository;
 
 	@InjectMocks
 	private CredentialsService service;
@@ -53,8 +52,7 @@ class CredentialsServiceTest {
 				assertThat(credentials.username()).isEqualTo("someUsername");
 				assertThat(credentials.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(credentials.password()).isNull();
-			}
-		);
+			});
 
 	}
 
@@ -94,5 +92,4 @@ class CredentialsServiceTest {
 		verify(encryptionUtility).encrypt(any());
 		verifyNoMoreInteractions(repository, encryptionUtility);
 	}
-
 }

@@ -35,7 +35,6 @@ public final class TestUtility {
 	}
 
 	public static CredentialsEntity createCredentialsEntity() {
-
 		return CredentialsEntity.builder()
 			.withDestinationFolder("someDestinationFolder")
 			.withDomain("someDomain")
@@ -54,8 +53,7 @@ public final class TestUtility {
 		final var headerMap = new HashMap<>(Objects.requireNonNullElse(headers, Map.of(
 			Header.MESSAGE_ID, List.of("someValue"),
 			Header.REFERENCES, List.of("someReferenceValue"),
-			Header.IN_REPLY_TO, List.of("someReplyToValue")
-		)));
+			Header.IN_REPLY_TO, List.of("someReplyToValue"))));
 
 		return Email.builder()
 			.withId("someId")
@@ -83,8 +81,7 @@ public final class TestUtility {
 			.withHeaders(List.of(
 				EmailHeaderEntity.builder().withHeader(Header.MESSAGE_ID).withValues(List.of("someValue")).build(),
 				EmailHeaderEntity.builder().withHeader(Header.REFERENCES).withValues(List.of("someReferenceValue")).build(),
-				EmailHeaderEntity.builder().withHeader(Header.IN_REPLY_TO).withValues(List.of("someReplyToValue")).build()
-			))
+				EmailHeaderEntity.builder().withHeader(Header.IN_REPLY_TO).withValues(List.of("someReplyToValue")).build()))
 			.withCreatedAt(OffsetDateTime.now())
 			.withNamespace("someNamespace")
 			.withMetadata(Map.of("someKey", "someValue"))
@@ -94,9 +91,7 @@ public final class TestUtility {
 					.withName("someName")
 					.withContent("someContent")
 					.withContentType("someContentType")
-					.build()
-			))
+					.build()))
 			.build();
 	}
-
 }

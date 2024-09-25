@@ -10,11 +10,10 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-
 class EmailTest {
 
 	@Test
-	void testBuilderAndGetters() {
+	void testBuilderMethods() {
 
 		final var result = Email.builder()
 			.withId("someId")
@@ -34,8 +33,7 @@ class EmailTest {
 		assertThat(result).isNotNull();
 		assertThat(result.id()).isEqualTo("someId");
 		assertThat(result.subject()).isEqualTo("someSubject");
-		assertThat(result.recipients()).hasSize(1).element(0).satisfies(recipient ->
-			assertThat(recipient).isEqualTo("someRecipient"));
+		assertThat(result.recipients()).hasSize(1).element(0).satisfies(recipient -> assertThat(recipient).isEqualTo("someRecipient"));
 		assertThat(result.sender()).isEqualTo("someSender");
 		assertThat(result.message()).isEqualTo("someMessage");
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
@@ -47,5 +45,4 @@ class EmailTest {
 		});
 
 	}
-
 }

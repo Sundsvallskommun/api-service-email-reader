@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import se.sundsvall.emailreader.service.EmailService;
 
-
 @ExtendWith(MockitoExtension.class)
 class EmailResourceTest {
 
@@ -60,7 +59,6 @@ class EmailResourceTest {
 
 		verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
 		verifyNoMoreInteractions(emailService);
-
 	}
 
 	@Test
@@ -74,5 +72,4 @@ class EmailResourceTest {
 		verify(emailService, times(1)).deleteEmail(eq("2281"), any(String.class));
 		verifyNoMoreInteractions(emailService);
 	}
-
 }
