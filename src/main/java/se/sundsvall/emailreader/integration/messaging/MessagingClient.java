@@ -6,8 +6,13 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import generated.se.sundsvall.messaging.EmailRequest;
+import generated.se.sundsvall.messaging.MessageResult;
+import generated.se.sundsvall.messaging.SmsRequest;
 
 @FeignClient(
 	name = CLIENT_ID,
@@ -16,6 +21,12 @@ import generated.se.sundsvall.messaging.EmailRequest;
 public interface MessagingClient {
 
 	@PostMapping("/{municipalityId}/email")
-	ResponseEntity<Void> sendEmail(@PathVariable final String municipalityId, EmailRequest request);
+	ResponseEntity<Void> sendEmail(@PathVariable final String municipalityId, final EmailRequest request);
 
+	@PostMapping("/{municipalityId}/sms")
+	MessageResult sendSms(
+		@RequestHeader final String origin,
+		@PathVariable final String municipalityId,
+		@RequestBody final SmsRequest request,
+		@RequestParam final boolean async);
 }
