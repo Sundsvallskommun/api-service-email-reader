@@ -35,6 +35,7 @@ import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 
 import generated.se.sundsvall.messaging.SmsRequest;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,9 +132,12 @@ class EmailSchedulerTest {
 	void checkForNewSmsEmails_NoFailures() throws Exception {
 		var credential = createCredentialsEntity();
 		var emailMessage = mock(EmailMessage.class);
+		var emailAddress = mock(EmailAddress.class);
 		var emailMap = Map.of("Message", "someMessage", "Recipient", "07012345678,07112345678");
 		var resultMap = Map.of("VALID", List.of("+467012345678", "+467112345678"));
 
+		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
+		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
 		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(credential, "someEmailAddress")).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
@@ -143,6 +147,9 @@ class EmailSchedulerTest {
 
 		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvalls Kommun").message("someMessage").mobileNumber("+467012345678"));
 		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvalls Kommun").message("someMessage").mobileNumber("+467112345678"));
+		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");
+		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
 	}
 
@@ -150,9 +157,12 @@ class EmailSchedulerTest {
 	void checkForNewSmsEmails_withFailures() throws Exception {
 		var credential = createCredentialsEntity();
 		var emailMessage = mock(EmailMessage.class);
+		var emailAddress = mock(EmailAddress.class);
 		var emailMap = Map.of("Message", "someMessage", "Recipient", "070123456789,071-23456789");
 		var resultMap = Map.of("VALID", List.of("+4670123456789"), "INVALID", List.of("+4671-23456789"));
 
+		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
+		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
 		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(credential, "someEmailAddress")).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
@@ -168,7 +178,7 @@ class EmailSchedulerTest {
 		});
 
 		verify(emailMessage).reply(messageBodyCaptor.capture(), eq(true));
-		assertThat(messageBodyCaptor.getValue().toString()).isEqualTo(
+		assertThat(messageBodyCaptor.getValue()).hasToString(
 			"""
 				Ditt mejl har hanterats av EmailReader.
 				SMS har skickats till:
@@ -178,6 +188,9 @@ class EmailSchedulerTest {
 				[+4671-23456789]
 				""");
 
+		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");
+		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
 	}
 
@@ -185,18 +198,21 @@ class EmailSchedulerTest {
 	void checkForNewSmsEmails_onlyFailures() throws Exception {
 		var credential = createCredentialsEntity();
 		var emailMessage = mock(EmailMessage.class);
+		var emailAddress = mock(EmailAddress.class);
 		var emailMap = Map.of("Message", "someMessage", "Recipient", "070123456789123123,071-23456789");
 		var resultMap = Map.of("INVALID", List.of("+4670123456789123123", "+4671-23456789"));
 
+		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
+		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
 		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(credential, "someEmailAddress")).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
 		when(ewsIntegrationMock.validateRecipientNumbers(any())).thenReturn(resultMap);
 
 		emailScheduler.checkForNewSmsEmails();
-		
+
 		verify(emailMessage).reply(messageBodyCaptor.capture(), eq(true));
-		assertThat(messageBodyCaptor.getValue().toString()).isEqualTo(
+		assertThat(messageBodyCaptor.getValue()).hasToString(
 			"""
 				Ditt mejl har hanterats av EmailReader.
 				SMS har skickats till:
@@ -206,6 +222,9 @@ class EmailSchedulerTest {
 				%s
 				""".formatted(resultMap.get("VALID"), resultMap.get("INVALID")));
 
+		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");
+		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
 	}
 

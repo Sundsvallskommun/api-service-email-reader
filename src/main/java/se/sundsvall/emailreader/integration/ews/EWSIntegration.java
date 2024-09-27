@@ -46,7 +46,7 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
 
-	private final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);

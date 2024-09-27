@@ -45,7 +45,7 @@ import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 @ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
 class EWSIntegrationTest {
 
-	private final static String EMAIL_MESSAGE_BODY_TEXT = """
+	private static final String EMAIL_MESSAGE_BODY_TEXT = """
 		CustomerId = 123456789
 		User = testUser
 		Password = testPassword
@@ -82,8 +82,7 @@ class EWSIntegrationTest {
 		var result = ewsIntegration.pageThroughEntireInbox(
 			"someUsername", "somePassword", "someDomain", "someEmailAdress");
 
-		assertThat(result).isNotNull().hasSize(1);
-		assertThat(result).isEqualTo(emailMessages);
+		assertThat(result).isNotNull().hasSize(1).isEqualTo(emailMessages);
 	}
 
 	@Test
@@ -167,12 +166,12 @@ class EWSIntegrationTest {
 
 		var resultMap = ewsIntegration.extractValuesEmailMessage(emailMessageMock);
 
-		assertThat(resultMap).isNotNull();
-		assertThat(resultMap.get("CustomerId")).isEqualTo("123456789");
-		assertThat(resultMap.get("User")).isEqualTo("testUser");
-		assertThat(resultMap.get("Password")).isEqualTo("testPassword");
-		assertThat(resultMap.get("Message")).isEqualTo("Nytt lösenord driftkonto: nyttLösenord");
-		assertThat(resultMap.get("Recipient")).isEqualTo("070123456789");
+		assertThat(resultMap).isNotNull()
+			.containsEntry("CustomerId", "123456789")
+			.containsEntry("User", "testUser")
+			.containsEntry("Password", "testPassword")
+			.containsEntry("Message", "Nytt lösenord driftkonto: nyttLösenord")
+			.containsEntry("Recipient", "070123456789");
 
 		verify(emailMessageMock).getBody();
 	}
@@ -184,9 +183,9 @@ class EWSIntegrationTest {
 		var result = ewsIntegration.validateRecipientNumbers(input);
 
 		assertThat(result).isNotNull();
-		assertThat(result).usingRecursiveComparison().isEqualTo(expected);
 		assertThat(result.get("VALID")).isEqualTo(expected.get("VALID"));
 		assertThat(result.get("INVALID")).isEqualTo(expected.get("INVALID"));
+		assertThat(result).usingRecursiveComparison().isEqualTo(expected);
 	}
 
 	private static Stream<Arguments> recipientNumbersProvider() {
