@@ -122,6 +122,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
   /{municipalityId}/credentials:
     get:
       tags:
@@ -226,6 +228,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
   /{municipalityId}/email/{namespace}:
     get:
       tags:
@@ -355,6 +359,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
 components:
   schemas:
     Credentials:
@@ -420,6 +426,8 @@ components:
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
