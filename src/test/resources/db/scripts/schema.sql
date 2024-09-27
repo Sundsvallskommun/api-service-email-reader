@@ -11,6 +11,7 @@
 
     create table credentials (
         created_at datetime(6),
+        action varchar(255),
         destination_folder varchar(255),
         domain varchar(255),
         id varchar(255) not null,

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import generated.se.sundsvall.messaging.EmailRequest;
+import generated.se.sundsvall.messaging.SmsRequest;
 
 @ExtendWith(MockitoExtension.class)
 class MessagingIntegrationTest {
@@ -28,12 +29,22 @@ class MessagingIntegrationTest {
 
 	@Test
 	void sendEmail() {
-
 		when(properties.getRecipientAdress()).thenReturn("someAddress");
 
 		messagingIntegration.sendEmail("2281", "some message", "someSubject");
 
 		verify(messagingClient).sendEmail(eq("2281"), any(EmailRequest.class));
+		verifyNoMoreInteractions(messagingClient);
+	}
+
+	@Test
+	void sendSms() {
+		var municipalityId = "2281";
+		var smsRequest = new SmsRequest().mobileNumber("07012345678");
+
+		messagingIntegration.sendSms(municipalityId, smsRequest);
+
+		verify(messagingClient).sendSms("EMAIL_READER", municipalityId, smsRequest, true);
 		verifyNoMoreInteractions(messagingClient);
 	}
 

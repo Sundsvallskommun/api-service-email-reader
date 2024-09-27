@@ -8,7 +8,6 @@ class EncryptionExceptionTest {
 
 	@Test
 	void testConstructor() {
-
 		final var message = "someMessage";
 
 		assertThat(new EncryptionException("someMessage")).hasMessage(message);
@@ -16,7 +15,6 @@ class EncryptionExceptionTest {
 
 	@Test
 	void testConstructorWithCause() {
-
 		final var message = "someMessage";
 		final var cause = new RuntimeException();
 

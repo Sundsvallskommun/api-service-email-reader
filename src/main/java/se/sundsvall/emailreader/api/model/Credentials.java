@@ -1,6 +1,5 @@
 package se.sundsvall.emailreader.api.model;
 
-
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
 import java.util.List;
@@ -9,11 +8,13 @@ import java.util.Map;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
+import se.sundsvall.dept44.common.validators.annotation.MemberOf;
+import se.sundsvall.emailreader.integration.db.entity.enums.Action;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.With;
-
 
 @With
 @Builder(setterPrefix = "with")
@@ -45,6 +46,10 @@ public record Credentials(
 	@NotEmpty
 	@Schema(description = "Namespace", example = "my.namespace")
 	String namespace,
+
+	@MemberOf(Action.class)
+	@Schema(description = "Action to take for new emails", example = "PERSIST")
+	String action,
 
 	@Schema(description = "Metadata to add to the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}")
 	Map<String, String> metadata,

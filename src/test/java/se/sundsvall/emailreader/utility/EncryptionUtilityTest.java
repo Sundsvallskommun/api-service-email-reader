@@ -22,7 +22,6 @@ class EncryptionUtilityTest {
 
 	@Test
 	void encryptAndDecrypt() {
-
 		final var input = "someInput";
 
 		when(credentialsProperties.secretKey()).thenReturn("WbVG8XC%m&9Z!7a$xyKGWzB^#kUSoUUs");

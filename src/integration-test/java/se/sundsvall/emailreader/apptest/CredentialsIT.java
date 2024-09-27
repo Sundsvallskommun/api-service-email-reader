@@ -10,11 +10,10 @@ import static org.springframework.http.HttpStatus.OK;
 
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
@@ -80,6 +79,7 @@ class CredentialsIT extends AbstractAppTest {
 				  "domain": "https://mail.example.com/EWS/Exchange.asmx",
 				  "namespace": "created.namespace",
 				  "destinationFolder": "createdFolder",
+				  "action": "PERSIST",
 				  "metadata": {
 				    "someKey": "someValue"
 				  }
@@ -122,6 +122,7 @@ class CredentialsIT extends AbstractAppTest {
 				        "myupdatedsupportemail@sundsvall.se"
 				      ],
 				  "namespace": "updated.namespace",
+				  "action": "PERSIST",
 				  "destinationFolder": "updatedFolder",
 				  "metadata": {
 				    "someKey": "updatedValue"

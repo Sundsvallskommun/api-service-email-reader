@@ -4,11 +4,17 @@ import static microsoft.exchange.webservices.data.core.enumeration.service.Delet
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstraintValidator;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import microsoft.exchange.webservices.data.core.ExchangeService;
@@ -18,6 +24,7 @@ import microsoft.exchange.webservices.data.core.enumeration.property.BasePropert
 import microsoft.exchange.webservices.data.core.enumeration.property.BodyType;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.enumeration.service.ConflictResolutionMode;
+import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
@@ -31,7 +38,6 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
-import se.sundsvall.emailreader.api.model.Email;
 
 /**
  * Exchange Web Services Integration
@@ -40,27 +46,23 @@ import se.sundsvall.emailreader.api.model.Email;
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
 
-	private final EWSMapper mapper = new EWSMapper();
+	private final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 
 	private final FolderView folderView = new FolderView(10);
-
-	private final ExchangeService service = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
-
-	private final Logger log = LoggerFactory.getLogger(EWSIntegration.class);
-
+	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
 
 	public EWSIntegration() {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
 	}
 
-	public List<Email> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress) {
+	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress) {
 
 		// These properties should be replaced with credentials from the database in a later step
-		this.service.setCredentials(new WebCredentials(username, password));
-		this.service.setUrl(URI.create(domain));
+		exchangeService.setCredentials(new WebCredentials(username, password));
+		exchangeService.setUrl(URI.create(domain));
 
-		final var emails = new ArrayList<Email>();
+		final var emails = new ArrayList<EmailMessage>();
 
 		final var pageSize = 50;
 		final var view = new ItemView(pageSize);
@@ -71,27 +73,26 @@ public class EWSIntegration {
 
 		do {
 			try {
-				findResults = service.findItems(folderId, view);
+				findResults = exchangeService.findItems(folderId, view);
 			} catch (final Exception e) {
-				log.error("Could not find items", e);
+				LOG.error("Could not find items", e);
 				return emails;
 			}
 			findResults.getItems().forEach(item -> {
 				try {
 					if (item instanceof final EmailMessage message) {
 						message.load(); // Load the full message data
-						service.loadPropertiesForItems(List.of(message), propertySetTextBody);
-						emails.add(mapper.toEmail(message));
+						exchangeService.loadPropertiesForItems(List.of(message), propertySetTextBody);
+						emails.add(message);
 					}
 				} catch (final Exception e) {
-					log.error("Could not load message", e);
+					LOG.error("Could not load message", e);
 				}
 			});
 
 			view.setOffset(view.getOffset() + pageSize);
 
 		} while (findResults.isMoreAvailable());
-
 		return emails;
 	}
 
@@ -101,7 +102,7 @@ public class EWSIntegration {
 
 		destinationFolder = findFolder(emailAddress, folderName);
 
-		final var email = service.bindToItem(emailId, new PropertySet());
+		final var email = exchangeService.bindToItem(emailId, new PropertySet());
 
 		if (email instanceof final EmailMessage message) {
 			message.setIsRead(true);
@@ -111,7 +112,7 @@ public class EWSIntegration {
 	}
 
 	public void deleteEmail(final ItemId emailId) throws Exception {
-		final var email = service.bindToItem(emailId, new PropertySet());
+		final var email = exchangeService.bindToItem(emailId, new PropertySet());
 		if (email instanceof final EmailMessage message) {
 			message.delete(HardDelete);
 		}
@@ -126,13 +127,55 @@ public class EWSIntegration {
 		folderView.setPropertySet(new PropertySet(BasePropertySet.IdOnly, FolderSchema.DisplayName));
 
 		final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
-		final var findFoldersResults = service.findFolders(folderId, searchFilter, folderView);
+		final var findFoldersResults = exchangeService.findFolders(folderId, searchFilter, folderView);
 
 		if ((findFoldersResults == null) || (findFoldersResults.getFolders().size() != 1)) {
 			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
 		}
 
 		return findFoldersResults.getFolders().getFirst();
+	}
+
+	public Map<String, String> extractValuesEmailMessage(final EmailMessage emailMessage) {
+		try {
+			return Arrays.stream(emailMessage.getBody().toString().split("\n"))
+				.map(line -> line.split("=", 2))
+				.filter(pairs -> pairs.length == 2)
+				.collect(Collectors.toMap(
+					pairs -> pairs[0].trim(),
+					pairs -> pairs[1].trim()
+				));
+		} catch (ServiceLocalException e) {
+			LOG.error("Exception in extractValuesEmailMessage method", e);
+			return null;
+		}
+	}
+
+	public Map<String, List<String>> validateRecipientNumbers(final Map<String, String> keyValueMap) {
+		var commaSeparatedNumbers = keyValueMap.get("Recipient");
+		var numbers = Arrays.asList(commaSeparatedNumbers.split(","));
+		var formattedNumbers = numbers.stream()
+			.map(number -> {
+				if (number.startsWith("0")) {
+					return number.replaceFirst("^0", "+46");
+				}
+				return number;
+			})
+			.toList();
+		var validator = new ValidMSISDNConstraintValidator();
+		var validationMap = new HashMap<String, List<String>>();
+
+		for (var number : formattedNumbers) {
+			if (validator.isValid(number)) {
+				validationMap.computeIfAbsent("VALID", k -> new ArrayList<>());
+				validationMap.get("VALID").add(number);
+			} else {
+				validationMap.computeIfAbsent("INVALID", k -> new ArrayList<>());
+				validationMap.get("INVALID").add(number);
+			}
+		}
+
+		return validationMap;
 	}
 
 }

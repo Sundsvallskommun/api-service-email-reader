@@ -9,12 +9,12 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+import jakarta.transaction.Transactional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import jakarta.transaction.Transactional;
-import microsoft.exchange.webservices.data.property.complex.ItemId;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
@@ -26,21 +26,21 @@ import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
+
 @Service
 public class EmailService {
 
-	private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EmailService.class);
 
 	private static final String EMAIL_SUBJECT = "[Warning] EmailReader has detected unhandled emails";
-
 	private static final String EMAIL_MESSAGE = "EmailReader has detected unhandled emails with the following IDs: {0}";
 
 	private final EmailRepository emailRepository;
-
 	private final CredentialsRepository credentialsRepository;
 
 	private final MessagingIntegration messagingIntegration;
-
 	private final EWSIntegration ewsIntegration;
 
 	private final EncryptionUtility encryptionUtility;
@@ -71,14 +71,18 @@ public class EmailService {
 		return credentialsRepository.findAll();
 	}
 
-	public List<Email> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress) {
+	public List<CredentialsEntity> findAllByAction(final String action) {
+		return credentialsRepository.findAllByAction(action);
+	}
+
+	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress) {
 		try {
 			final var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
 			return ewsIntegration.pageThroughEntireInbox(
 				credential.getUsername(), decryptedPassword,
 				credential.getDomain(), emailAddress);
 		} catch (final EncryptionException e) {
-			log.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
+			LOG.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
 		}
 		return emptyList();
 	}
@@ -127,5 +131,6 @@ public class EmailService {
 			.flatMap(entry -> entry.getValue().stream())
 			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
+
 
 }
