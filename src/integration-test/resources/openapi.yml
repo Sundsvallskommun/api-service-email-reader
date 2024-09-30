@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.0"
+  version: "3.0"
 servers:
-  - url: http://localhost:55919
+  - url: http://localhost:52895
     description: Generated server url
 tags:
   - name: Email
@@ -45,15 +45,6 @@ paths:
       responses:
         "204":
           description: No content
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -65,6 +56,15 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -93,17 +93,6 @@ paths:
             type: string
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
-        "204":
-          description: No content
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -115,6 +104,17 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -137,15 +137,6 @@ paths:
             type: string
           example: 2281
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -157,6 +148,15 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -197,17 +197,6 @@ paths:
               $ref: "#/components/schemas/Credentials"
         required: true
       responses:
-        "204":
-          description: No content
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -219,6 +208,17 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -248,15 +248,6 @@ paths:
             type: string
           example: CONTACTCENTER
       responses:
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -268,6 +259,15 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -326,17 +326,6 @@ paths:
             type: string
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
-        "204":
-          description: No content
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "400":
           description: Bad Request
           content:
@@ -348,6 +337,17 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
+        "500":
+          description: Internal Server Error
           content:
             application/json:
               schema:
@@ -398,6 +398,10 @@ components:
           type: string
           description: Namespace
           example: my.namespace
+        action:
+          type: string
+          description: Action to take for new emails
+          example: PERSIST
         metadata:
           type: object
           additionalProperties:
@@ -428,9 +432,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
     StatusType:
       type: object

@@ -33,3 +33,5 @@ scheduled:
     cron: "-"
   check-for-old-emails:
     cron: "-"
+  check-for-new-sms-emails:
+    cron: "-"

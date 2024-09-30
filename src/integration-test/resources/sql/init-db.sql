@@ -33,7 +33,8 @@ INSERT INTO credentials (created_at,
                          municipality_id,
                          namespace,
                          password,
-                         username)
+                         username,
+                         action)
 VALUES (CURRENT_TIMESTAMP,
         'someDestinationFolder',
         'someDomain',
@@ -41,7 +42,8 @@ VALUES (CURRENT_TIMESTAMP,
         '2281',
         'someNamespace',
         'somePassword',
-        'someUsername');
+        'someUsername',
+        'PERSIST');
 
 -- Insert into credentials_entity_email_address
 INSERT INTO credentials_email_address (credentials_id, email_address)

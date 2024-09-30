@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import se.sundsvall.emailreader.configuration.CredentialsProperties;
 
-
 @Component
 public class EncryptionUtility {
 

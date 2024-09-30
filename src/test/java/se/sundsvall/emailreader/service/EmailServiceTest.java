@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -17,6 +18,8 @@ import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +32,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
-import jakarta.transaction.Transactional;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -39,6 +41,8 @@ import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
@@ -127,13 +131,25 @@ class EmailServiceTest {
 	}
 
 	@Test
+	void findAllByAction() {
+		when(mockCredentialsRepository.findAllByAction(any())).thenReturn(List.of(createCredentialsEntity()));
+
+		var credentials = emailService.findAllByAction("someAction");
+
+		assertThat(credentials).hasSize(1);
+		verify(mockCredentialsRepository).findAllByAction("someAction");
+		verifyNoMoreInteractions(mockCredentialsRepository);
+	}
+
+	@Test
 	void getAllEmailsInInbox() {
 		final var credentials = createCredentialsEntity();
 		final var emailAddress = "someEmailAddress";
+		var emailMessage = mock(EmailMessage.class);
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenReturn("somePassword");
 		when(mockEwsIntegration.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
-			.thenReturn(List.of(createEmail(null)));
+			.thenReturn(List.of(emailMessage));
 
 		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
 
