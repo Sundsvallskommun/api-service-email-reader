@@ -21,6 +21,7 @@ public final class CredentialsMapper {
 			.withDestinationFolder(credentials.destinationFolder())
 			.withPassword(password)
 			.withMetadata(credentials.metadata())
+			.withAction(credentials.action())
 			.build();
 	}
 
@@ -33,6 +34,7 @@ public final class CredentialsMapper {
 			.withUsername(entity.getUsername())
 			.withMetadata(entity.getMetadata())
 			.withDestinationFolder(entity.getDestinationFolder())
+			.withAction(entity.getAction())
 			.build();
 	}
 
@@ -50,5 +52,6 @@ public final class CredentialsMapper {
 		entity.setPassword(password);
 		entity.setEmailAddress(credentials.emailAddress());
 		entity.setMetadata(credentials.metadata());
+		entity.setAction(credentials.action());
 	}
 }

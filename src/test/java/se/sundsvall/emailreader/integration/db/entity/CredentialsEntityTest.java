@@ -53,6 +53,7 @@ class CredentialsEntityTest {
 			.withDestinationFolder("someDestinationFolder")
 			.withCreatedAt(LocalDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
+			.withAction("PERSIST")
 			.build();
 
 		object.prePersist();

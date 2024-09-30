@@ -24,7 +24,7 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 class ShedlockAnnotationsTest {
 
 	@Test
-	void verifyMandatorySchedlockAnnotations() {
+	void verifyMandatoryShedlockAnnotations() {
 		final var scanner = new ClassPathScanningCandidateComponentProvider(true);
 		final var candidates = scanner.findCandidateComponents(this.getClass().getPackageName());
 		final var hasEnableSchedulerLock = hasEnableSchedulerLock(candidates);

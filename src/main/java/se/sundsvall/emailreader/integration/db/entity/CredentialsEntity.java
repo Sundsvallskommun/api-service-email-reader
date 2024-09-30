@@ -62,6 +62,9 @@ public class CredentialsEntity {
 	@Column(name = "destination_folder")
 	private String destinationFolder;
 
+	@Column(name = "action")
+	private String action;
+
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
 

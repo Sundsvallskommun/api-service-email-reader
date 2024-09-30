@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -23,19 +24,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.api.model.Header;
+
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.FileAttachment;
-import se.sundsvall.emailreader.api.model.Email;
-import se.sundsvall.emailreader.api.model.Header;
 
 @Component
-public class EWSMapper {
+public final class EWSMapper {
 
-	private final Logger log = LoggerFactory.getLogger(EWSMapper.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EWSMapper.class);
 
-	Email toEmail(final EmailMessage emailMessage) {
+	private EWSMapper() {
+	}
+
+	public static List<Email> toEmails(final List<EmailMessage> emailMessages) {
+		return emailMessages.stream()
+			.map(EWSMapper::toEmail)
+			.filter(Objects::nonNull)
+			.toList();
+	}
+
+	public static Email toEmail(final EmailMessage emailMessage) {
 		try {
 
 			final var recipients = emailMessage.getToRecipients().getItems().stream()
@@ -47,7 +59,7 @@ public class EWSMapper {
 				.orElseGet(Stream::empty)
 				.filter(FileAttachment.class::isInstance)
 				.map(FileAttachment.class::cast)
-				.map(this::toAttachment)
+				.map(EWSMapper::toAttachment)
 				.toList();
 
 			final var receivedAt = Optional.ofNullable(emailMessage.getDateTimeReceived())
@@ -68,12 +80,12 @@ public class EWSMapper {
 				.withHeaders(toHeaders(emailMessage))
 				.build();
 		} catch (final ServiceLocalException e) {
-			log.warn("Could not load email", e);
+			LOG.warn("Could not load email", e);
 			return null;
 		}
 	}
 
-	private Email.Attachment toAttachment(final FileAttachment fileAttachment) {
+	private static Email.Attachment toAttachment(final FileAttachment fileAttachment) {
 
 		try {
 			fileAttachment.load();
@@ -83,12 +95,12 @@ public class EWSMapper {
 				.withContentType(fileAttachment.getContentType())
 				.build();
 		} catch (final Exception e) {
-			log.warn("Could not load attachment", e);
+			LOG.warn("Could not load attachment", e);
 			return null;
 		}
 	}
 
-	private Map<Header, List<String>> toHeaders(final EmailMessage emailMessage) {
+	private static Map<Header, List<String>> toHeaders(final EmailMessage emailMessage) {
 
 		try {
 			final var headers = new EnumMap<Header, List<String>>(Header.class);
@@ -101,12 +113,12 @@ public class EWSMapper {
 
 			return headers;
 		} catch (final Exception e) {
-			log.warn("Could not load headers", e);
+			LOG.warn("Could not load headers", e);
 			return emptyMap();
 		}
 	}
 
-	private List<String> extractValues(final String input) {
+	private static List<String> extractValues(final String input) {
 		return Optional.ofNullable(input)
 			.map(inputString -> Pattern.compile(" ")
 				.splitAsStream(inputString)

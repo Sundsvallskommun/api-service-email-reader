@@ -3,13 +3,18 @@ package se.sundsvall.emailreader.integration.ews;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.integration.ews.EWSMapper.toEmail;
+import static se.sundsvall.emailreader.integration.ews.EWSMapper.toEmails;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -19,7 +24,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
@@ -35,9 +39,6 @@ import microsoft.exchange.webservices.data.property.complex.MessageBody;
 
 @ExtendWith({MockitoExtension.class})
 class EWSMapperTest {
-
-	@InjectMocks
-	private EWSMapper mapper;
 
 	@Test
 	void testToEmail() throws Exception {
@@ -69,7 +70,7 @@ class EWSMapperTest {
 		attachments.getItems().add(fileAttachment);
 
 		// Act
-		final var result = mapper.toEmail(emailMessage);
+		final var result = toEmail(emailMessage);
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata");
@@ -131,7 +132,7 @@ class EWSMapperTest {
 		attachments.getItems().add(fileAttachment);
 
 		// Act
-		final var result = mapper.toEmail(emailMessage);
+		final var result = toEmail(emailMessage);
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "receivedAt");
@@ -180,7 +181,7 @@ class EWSMapperTest {
 
 
 		// Act
-		final var result = mapper.toEmail(emailMessage);
+		final var result = toEmail(emailMessage);
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments");
@@ -203,10 +204,24 @@ class EWSMapperTest {
 		final var emailMessage = mock(EmailMessage.class);
 		when(emailMessage.getToRecipients()).thenThrow(new ServiceLocalException("Something went wrong"));
 		// Act
-		final var result = mapper.toEmail(emailMessage);
+		final var result = toEmail(emailMessage);
 		// Assert
 		assertThat(result).isNull();
 	}
 
+	@Test
+	void toEmailsTest() {
+		var staticMock = mockStatic(EWSMapper.class);
+		var emailMessage = mock(EmailMessage.class);
+		var emailMessages = List.of(emailMessage);
+		var email = createEmail(null);
 
+		staticMock.when(() -> toEmail(emailMessage)).thenReturn(email);
+		staticMock.when(() -> toEmails(any())).thenCallRealMethod();
+
+		var result = toEmails(emailMessages);
+
+		assertThat(result).hasSize(1).containsExactly(email);
+		staticMock.close();
+	}
 }

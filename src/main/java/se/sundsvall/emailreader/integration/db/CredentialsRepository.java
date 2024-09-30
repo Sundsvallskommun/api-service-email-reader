@@ -18,4 +18,6 @@ public interface CredentialsRepository extends JpaRepository<CredentialsEntity, 
 
 	Optional<CredentialsEntity> findByMunicipalityIdAndId(final String municipalityId, final String id);
 
+	List<CredentialsEntity> findAllByAction(final String action);
+
 }
