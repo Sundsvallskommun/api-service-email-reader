@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class EmailScheduler {
 	private void sendSms(final CredentialsEntity credentials, final List<String> validNumbers, final Map<String, String> emailMap) {
 		for (var validNumber : validNumbers) {
 			var smsRequest = new SmsRequest()
-				.sender("Sundsvalls Kommun")
+				.sender("Sundsvall")
 				.message(emailMap.get("Message"))
 				.mobileNumber(validNumber);
 			messagingIntegration.sendSms(credentials.getMunicipalityId(), smsRequest);
@@ -96,10 +97,36 @@ public class EmailScheduler {
 		emailMessage.reply(new MessageBody(replyBody), true);
 	}
 
+	private void badRequestReply(final EmailMessage emailMessage, Map<String, String> emailMap) throws Exception {
+		List<String> missingFields = new ArrayList<>();
+
+		if (emailMap.get("Recipient") == null) {
+			missingFields.add("Mottagare saknas.");
+		}
+		if (emailMap.get("Message") == null) {
+			missingFields.add("Meddelande saknas.");
+		}
+
+		var missingFieldsMessage = String.join(" ", missingFields);
+
+		var replyBody = String.format("""
+			Ditt mejl har hanterats av EmailReader.
+			Det gick inte att skicka SMS.
+			Orsak: %s
+			""", missingFieldsMessage).trim();
+
+		emailMessage.reply(new MessageBody(replyBody), true);
+	}
+
 	private void handleMessages(final CredentialsEntity credentials, final List<EmailMessage> messages) throws Exception {
 		for (var emailMessage : messages) {
 			try {
 				var emailMap = ewsIntegration.extractValuesEmailMessage(emailMessage);
+				if (emailMap.get("Recipient") == null || emailMap.get("Message") == null) {
+					badRequestReply(emailMessage, emailMap);
+					continue;
+				}
+
 				var result = ewsIntegration.validateRecipientNumbers(emailMap);
 				var validNumbers = result.get("VALID");
 				var invalidNumbers = result.get("INVALID");
