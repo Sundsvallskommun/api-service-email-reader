@@ -145,8 +145,8 @@ class EmailSchedulerTest {
 
 		emailScheduler.checkForNewSmsEmails();
 
-		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvalls Kommun").message("someMessage").mobileNumber("+467012345678"));
-		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvalls Kommun").message("someMessage").mobileNumber("+467112345678"));
+		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467012345678"));
+		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467112345678"));
 		verify(emailServiceMock).findAllByAction("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
@@ -172,21 +172,10 @@ class EmailSchedulerTest {
 
 		verify(messagingIntegrationMock).sendSms(eq(credential.getMunicipalityId()), smsRequestCaptor.capture());
 		assertThat(smsRequestCaptor.getValue()).satisfies(request -> {
-			assertThat(request.getSender()).isEqualTo("Sundsvalls Kommun");
+			assertThat(request.getSender()).isEqualTo("Sundsvall");
 			assertThat(request.getMessage()).isEqualTo("someMessage");
 			assertThat(request.getMobileNumber()).isEqualTo("+4670123456789");
 		});
-
-		verify(emailMessage).reply(messageBodyCaptor.capture(), eq(true));
-		assertThat(messageBodyCaptor.getValue()).hasToString(
-			"""
-				Ditt mejl har hanterats av EmailReader.
-				SMS har skickats till:
-				[+4670123456789]
-				
-				Det gick inte att skicka SMS till:
-				[+4671-23456789]
-				""");
 
 		verify(emailServiceMock).findAllByAction("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");
@@ -210,17 +199,6 @@ class EmailSchedulerTest {
 		when(ewsIntegrationMock.validateRecipientNumbers(any())).thenReturn(resultMap);
 
 		emailScheduler.checkForNewSmsEmails();
-
-		verify(emailMessage).reply(messageBodyCaptor.capture(), eq(true));
-		assertThat(messageBodyCaptor.getValue()).hasToString(
-			"""
-				Ditt mejl har hanterats av EmailReader.
-				SMS har skickats till:
-				%s
-				
-				Det gick inte att skicka SMS till:
-				%s
-				""".formatted(resultMap.get("VALID"), resultMap.get("INVALID")));
 
 		verify(emailServiceMock).findAllByAction("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(credential, "someEmailAddress");

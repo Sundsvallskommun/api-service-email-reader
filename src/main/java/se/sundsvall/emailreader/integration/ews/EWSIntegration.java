@@ -153,6 +153,7 @@ public class EWSIntegration {
 
 	public Map<String, List<String>> validateRecipientNumbers(final Map<String, String> keyValueMap) {
 		var commaSeparatedNumbers = keyValueMap.get("Recipient");
+		var validationMap = new HashMap<String, List<String>>();
 		var numbers = Arrays.asList(commaSeparatedNumbers.split(","));
 		var formattedNumbers = numbers.stream()
 			.map(number -> {
@@ -163,7 +164,6 @@ public class EWSIntegration {
 			})
 			.toList();
 		var validator = new ValidMSISDNConstraintValidator();
-		var validationMap = new HashMap<String, List<String>>();
 
 		for (var number : formattedNumbers) {
 			if (validator.isValid(number)) {
