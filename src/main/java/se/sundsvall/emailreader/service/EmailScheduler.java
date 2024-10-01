@@ -15,7 +15,6 @@ import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 
 import generated.se.sundsvall.messaging.SmsRequest;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
-import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
@@ -77,29 +76,22 @@ public class EmailScheduler {
 	private void sendSms(final CredentialsEntity credentials, final List<String> validNumbers, final Map<String, String> emailMap) {
 		for (var validNumber : validNumbers) {
 			var smsRequest = new SmsRequest()
-				.sender("Sundsvalls Kommun")
+				.sender("Sundsvall")
 				.message(emailMap.get("Message"))
 				.mobileNumber(validNumber);
 			messagingIntegration.sendSms(credentials.getMunicipalityId(), smsRequest);
 		}
 	}
 
-	private void reply(final EmailMessage emailMessage, List<String> validNumbers, List<String> invalidNumbers) throws Exception {
-		var replyBody = """
-			Ditt mejl har hanterats av EmailReader.
-			SMS har skickats till:
-			%s
-			
-			Det gick inte att skicka SMS till:
-			%s
-			""".formatted(validNumbers, invalidNumbers);
-		emailMessage.reply(new MessageBody(replyBody), true);
-	}
-
 	private void handleMessages(final CredentialsEntity credentials, final List<EmailMessage> messages) throws Exception {
 		for (var emailMessage : messages) {
 			try {
 				var emailMap = ewsIntegration.extractValuesEmailMessage(emailMessage);
+				if (emailMap.get("Recipient") == null || emailMap.get("Message") == null) {
+					LOG.info("Either 'Recipient' or 'Message' is missing in email. Recipient: {}, Message: {}. Skipping email.", emailMap.get("Recipient"), emailMap.get("Message"));
+					continue;
+				}
+
 				var result = ewsIntegration.validateRecipientNumbers(emailMap);
 				var validNumbers = result.get("VALID");
 				var invalidNumbers = result.get("INVALID");
@@ -108,13 +100,13 @@ public class EmailScheduler {
 					sendSms(credentials, validNumbers, emailMap);
 				}
 				if (invalidNumbers != null) {
-					reply(emailMessage, validNumbers, invalidNumbers);
+					LOG.info("Can not send sms to invalid numbers: {}", invalidNumbers);
 				}
-				LOG.debug("Moving sms email to folder '{}'", credentials.getDestinationFolder());
+				LOG.debug("Moving sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 			} catch (Exception e) {
-				LOG.error("Failed to handle sms email", e);
-				LOG.debug("Moving failed sms email to folder '{}'", credentials.getDestinationFolder());
+				LOG.error("Failed to handle sms-email", e);
+				LOG.debug("Moving failed sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 			}
 		}
