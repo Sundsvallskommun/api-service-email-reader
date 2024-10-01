@@ -89,6 +89,7 @@ public class EmailScheduler {
 				var emailMap = ewsIntegration.extractValuesEmailMessage(emailMessage);
 				if (emailMap.get("Recipient") == null || emailMap.get("Message") == null) {
 					LOG.info("Either 'Recipient' or 'Message' is missing in email. Recipient: {}, Message: {}. Skipping email.", emailMap.get("Recipient"), emailMap.get("Message"));
+					ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 					continue;
 				}
 
