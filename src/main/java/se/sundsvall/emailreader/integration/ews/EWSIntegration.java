@@ -165,7 +165,6 @@ public class EWSIntegration {
 			.toList();
 		var validator = new ValidMSISDNConstraintValidator();
 
-
 		for (var number : formattedNumbers) {
 			if (validator.isValid(number)) {
 				validationMap.computeIfAbsent("VALID", k -> new ArrayList<>());
