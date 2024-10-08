@@ -1,7 +1,10 @@
 package se.sundsvall.emailreader.service;
 
+import static java.lang.Math.min;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +79,7 @@ public class EmailScheduler {
 	private void sendSms(final CredentialsEntity credentials, final List<String> validNumbers, final Map<String, String> emailMap) {
 		for (var validNumber : validNumbers) {
 			var smsRequest = new SmsRequest()
-				.sender("Sundsvall")
+				.sender(Optional.ofNullable(emailMap.get("Sender")).map(sender -> sender.substring(0, min(sender.length(), 11))).orElse("Sundsvall"))
 				.message(emailMap.get("Message"))
 				.mobileNumber(validNumber);
 			messagingIntegration.sendSms(credentials.getMunicipalityId(), smsRequest);
