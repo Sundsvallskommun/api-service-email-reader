@@ -21,43 +21,25 @@ import lombok.With;
 @Schema(name = "Credentials", description = "Email credentials to use for authentication against the email server")
 public record Credentials(
 
-	@Schema(description = "Credentials id", accessMode = AccessMode.READ_ONLY, example = "74531aac-ffea-42cc-8a0a-52715bb27850")
-	String id,
+	@Schema(description = "Credentials id", accessMode = AccessMode.READ_ONLY, example = "74531aac-ffea-42cc-8a0a-52715bb27850") String id,
 
-	@NotBlank
-	@Schema(description = "username to use for authentication against the email server", example = "joe01doe")
-	String username,
+	@NotBlank @Schema(description = "username to use for authentication against the email server", example = "joe01doe") String username,
 
-	@NotBlank
-	@Schema(description = "password to use for authentication against the email server", example = "mySecretPassword", accessMode = AccessMode.WRITE_ONLY)
-	String password,
+	@NotBlank @Schema(description = "password to use for authentication against the email server", example = "mySecretPassword", accessMode = AccessMode.WRITE_ONLY) String password,
 
-	@NotEmpty
-	@ArraySchema(arraySchema = @Schema(
+	@NotEmpty @ArraySchema(arraySchema = @Schema(
 		implementation = String.class,
 		description = "List of email addresses to check for new emails. The provided user must have access to these email addresses.",
-		example = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]"))
-	List<String> emailAddress,
+		example = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]")) List<String> emailAddress,
 
-	@NotBlank
-	@Schema(description = "domain for the email server", example = "https://mail.example.com/EWS/Exchange.asmx")
-	String domain,
+	@NotBlank @Schema(description = "domain for the email server", example = "https://mail.example.com/EWS/Exchange.asmx") String domain,
 
-	@NotEmpty
-	@Schema(description = "Namespace", example = "my.namespace")
-	String namespace,
+	@NotEmpty @Schema(description = "Namespace", example = "my.namespace") String namespace,
 
-	@MemberOf(Action.class)
-	@Schema(description = "Action to take for new emails", example = "PERSIST")
-	String action,
+	@MemberOf(Action.class) @Schema(description = "Action to take for new emails", example = "PERSIST") String action,
 
-	@Schema(description = "Metadata to add to the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}")
-	Map<String, String> metadata,
+	@Schema(description = "Metadata to add to the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}") Map<String, String> metadata,
 
-	@NotBlank
-	@Schema(description = "The folder to move emails to after processing", example = "Processed")
-	String destinationFolder
-) {
-
+	@NotBlank @Schema(description = "The folder to move emails to after processing", example = "Processed") String destinationFolder) {
 
 }

@@ -37,8 +37,7 @@ public final class EWSMapper {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EWSMapper.class);
 
-	private EWSMapper() {
-	}
+	private EWSMapper() {}
 
 	public static List<Email> toEmails(final List<EmailMessage> emailMessages) {
 		return emailMessages.stream()

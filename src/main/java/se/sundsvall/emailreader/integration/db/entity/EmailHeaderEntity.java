@@ -42,8 +42,10 @@ public class EmailHeaderEntity {
 	private Header header;
 
 	@ElementCollection
-	@CollectionTable(name = "email_header_value", joinColumns = @JoinColumn(name = "header_id", referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = "fk_header_value_header_id")))
+	@CollectionTable(name = "email_header_value",
+		joinColumns = @JoinColumn(name = "header_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_header_value_header_id")))
 	@Column(name = "value", length = 2048)
 	@OrderColumn(name = "order_index")
 	private List<String> values;

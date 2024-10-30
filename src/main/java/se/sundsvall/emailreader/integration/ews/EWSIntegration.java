@@ -143,8 +143,7 @@ public class EWSIntegration {
 				.filter(pairs -> pairs.length == 2)
 				.collect(Collectors.toMap(
 					pairs -> pairs[0].trim(),
-					pairs -> pairs[1].trim()
-				));
+					pairs -> pairs[1].trim()));
 		} catch (ServiceLocalException e) {
 			LOG.error("Exception in extractValuesEmailMessage method", e);
 			return null;

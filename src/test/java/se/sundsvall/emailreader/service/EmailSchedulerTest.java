@@ -206,5 +206,4 @@ class EmailSchedulerTest {
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
 	}
 
-
 }

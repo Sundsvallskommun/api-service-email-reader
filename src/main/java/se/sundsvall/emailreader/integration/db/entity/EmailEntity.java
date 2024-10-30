@@ -1,6 +1,5 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
-
 import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 import java.time.OffsetDateTime;
@@ -66,7 +65,8 @@ public class EmailEntity {
 	private String namespace;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "email_id", referencedColumnName = "id",
+	@JoinColumn(name = "email_id",
+		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = "fk_email_attachment_email_id"))
 	private List<AttachmentEntity> attachments;
 
@@ -87,7 +87,8 @@ public class EmailEntity {
 	private Map<String, String> metadata;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "email_id", referencedColumnName = "id",
+	@JoinColumn(name = "email_id",
+		referencedColumnName = "id",
 		foreignKey = @ForeignKey(name = "fk_email_header_email_id"))
 	private List<EmailHeaderEntity> headers;
 

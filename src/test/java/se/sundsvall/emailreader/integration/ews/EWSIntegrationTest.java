@@ -42,7 +42,9 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 
-@ExtendWith({MockitoExtension.class, OutputCaptureExtension.class})
+@ExtendWith({
+	MockitoExtension.class, OutputCaptureExtension.class
+})
 class EWSIntegrationTest {
 
 	private static final String EMAIL_MESSAGE_BODY_TEXT = """

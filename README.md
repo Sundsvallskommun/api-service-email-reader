@@ -9,6 +9,6 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-email-reader&metric=vulnerabilities)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-email-reader)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Sundsvallskommun_api-service-email-reader&metric=bugs)](https://sonarcloud.io/summary/overall?id=Sundsvallskommun_api-service-email-reader)
 
-##              
+## 
 
 Copyright (c) 2023 Sundsvalls kommun

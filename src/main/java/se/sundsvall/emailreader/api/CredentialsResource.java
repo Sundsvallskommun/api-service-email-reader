@@ -37,7 +37,9 @@ import se.sundsvall.emailreader.service.CredentialsService;
 @Validated
 @Tag(name = "Credentials", description = "Credentials")
 @RequestMapping(path = "/{municipalityId}/credentials",
-	produces = { APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE })
+	produces = {
+		APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
+	})
 @ApiResponse(
 	responseCode = "400",
 	description = "Bad Request",
