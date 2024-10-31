@@ -1,6 +1,5 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

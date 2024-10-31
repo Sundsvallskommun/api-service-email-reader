@@ -132,5 +132,4 @@ public class EmailService {
 			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
 
-
 }

@@ -37,7 +37,9 @@ import microsoft.exchange.webservices.data.property.complex.InternetMessageHeade
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
 
-@ExtendWith({MockitoExtension.class})
+@ExtendWith({
+	MockitoExtension.class
+})
 class EWSMapperTest {
 
 	@Test
@@ -99,7 +101,6 @@ class EWSMapperTest {
 					references -> assertThat(references).isEqualTo(List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 			});
 	}
-
 
 	@Test
 	void testToEmail_receivedAtNull() throws Exception {
@@ -178,7 +179,6 @@ class EWSMapperTest {
 		when(emailMessage.getFrom()).thenReturn(new EmailAddress("test", "sender@example.com"));
 		when(emailMessage.getDateTimeReceived()).thenReturn(Date.from(Instant.now()));
 		when(emailMessage.getInternetMessageHeaders()).thenReturn(new InternetMessageHeaderCollection());
-
 
 		// Act
 		final var result = toEmail(emailMessage);

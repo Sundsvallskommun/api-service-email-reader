@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class MessagingIntegrationMapperTest {
 
-
 	@Test
 	void toRequest() {
 		var result = MessagingIntegrationMapper.toRequest("someAddress", "some message", "[Warning] EmailReader has detected unhandled emails");
@@ -22,6 +21,5 @@ class MessagingIntegrationMapperTest {
 		assertThat(result.getSender().getName()).isEqualTo("EmailReader");
 		assertThat(result.getSender().getAddress()).isEqualTo("noreply@emailsender.se");
 	}
-
 
 }

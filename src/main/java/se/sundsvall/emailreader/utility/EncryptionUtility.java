@@ -17,11 +17,13 @@ public class EncryptionUtility {
 
 	private static final String ENCRYPT_ALGO = "ChaCha20-Poly1305/None/NoPadding";
 
-	private static final int NONCE_LEN = 12; //bytes
+	private static final int NONCE_LEN = 12; // bytes
 
 	private final CredentialsProperties credentialsProperties;
 
-	public EncryptionUtility(final CredentialsProperties credentialsProperties) {this.credentialsProperties = credentialsProperties;}
+	public EncryptionUtility(final CredentialsProperties credentialsProperties) {
+		this.credentialsProperties = credentialsProperties;
+	}
 
 	private SecretKeySpec getSecretKeySpec() {
 		return new SecretKeySpec(credentialsProperties.secretKey().getBytes(), "ChaCha20-Poly1305");
