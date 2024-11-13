@@ -68,7 +68,6 @@ class EWSMapperTest {
 		final var fileAttachment = mock(FileAttachment.class);
 		when(fileAttachment.getName()).thenReturn("Mocked attachment");
 		when(fileAttachment.getContent()).thenReturn("mockedfile.jpg".getBytes());
-		when(fileAttachment.getContentType()).thenReturn("text/plain");
 		attachments.getItems().add(fileAttachment);
 
 		// Act
@@ -129,7 +128,6 @@ class EWSMapperTest {
 		final var fileAttachment = mock(FileAttachment.class);
 		when(fileAttachment.getName()).thenReturn("Mocked attachment");
 		when(fileAttachment.getContent()).thenReturn("mockedfile.jpg".getBytes());
-		when(fileAttachment.getContentType()).thenReturn("text/plain");
 		attachments.getItems().add(fileAttachment);
 
 		// Act
