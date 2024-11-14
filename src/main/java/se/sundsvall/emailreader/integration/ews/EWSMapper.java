@@ -6,6 +6,7 @@ import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.utility.ServiceUtil.detectMimeType;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -91,7 +92,7 @@ public final class EWSMapper {
 			return Email.Attachment.builder()
 				.withName(fileAttachment.getName())
 				.withContent(Base64.getEncoder().encodeToString(fileAttachment.getContent()))
-				.withContentType(fileAttachment.getContentType())
+				.withContentType(detectMimeType(fileAttachment.getName(), fileAttachment.getContent()))
 				.build();
 		} catch (final Exception e) {
 			LOG.warn("Could not load attachment", e);
