@@ -127,7 +127,11 @@ public class EWSIntegration {
 		final var searchFilter = new SearchFilter.IsEqualTo(FolderSchema.DisplayName, folderName);
 		final var findFoldersResults = exchangeService.findFolders(folderId, searchFilter, folderView);
 
-		if ((findFoldersResults == null) || (findFoldersResults.getFolders().size() != 1)) {
+		if ((findFoldersResults != null) && (findFoldersResults.getFolders().size() > 1)) {
+			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
+		}
+
+		if ((findFoldersResults == null) || (findFoldersResults.getFolders().isEmpty())) {
 			final var newFolder = new Folder(exchangeService);
 			newFolder.setDisplayName(folderName);
 			exchangeService.createFolder(newFolder, folderId);
