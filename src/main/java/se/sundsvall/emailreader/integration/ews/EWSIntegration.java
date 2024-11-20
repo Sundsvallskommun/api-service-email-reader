@@ -1,7 +1,9 @@
 package se.sundsvall.emailreader.integration.ews;
 
+import static java.util.Collections.emptyMap;
 import static microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode.HardDelete;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,14 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-
-import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstraintValidator;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
@@ -38,6 +32,10 @@ import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstraintValidator;
 
 /**
  * Exchange Web Services Integration
@@ -130,7 +128,10 @@ public class EWSIntegration {
 		final var findFoldersResults = exchangeService.findFolders(folderId, searchFilter, folderView);
 
 		if ((findFoldersResults == null) || (findFoldersResults.getFolders().size() != 1)) {
-			throw new IllegalArgumentException("Could not determine a unique folder with the name: " + folderName);
+			final var newFolder = new Folder(exchangeService);
+			newFolder.setDisplayName(folderName);
+			exchangeService.createFolder(newFolder, folderId);
+			return newFolder;
 		}
 
 		return findFoldersResults.getFolders().getFirst();
@@ -144,17 +145,17 @@ public class EWSIntegration {
 				.collect(Collectors.toMap(
 					pairs -> pairs[0].trim(),
 					pairs -> pairs[1].trim()));
-		} catch (ServiceLocalException e) {
+		} catch (final ServiceLocalException e) {
 			LOG.error("Exception in extractValuesEmailMessage method", e);
-			return null;
+			return emptyMap();
 		}
 	}
 
 	public Map<String, List<String>> validateRecipientNumbers(final Map<String, String> keyValueMap) {
-		var commaSeparatedNumbers = keyValueMap.get("Recipient");
-		var validationMap = new HashMap<String, List<String>>();
-		var numbers = Arrays.asList(commaSeparatedNumbers.split(","));
-		var formattedNumbers = numbers.stream()
+		final var commaSeparatedNumbers = keyValueMap.get("Recipient");
+		final var validationMap = new HashMap<String, List<String>>();
+		final var numbers = Arrays.asList(commaSeparatedNumbers.split(","));
+		final var formattedNumbers = numbers.stream()
 			.map(number -> {
 				if (number.startsWith("0")) {
 					return number.replaceFirst("^0", "+46");
@@ -162,9 +163,9 @@ public class EWSIntegration {
 				return number;
 			})
 			.toList();
-		var validator = new ValidMSISDNConstraintValidator();
+		final var validator = new ValidMSISDNConstraintValidator();
 
-		for (var number : formattedNumbers) {
+		for (final var number : formattedNumbers) {
 			if (validator.isValid(number)) {
 				validationMap.computeIfAbsent("VALID", k -> new ArrayList<>());
 				validationMap.get("VALID").add(number);
