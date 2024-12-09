@@ -2,23 +2,20 @@ package se.sundsvall.emailreader.service;
 
 import static java.lang.Math.min;
 
+import generated.se.sundsvall.messaging.SmsRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
-
-import generated.se.sundsvall.messaging.SmsRequest;
-import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 
 @Component
 public class EmailScheduler {

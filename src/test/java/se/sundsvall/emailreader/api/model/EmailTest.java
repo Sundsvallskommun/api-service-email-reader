@@ -7,7 +7,6 @@ import static org.assertj.core.api.Assertions.within;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 
 class EmailTest {
