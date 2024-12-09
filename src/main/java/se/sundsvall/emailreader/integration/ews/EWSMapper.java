@@ -20,18 +20,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
-import se.sundsvall.emailreader.api.model.Email;
-import se.sundsvall.emailreader.api.model.Header;
-
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.FileAttachment;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.api.model.Header;
 
 @Component
 public final class EWSMapper {

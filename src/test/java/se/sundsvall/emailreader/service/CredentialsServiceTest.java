@@ -11,13 +11,11 @@ import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsWithPassword;
 
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.utility.EncryptionUtility;

@@ -21,11 +21,6 @@ import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.AttachmentCollection;
@@ -36,6 +31,9 @@ import microsoft.exchange.webservices.data.property.complex.InternetMessageHeade
 import microsoft.exchange.webservices.data.property.complex.InternetMessageHeaderCollection;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({
 	MockitoExtension.class

@@ -3,13 +3,10 @@ package se.sundsvall.emailreader.utility;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Base64;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.springframework.stereotype.Component;
-
 import se.sundsvall.emailreader.configuration.CredentialsProperties;
 
 @Component

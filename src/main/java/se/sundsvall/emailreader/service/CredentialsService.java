@@ -4,11 +4,9 @@ import static se.sundsvall.emailreader.service.mapper.CredentialsMapper.toDtos;
 import static se.sundsvall.emailreader.service.mapper.CredentialsMapper.toEntity;
 import static se.sundsvall.emailreader.service.mapper.CredentialsMapper.updateEntity;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import jakarta.transaction.Transactional;
+import java.util.List;
+import org.springframework.stereotype.Service;
 import se.sundsvall.emailreader.api.model.Credentials;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.utility.EncryptionUtility;

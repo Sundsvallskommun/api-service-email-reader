@@ -3,7 +3,6 @@ package se.sundsvall.emailreader.api.model;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-
 import org.junit.jupiter.api.Test;
 
 class CredentialsTest {

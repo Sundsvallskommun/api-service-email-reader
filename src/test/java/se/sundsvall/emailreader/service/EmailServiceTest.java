@@ -15,11 +15,10 @@ import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.transaction.Transactional;
-
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +30,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -41,8 +39,6 @@ import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
-
-import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest

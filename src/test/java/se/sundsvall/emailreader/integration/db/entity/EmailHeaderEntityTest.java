@@ -10,10 +10,8 @@ import static org.hamcrest.CoreMatchers.allOf;
 
 import java.util.List;
 import java.util.UUID;
-
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
-
 import se.sundsvall.emailreader.api.model.Header;
 
 class EmailHeaderEntityTest {

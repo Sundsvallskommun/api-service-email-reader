@@ -15,9 +15,12 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 
+import generated.se.sundsvall.messaging.SmsRequest;
 import java.util.List;
 import java.util.Map;
-
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.property.complex.EmailAddress;
+import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,15 +31,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
-
-import generated.se.sundsvall.messaging.SmsRequest;
-import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
-import microsoft.exchange.webservices.data.property.complex.EmailAddress;
-import microsoft.exchange.webservices.data.property.complex.MessageBody;
 
 @ExtendWith(MockitoExtension.class)
 class EmailSchedulerTest {

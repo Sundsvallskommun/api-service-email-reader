@@ -1,11 +1,10 @@
 package se.sundsvall.emailreader.api.model;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
-
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 @Builder(setterPrefix = "with")

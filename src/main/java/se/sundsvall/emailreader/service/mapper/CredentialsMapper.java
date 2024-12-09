@@ -1,7 +1,6 @@
 package se.sundsvall.emailreader.service.mapper;
 
 import java.util.List;
-
 import se.sundsvall.emailreader.api.model.Credentials;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 

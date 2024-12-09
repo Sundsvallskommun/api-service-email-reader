@@ -1,10 +1,9 @@
 package se.sundsvall.emailreader.integration.messaging;
 
+import generated.se.sundsvall.messaging.SmsRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import generated.se.sundsvall.messaging.SmsRequest;
 
 @Component
 public class MessagingIntegration {

@@ -7,9 +7,7 @@ import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
-
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 
