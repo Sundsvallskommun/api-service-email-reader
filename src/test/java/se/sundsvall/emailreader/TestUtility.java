@@ -2,7 +2,7 @@ package se.sundsvall.emailreader;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public final class TestUtility {
 
 	public static Email createEmail(final Map<Header, List<String>> headers) {
 
-		final var headerMap = new HashMap<>(Objects.requireNonNullElse(headers, Map.of(
+		final var headerMap = new EnumMap<>(Objects.requireNonNullElse(headers, Map.of(
 			Header.MESSAGE_ID, List.of("someValue"),
 			Header.REFERENCES, List.of("someReferenceValue"),
 			Header.IN_REPLY_TO, List.of("someReplyToValue"))));
