@@ -54,8 +54,9 @@ class EmailResource {
 		this.service = service;
 	}
 
-	@Operation(description = "Get a list of emails")
-	@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
+	@Operation(description = "Get a list of emails", responses = {
+		@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
+	})
 	@GetMapping("/{namespace}")
 	ResponseEntity<List<Email>> getAllEmails(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
@@ -64,8 +65,9 @@ class EmailResource {
 		return ok(service.getAllEmails(municipalityId, namespace));
 	}
 
-	@Operation(description = "Delete an email by id")
-	@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	@Operation(description = "Delete an email by id", responses = {
+		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	})
 	@DeleteMapping(path = "/{id}")
 	ResponseEntity<Void> deleteEmail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
