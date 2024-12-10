@@ -2,19 +2,16 @@ package se.sundsvall.emailreader.api.model;
 
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
-import java.util.List;
-import java.util.Map;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-
-import se.sundsvall.dept44.common.validators.annotation.MemberOf;
-import se.sundsvall.emailreader.integration.db.entity.enums.Action;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.With;
+import se.sundsvall.dept44.common.validators.annotation.MemberOf;
+import se.sundsvall.emailreader.integration.db.entity.enums.Action;
 
 @With
 @Builder(setterPrefix = "with")

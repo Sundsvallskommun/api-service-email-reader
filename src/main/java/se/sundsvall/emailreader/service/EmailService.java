@@ -5,16 +5,15 @@ import static java.util.Collections.emptyList;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
+import jakarta.transaction.Transactional;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
-
-import jakarta.transaction.Transactional;
-
+import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
@@ -25,9 +24,6 @@ import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
-
-import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
-import microsoft.exchange.webservices.data.property.complex.ItemId;
 
 @Service
 public class EmailService {

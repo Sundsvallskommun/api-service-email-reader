@@ -7,8 +7,14 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,14 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.emailreader.api.model.Credentials;
@@ -60,8 +58,9 @@ class CredentialsResource {
 		this.credentialsService = credentialsService;
 	}
 
-	@Operation(description = "Get a list of credentials")
-	@ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true)
+	@Operation(description = "Get a list of credentials", responses = {
+		@ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true)
+	})
 	@GetMapping
 	ResponseEntity<List<Credentials>> getAllByMunicipalityId(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId) {
@@ -69,8 +68,9 @@ class CredentialsResource {
 		return ok(credentialsService.getCredentialsByMunicipalityId(municipalityId));
 	}
 
-	@Operation(description = "Create credentials")
-	@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	@Operation(description = "Create credentials", responses = {
+		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	})
 	@PostMapping(consumes = APPLICATION_JSON_VALUE)
 	ResponseEntity<Void> create(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
@@ -83,8 +83,9 @@ class CredentialsResource {
 			.build();
 	}
 
-	@Operation(description = "Update credentials")
-	@ApiResponse(responseCode = "204", description = "No content")
+	@Operation(description = "Update credentials", responses = {
+		@ApiResponse(responseCode = "204", description = "No content")
+	})
 	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
 	ResponseEntity<Void> update(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
@@ -98,8 +99,9 @@ class CredentialsResource {
 			.build();
 	}
 
-	@Operation(description = "Delete credentials by id")
-	@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	@Operation(description = "Delete credentials by id", responses = {
+		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+	})
 	@DeleteMapping(path = "/{id}")
 	ResponseEntity<Void> delete(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
