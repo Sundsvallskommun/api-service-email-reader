@@ -32,10 +32,9 @@ class EmailMapperTest {
 			.hasFieldOrPropertyWithValue("receivedAt", entity.getReceivedAt())
 			.hasFieldOrPropertyWithValue("metadata", entity.getMetadata()));
 
-		assertThat(result.getFirst().attachments()).hasSize(1).element(0).satisfies(attachment -> assertThat(attachment).isNotNull().hasNoNullFieldsOrProperties()
+		assertThat(result.getFirst().attachments()).hasSize(1).element(0).satisfies(attachment -> assertThat(attachment).isNotNull().hasNoNullFieldsOrPropertiesExcept("content")
 			.hasFieldOrPropertyWithValue("name", entity.getAttachments().getFirst().getName())
-			.hasFieldOrPropertyWithValue("contentType", entity.getAttachments().getFirst().getContentType())
-			.hasFieldOrPropertyWithValue("content", entity.getAttachments().getFirst().getContent()));
+			.hasFieldOrPropertyWithValue("contentType", entity.getAttachments().getFirst().getContentType()));
 
 		assertThat(result.getFirst().headers()).hasSize(3).contains(
 			new SimpleEntry<>(Header.MESSAGE_ID, List.of("someValue")),
@@ -63,10 +62,9 @@ class EmailMapperTest {
 				.hasFieldOrPropertyWithValue("receivedAt", entity.getReceivedAt())
 				.hasFieldOrPropertyWithValue("metadata", entity.getMetadata()));
 
-		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> assertThat(attachment).isNotNull().hasNoNullFieldsOrProperties()
+		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> assertThat(attachment).isNotNull().hasNoNullFieldsOrPropertiesExcept("content")
 			.hasFieldOrPropertyWithValue("name", entity.getAttachments().getFirst().getName())
-			.hasFieldOrPropertyWithValue("contentType", entity.getAttachments().getFirst().getContentType())
-			.hasFieldOrPropertyWithValue("content", entity.getAttachments().getFirst().getContent()));
+			.hasFieldOrPropertyWithValue("contentType", entity.getAttachments().getFirst().getContentType()));
 
 		assertThat(result.headers()).hasSize(3).contains(
 			new SimpleEntry<>(Header.MESSAGE_ID, List.of("someValue")),
@@ -93,8 +91,7 @@ class EmailMapperTest {
 
 		assertThat(result.getAttachments()).hasSize(1).element(0).satisfies(attachment -> assertThat(attachment).isNotNull().hasNoNullFieldsOrPropertiesExcept("id", "createdAt")
 			.hasFieldOrPropertyWithValue("name", email.attachments().getFirst().name())
-			.hasFieldOrPropertyWithValue("contentType", email.attachments().getFirst().contentType())
-			.hasFieldOrPropertyWithValue("content", email.attachments().getFirst().content()));
+			.hasFieldOrPropertyWithValue("contentType", email.attachments().getFirst().contentType()));
 
 		assertThat(result.getHeaders()).hasSize(3).contains(
 			EmailHeaderEntity.builder()
@@ -121,9 +118,8 @@ class EmailMapperTest {
 		final var result = EmailMapper.toAttachment(attachmentEntity);
 
 		// Assert
-		assertThat(result).isNotNull().hasNoNullFieldsOrProperties()
+		assertThat(result).isNotNull().hasNoNullFieldsOrPropertiesExcept("content")
 			.hasFieldOrPropertyWithValue("name", attachmentEntity.getName())
-			.hasFieldOrPropertyWithValue("contentType", attachmentEntity.getContentType())
-			.hasFieldOrPropertyWithValue("content", attachmentEntity.getContent());
+			.hasFieldOrPropertyWithValue("contentType", attachmentEntity.getContentType());
 	}
 }

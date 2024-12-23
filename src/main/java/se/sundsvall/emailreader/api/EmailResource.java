@@ -3,7 +3,6 @@ package se.sundsvall.emailreader.api;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -13,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,22 +30,11 @@ import se.sundsvall.emailreader.service.EmailService;
 @RestController
 @Validated
 @Tag(name = "Email", description = "Email")
-@RequestMapping(path = "/{municipalityId}/email",
-	produces = {
-		APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-	})
-@ApiResponse(
-	responseCode = "400",
-	description = "Bad Request",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
-@ApiResponse(
-	responseCode = "500",
-	description = "Internal Server Error",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
-@ApiResponse(
-	responseCode = "502",
-	description = "Bad Gateway",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
+@RequestMapping(path = "/{municipalityId}/email")
+
+@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class)))
+@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
+@ApiResponse(responseCode = "502", description = "Bad Gateway", content = @Content(schema = @Schema(implementation = Problem.class)))
 class EmailResource {
 
 	private final EmailService service;
@@ -57,7 +46,7 @@ class EmailResource {
 	@Operation(description = "Get a list of emails", responses = {
 		@ApiResponse(responseCode = "200", description = "OK", useReturnTypeSchema = true)
 	})
-	@GetMapping("/{namespace}")
+	@GetMapping(path = "/{namespace}", produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Email>> getAllEmails(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Parameter(name = "namespace", description = "A specific namespace", example = "CONTACTCENTER") @PathVariable("namespace") final String namespace) {
@@ -65,10 +54,20 @@ class EmailResource {
 		return ok(service.getAllEmails(municipalityId, namespace));
 	}
 
+	@GetMapping(value = "/attachments/{attachmentId}", produces = ALL_VALUE)
+	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
+	@Operation(summary = "Get a messageAttachment", description = "Returns a messageAttachment as a stream for the specified attachmentId")
+	void getAttachment(
+		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId, final HttpServletResponse response) {
+
+		service.getMessageAttachmentStreamed(attachmentId, response);
+	}
+
 	@Operation(description = "Delete an email by id", responses = {
 		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
 	})
-	@DeleteMapping(path = "/{id}")
+	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> deleteEmail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {

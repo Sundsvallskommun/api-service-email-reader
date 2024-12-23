@@ -7,23 +7,29 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import se.sundsvall.emailreader.Application;
+import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.service.EmailService;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
+@ActiveProfiles("junit")
 class EmailResourceTest {
 
-	@InjectMocks
-	private EmailResource emailResource;
+	@Autowired
+	private WebTestClient webTestClient;
 
-	@Mock
+	@MockitoBean
 	private EmailService emailService;
 
 	@Test
@@ -32,28 +38,15 @@ class EmailResourceTest {
 		when(emailService.getAllEmails(any(String.class), any(String.class)))
 			.thenReturn(List.of(createEmail(null)));
 
-		final var result = emailResource.getAllEmails("someMunicipalityId", "someNamespace");
+		final var response = webTestClient.get()
+			.uri("/2281/email/namespace")
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(Email.class)
+			.returnResult()
+			.getResponseBody();
 
-		assertThat(result).isNotNull();
-		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
-
-		assertThat(result.getBody()).isNotNull().isNotEmpty().hasSize(1);
-
-		final var email = result.getBody().getFirst();
-
-		assertThat(email).isNotNull();
-		assertThat(email.id()).isEqualTo("someId");
-		assertThat(email.subject()).isEqualTo("someSubject");
-		assertThat(email.recipients()).hasSize(1).element(0)
-			.satisfies(recipient -> assertThat(recipient).isEqualTo("someRecipient"));
-		assertThat(email.sender()).isEqualTo("someSender");
-		assertThat(email.metadata()).hasSize(1).containsEntry("someKey", "someValue");
-		assertThat(email.message()).isEqualTo("someMessage");
-		assertThat(email.attachments()).hasSize(1).element(0).satisfies(attachment -> {
-			assertThat(attachment.name()).isEqualTo("someName");
-			assertThat(attachment.contentType()).isEqualTo("someContentType");
-			assertThat(attachment.content()).isEqualTo("someContent");
-		});
+		assertThat(response).isNotNull().hasSize(1);
 
 		verify(emailService, times(1)).getAllEmails(any(String.class), any(String.class));
 		verifyNoMoreInteractions(emailService);
@@ -62,12 +55,27 @@ class EmailResourceTest {
 	@Test
 	void testDeleteEmail() {
 
-		final var result = emailResource.deleteEmail("2281", "someMessageId");
+		final var uuid = UUID.randomUUID().toString();
 
-		assertThat(result).isNotNull();
-		assertThat(result.getStatusCode().is2xxSuccessful()).isTrue();
+		webTestClient.delete()
+			.uri("/2281/email/" + uuid)
+			.exchange()
+			.expectStatus()
+			.isNoContent();
 
-		verify(emailService, times(1)).deleteEmail(eq("2281"), any(String.class));
+		verify(emailService, times(1)).deleteEmail(eq("2281"), eq(uuid));
+		verifyNoMoreInteractions(emailService);
+	}
+
+	@Test
+	void testGetAttachment() {
+		webTestClient.get()
+			.uri("/2281/email/attachments/1")
+			.exchange()
+			.expectStatus()
+			.isOk();
+
+		verify(emailService, times(1)).getMessageAttachmentStreamed(eq(1L), any());
 		verifyNoMoreInteractions(emailService);
 	}
 }

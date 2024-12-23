@@ -1,10 +1,16 @@
 package se.sundsvall.emailreader.service.mapper;
 
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.sql.rowset.serial.SerialBlob;
+import org.zalando.problem.Problem;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
@@ -85,7 +91,7 @@ public final class EmailMapper {
 
 		return AttachmentEntity.builder()
 			.withName(attachment.name())
-			.withContent(attachment.content())
+			.withContent(toBlob(attachment.content()))
 			.withContentType(attachment.contentType())
 			.build();
 	}
@@ -93,10 +99,18 @@ public final class EmailMapper {
 	public static Email.Attachment toAttachment(final AttachmentEntity attachmentEntity) {
 
 		return Email.Attachment.builder()
+			.withId(attachmentEntity.getId())
 			.withName(attachmentEntity.getName())
-			.withContent(attachmentEntity.getContent())
 			.withContentType(attachmentEntity.getContentType())
 			.build();
+	}
+
+	private static Blob toBlob(final String content) {
+		try {
+			return new SerialBlob(content.getBytes());
+		} catch (final SQLException e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "Failed to create blob ");
+		}
 	}
 
 }

@@ -207,15 +207,15 @@ class EWSMapperTest {
 
 	@Test
 	void toEmailsTest() {
-		var staticMock = mockStatic(EWSMapper.class);
-		var emailMessage = mock(EmailMessage.class);
-		var emailMessages = List.of(emailMessage);
-		var email = createEmail(null);
+		final var staticMock = mockStatic(EWSMapper.class);
+		final var emailMessage = mock(EmailMessage.class);
+		final var emailMessages = List.of(emailMessage);
+		final var email = createEmail(null);
 
 		staticMock.when(() -> toEmail(emailMessage)).thenReturn(email);
 		staticMock.when(() -> toEmails(any())).thenCallRealMethod();
 
-		var result = toEmails(emailMessages);
+		final var result = toEmails(emailMessages);
 
 		assertThat(result).hasSize(1).containsExactly(email);
 		staticMock.close();

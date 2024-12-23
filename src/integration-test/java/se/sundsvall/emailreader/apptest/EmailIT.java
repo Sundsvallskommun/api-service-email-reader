@@ -1,19 +1,20 @@
 package se.sundsvall.emailreader.apptest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-
+import java.io.IOException;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.test.context.jdbc.Sql;
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.emailreader.Application;
@@ -56,9 +57,9 @@ class EmailIT extends AbstractAppTest {
 					recipient -> assertThat(recipient).isEqualTo("recipient1@sundsvall.se"));
 				assertThat(email.attachments()).hasSize(1).element(0).satisfies(
 					attachment -> {
-						assertThat(attachment.content()).isEqualTo("Attachment content");
-						assertThat(attachment.name()).isEqualTo("attachment_name.pdf");
-						assertThat(attachment.contentType()).isEqualTo("application/pdf");
+						assertThat(attachment.id()).isEqualTo(1);
+						assertThat(attachment.name()).isEqualTo("test_image.png");
+						assertThat(attachment.contentType()).isEqualTo("image/png");
 					});
 				assertThat(email.headers()).hasSize(1).containsEntry(Header.REFERENCES, List.of("someValue", "someOtherValue"));
 			});
@@ -76,6 +77,17 @@ class EmailIT extends AbstractAppTest {
 		final var result = emailRepository.findAll();
 
 		assertThat(result).isEmpty();
+	}
+
+	@Test
+	void test3_getAttachment() throws IOException {
+		setupCall()
+			.withServicePath("/1984/email/attachments/1")
+			.withHttpMethod(HttpMethod.GET)
+			.withExpectedResponseStatus(OK)
+			.withExpectedResponseHeader(CONTENT_TYPE, List.of(IMAGE_PNG_VALUE))
+			.withExpectedBinaryResponse("test_image.png")
+			.sendRequestAndVerifyResponse();
 	}
 
 }

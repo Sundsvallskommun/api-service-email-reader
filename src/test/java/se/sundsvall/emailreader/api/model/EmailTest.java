@@ -23,6 +23,7 @@ class EmailTest {
 			.withReceivedAt(OffsetDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(Email.Attachment.builder()
+				.withId(1L)
 				.withName("someName")
 				.withContent("someContent")
 				.withContentType("someContentType")
@@ -38,6 +39,8 @@ class EmailTest {
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.receivedAt()).isNotNull().isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
 		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> {
+			assertThat(attachment).isNotNull();
+			assertThat(attachment.id()).isEqualTo(1);
 			assertThat(attachment.name()).isEqualTo("someName");
 			assertThat(attachment.contentType()).isEqualTo("someContentType");
 			assertThat(attachment.content()).isEqualTo("someContent");

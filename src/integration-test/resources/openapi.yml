@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "3.0"
+  version: "4.0"
 servers:
-  - url: http://localhost:52895
+  - url: http://localhost:62419
     description: Generated server url
 tags:
   - name: Email
@@ -45,15 +45,6 @@ paths:
       responses:
         "204":
           description: No content
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "502":
           description: Bad Gateway
           content:
@@ -65,6 +56,15 @@ paths:
                 $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -93,15 +93,8 @@ paths:
             type: string
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
         "502":
           description: Bad Gateway
           content:
@@ -111,10 +104,17 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "204":
-          description: No content
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -137,15 +137,19 @@ paths:
             type: string
           example: 2281
       responses:
-        "400":
-          description: Bad Request
+        "200":
+          description: Ok
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Problem"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Credentials"
             application/problem+json:
               schema:
-                $ref: "#/components/schemas/Problem"
+                type: array
+                items:
+                  $ref: "#/components/schemas/Credentials"
         "502":
           description: Bad Gateway
           content:
@@ -164,19 +168,15 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "200":
-          description: Ok
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Credentials"
+                $ref: "#/components/schemas/Problem"
             application/problem+json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Credentials"
+                $ref: "#/components/schemas/Problem"
     post:
       tags:
         - Credentials
@@ -197,15 +197,8 @@ paths:
               $ref: "#/components/schemas/Credentials"
         required: true
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
         "502":
           description: Bad Gateway
           content:
@@ -215,10 +208,17 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
-        "204":
-          description: No content
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
@@ -248,33 +248,6 @@ paths:
             type: string
           example: CONTACTCENTER
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "500":
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "200":
           description: OK
           content:
@@ -283,11 +256,68 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Email"
-            application/problem+json:
+        "502":
+          description: Bad Gateway
+          content:
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Email"
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/email/attachments/{attachmentId}:
+    get:
+      tags:
+        - Email
+      summary: Get a messageAttachment
+      description: Returns a messageAttachment as a stream for the specified attachmentId
+      operationId: getAttachment
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality Id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: attachmentId
+          in: path
+          description: MessageId to fetch attachment for
+          required: true
+          schema:
+            type: integer
+            format: int32
+          example: 123
+      responses:
+        "502":
+          description: Bad Gateway
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "200":
+          description: Successful Operation
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Problem"
   /api-docs:
     get:
       tags:
@@ -326,33 +356,24 @@ paths:
             type: string
           example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
+        "204":
+          description: No content
         "502":
           description: Bad Gateway
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-        "204":
-          description: No content
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/Problem"
-            application/problem+json:
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
               schema:
                 $ref: "#/components/schemas/Problem"
 components:
@@ -432,9 +453,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
         title:
+          type: string
+        detail:
           type: string
     StatusType:
       type: object
@@ -522,6 +543,11 @@ components:
     EmailAttachment:
       type: object
       properties:
+        id:
+          type: integer
+          description: The attachment id
+          format: int64
+          example: 1
         name:
           type: string
           description: The attachment filename
@@ -530,9 +556,5 @@ components:
           type: string
           description: The attachment content type
           example: text/plain
-        content:
-          type: string
-          description: The attachment (file) content as a BASE64-encoded string
-          example: aGVsbG8gd29ybGQK
       description: Attachment
   securitySchemes: { }
