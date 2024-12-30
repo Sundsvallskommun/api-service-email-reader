@@ -63,7 +63,7 @@ class EmailResourceTest {
 			.expectStatus()
 			.isNoContent();
 
-		verify(emailService, times(1)).deleteEmail(eq("2281"), eq(uuid));
+		verify(emailService, times(1)).deleteEmail("2281", uuid);
 		verifyNoMoreInteractions(emailService);
 	}
 

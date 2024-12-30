@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
+import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.emailreader.api.model.Credentials;
@@ -40,8 +41,10 @@ import se.sundsvall.emailreader.service.CredentialsService;
 	})
 @ApiResponse(
 	responseCode = "400",
-	description = "Bad Request",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
+	description = "Bad request",
+	content = @Content(schema = @Schema(oneOf = {
+		Problem.class, ConstraintViolationProblem.class
+	})))
 @ApiResponse(
 	responseCode = "500",
 	description = "Internal Server Error",
