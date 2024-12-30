@@ -2,10 +2,16 @@ package se.sundsvall.emailreader.service;
 
 import static java.text.MessageFormat.format;
 import static java.util.Collections.emptyList;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +20,11 @@ import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StreamUtils;
+import org.zalando.problem.Problem;
+import org.zalando.problem.Status;
 import se.sundsvall.emailreader.api.model.Email;
+import se.sundsvall.emailreader.integration.db.AttachmentRepository;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
@@ -41,16 +51,19 @@ public class EmailService {
 
 	private final EncryptionUtility encryptionUtility;
 
+	private final AttachmentRepository attachmentRepository;
+
 	public EmailService(final EmailRepository emailRepository,
 		final CredentialsRepository credentialsRepository,
 		final MessagingIntegration messagingIntegration,
 		final EWSIntegration ewsIntegration,
-		final EncryptionUtility encryptionUtility) {
+		final EncryptionUtility encryptionUtility, final AttachmentRepository attachmentRepository) {
 		this.emailRepository = emailRepository;
 		this.credentialsRepository = credentialsRepository;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
 		this.encryptionUtility = encryptionUtility;
+		this.attachmentRepository = attachmentRepository;
 	}
 
 	public List<Email> getAllEmails(final String municipalityId, final String namespace) {
@@ -128,4 +141,21 @@ public class EmailService {
 			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
 
+	public void getMessageAttachmentStreamed(final long attachmentId, final HttpServletResponse response) {
+
+		try {
+			final var attachmentEntity = attachmentRepository
+				.findById(attachmentId)
+				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
+
+			final var file = attachmentEntity.getContent();
+
+			response.addHeader(CONTENT_TYPE, attachmentEntity.getContentType());
+			response.addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentEntity.getName() + "\"");
+			response.setContentLength((int) file.length());
+			StreamUtils.copy(file.getBinaryStream(), response.getOutputStream());
+		} catch (final IOException | SQLException e) {
+			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentId, e.getMessage()));
+		}
+	}
 }

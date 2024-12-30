@@ -1,6 +1,8 @@
 package se.sundsvall.emailreader.service;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -11,14 +13,22 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
+import java.io.IOException;
+import java.sql.Blob;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,10 +40,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.zalando.problem.Status;
+import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
+import se.sundsvall.emailreader.integration.db.AttachmentRepository;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
@@ -57,30 +71,45 @@ class EmailServiceTest {
 	private CredentialsRepository credentialsRepository;
 
 	@Mock
-	private EmailRepository mockEmailRepository;
+	private EmailRepository emailRepositoryMock;
 
 	@Mock
-	private CredentialsRepository mockCredentialsRepository;
+	private CredentialsRepository credentialsRepositoryMock;
 
 	@Mock
-	private EWSIntegration mockEwsIntegration;
+	private EWSIntegration ewsIntegrationMock;
 
 	@Mock
-	private MessagingIntegration mockMessagingIntegration;
+	private MessagingIntegration messagingIntegrationMock;
 
 	@Mock
 	private EncryptionUtility mockEncryptionUtility;
+
+	@Mock
+	private AttachmentRepository mockAttachmentRepository;
+
+	@Mock
+	private AttachmentEntity messageAttachmentEntityMock;
+
+	@Mock
+	private HttpServletResponse servletResponseMock;
+
+	@Mock
+	private ServletOutputStream servletOutputStreamMock;
+
+	@Mock
+	private Blob blobMock;
 
 	private EmailService emailService;
 
 	@BeforeEach
 	void init() {
-		emailService = new EmailService(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
+		emailService = new EmailService(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
 	}
 
 	@Test
 	void getAllEmails() {
-		when(mockEmailRepository.findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace"))
+		when(emailRepositoryMock.findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace"))
 			.thenReturn(List.of(createEmailEntity()));
 
 		final var emails = emailService.getAllEmails("someMunicipalityId", "someNamespace");
@@ -99,61 +128,61 @@ class EmailServiceTest {
 				.containsEntry(Header.IN_REPLY_TO, List.of("someReplyToValue"));
 		});
 
-		verify(mockEmailRepository).findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace");
-		verifyNoMoreInteractions(mockEmailRepository);
-		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
+		verify(emailRepositoryMock).findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace");
+		verifyNoMoreInteractions(emailRepositoryMock);
+		verifyNoInteractions(credentialsRepositoryMock, ewsIntegrationMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void deleteEmail() {
 		emailService.deleteEmail("2281", "someId");
 
-		verify(mockEmailRepository, times(1)).deleteByMunicipalityIdAndId("2281", "someId");
-		verifyNoMoreInteractions(mockEmailRepository);
-		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
+		verify(emailRepositoryMock, times(1)).deleteByMunicipalityIdAndId("2281", "someId");
+		verifyNoMoreInteractions(emailRepositoryMock);
+		verifyNoInteractions(credentialsRepositoryMock, ewsIntegrationMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void getAllCredentials() {
-		when(mockCredentialsRepository.findAll()).thenReturn(List.of(createCredentialsEntity()));
+		when(credentialsRepositoryMock.findAll()).thenReturn(List.of(createCredentialsEntity()));
 
 		final var credentials = emailService.getAllCredentials();
 
 		assertThat(credentials).hasSize(1);
 
-		verify(mockCredentialsRepository).findAll();
-		verifyNoMoreInteractions(mockCredentialsRepository);
-		verifyNoInteractions(mockEmailRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
+		verify(credentialsRepositoryMock).findAll();
+		verifyNoMoreInteractions(credentialsRepositoryMock);
+		verifyNoInteractions(emailRepositoryMock, ewsIntegrationMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void findAllByAction() {
-		when(mockCredentialsRepository.findAllByAction(any())).thenReturn(List.of(createCredentialsEntity()));
+		when(credentialsRepositoryMock.findAllByAction(any())).thenReturn(List.of(createCredentialsEntity()));
 
-		var credentials = emailService.findAllByAction("someAction");
+		final var credentials = emailService.findAllByAction("someAction");
 
 		assertThat(credentials).hasSize(1);
-		verify(mockCredentialsRepository).findAllByAction("someAction");
-		verifyNoMoreInteractions(mockCredentialsRepository);
+		verify(credentialsRepositoryMock).findAllByAction("someAction");
+		verifyNoMoreInteractions(credentialsRepositoryMock);
 	}
 
 	@Test
 	void getAllEmailsInInbox() {
 		final var credentials = createCredentialsEntity();
 		final var emailAddress = "someEmailAddress";
-		var emailMessage = mock(EmailMessage.class);
+		final var emailMessage = mock(EmailMessage.class);
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenReturn("somePassword");
-		when(mockEwsIntegration.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
+		when(ewsIntegrationMock.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
 			.thenReturn(List.of(emailMessage));
 
 		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
 
 		assertThat(emails).hasSize(1);
 
-		verify(mockEwsIntegration).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress);
-		verifyNoMoreInteractions(mockEwsIntegration);
-		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration);
+		verify(ewsIntegrationMock).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress);
+		verifyNoMoreInteractions(ewsIntegrationMock);
+		verifyNoInteractions(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock);
 	}
 
 	@Test
@@ -169,7 +198,7 @@ class EmailServiceTest {
 
 		verify(mockEncryptionUtility).decrypt("somePassword");
 		verifyNoMoreInteractions(mockEncryptionUtility);
-		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration);
+		verifyNoInteractions(emailRepositoryMock, credentialsRepositoryMock, ewsIntegrationMock, messagingIntegrationMock);
 	}
 
 	@Test
@@ -177,15 +206,15 @@ class EmailServiceTest {
 		final var emailEntity = createEmailEntity();
 		emailEntity.setCreatedAt(emailEntity.getCreatedAt().minusDays(2));
 
-		when(mockEmailRepository.findAll()).thenReturn(List.of(emailEntity, createEmailEntity(), createEmailEntity()));
+		when(emailRepositoryMock.findAll()).thenReturn(List.of(emailEntity, createEmailEntity(), createEmailEntity()));
 
 		final var emails = emailService.getOldEmails();
 
 		assertThat(emails).hasSize(1);
 
-		verify(mockEmailRepository).findAll();
-		verifyNoMoreInteractions(mockEmailRepository);
-		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockMessagingIntegration, mockEncryptionUtility);
+		verify(emailRepositoryMock).findAll();
+		verifyNoMoreInteractions(emailRepositoryMock);
+		verifyNoInteractions(credentialsRepositoryMock, ewsIntegrationMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
@@ -194,36 +223,36 @@ class EmailServiceTest {
 		final var emailEntity = createEmailEntity();
 		emailEntity.setId("Test!");
 		when(spy.getOldEmails()).thenReturn(List.of(emailEntity));
-		doNothing().when(mockMessagingIntegration).sendEmail(eq("someMunicipalityId"), any(), any());
+		doNothing().when(messagingIntegrationMock).sendEmail(eq("someMunicipalityId"), any(), any());
 
 		spy.sendReport();
 
 		verify(spy).getOldEmails();
 		verify(spy).sendReport();
-		verify(mockEmailRepository).findAll();
-		verify(mockMessagingIntegration).sendEmail(
+		verify(emailRepositoryMock).findAll();
+		verify(messagingIntegrationMock).sendEmail(
 			"someMunicipalityId",
 			"EmailReader has detected unhandled emails with the following IDs: [Test!]",
 			"[Warning] EmailReader has detected unhandled emails");
-		verifyNoMoreInteractions(mockMessagingIntegration);
-		verifyNoInteractions(mockCredentialsRepository, mockEwsIntegration, mockEncryptionUtility);
+		verifyNoMoreInteractions(messagingIntegrationMock);
+		verifyNoInteractions(credentialsRepositoryMock, ewsIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
 		emailService.saveAndMoveEmail(createEmail(null), "someEmail", createCredentialsEntity());
 
-		verify(mockEmailRepository).save(any());
-		verify(mockEwsIntegration).moveEmail(any(), any(), any());
-		verifyNoMoreInteractions(mockEmailRepository, mockEwsIntegration);
-		verifyNoInteractions(mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
+		verify(emailRepositoryMock).save(any());
+		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verifyNoMoreInteractions(emailRepositoryMock, ewsIntegrationMock);
+		verifyNoInteractions(credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void saveAndMoveEmailWithoutMockedDB() throws Exception {
 
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isEmpty();
-		final var service = new EmailService(emailRepository, credentialsRepository, mockMessagingIntegration, mockEwsIntegration, mockEncryptionUtility);
+		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
 		service.saveAndMoveEmail(createEmail(null), "someEmail", credentialsEntity);
@@ -231,9 +260,9 @@ class EmailServiceTest {
 		assertThat(credentialsRepository.findAll().getFirst().getMetadata()).isNotEmpty();
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isNotEmpty();
 
-		verify(mockEwsIntegration).moveEmail(any(), any(), any());
-		verifyNoMoreInteractions(mockEwsIntegration);
-		verifyNoInteractions(mockMessagingIntegration, mockEncryptionUtility);
+		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verifyNoMoreInteractions(ewsIntegrationMock);
+		verifyNoInteractions(messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
@@ -243,15 +272,71 @@ class EmailServiceTest {
 		final var email = createEmail(headers);
 		emailService.saveAndMoveEmail(email, "someEmail", createCredentialsEntity());
 
-		verify(mockEwsIntegration).deleteEmail(any());
-		verifyNoMoreInteractions(mockEwsIntegration);
-		verifyNoInteractions(mockEmailRepository, mockCredentialsRepository, mockMessagingIntegration, mockEncryptionUtility);
+		verify(ewsIntegrationMock).deleteEmail(any());
+		verifyNoMoreInteractions(ewsIntegrationMock);
+		verifyNoInteractions(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
 
 	@Test
 	void hasTransactionalAnnotation() throws Exception {
 		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", Email.class, String.class, CredentialsEntity.class);
 		assertThat(method.getAnnotation(Transactional.class)).isNotNull();
+	}
+
+	@Test
+	void getMessageAttachmentStreamed() throws Exception {
+		final var attachmentId = 12L;
+		final var content = "content";
+		final var contentType = "contentType";
+		final var fileName = "fileName";
+		final var inputStream = IOUtils.toInputStream(content, UTF_8);
+
+		when(mockAttachmentRepository.findById(any())).thenReturn(Optional.of(messageAttachmentEntityMock));
+		when(messageAttachmentEntityMock.getContentType()).thenReturn(contentType);
+		when(messageAttachmentEntityMock.getName()).thenReturn(fileName);
+		when(messageAttachmentEntityMock.getContent()).thenReturn(blobMock);
+		when(blobMock.length()).thenReturn((long) content.length());
+		when(blobMock.getBinaryStream()).thenReturn(inputStream);
+		when(servletResponseMock.getOutputStream()).thenReturn(servletOutputStreamMock);
+
+		emailService.getMessageAttachmentStreamed(attachmentId, servletResponseMock);
+
+		verify(mockAttachmentRepository).findById(attachmentId);
+		verify(messageAttachmentEntityMock).getContent();
+		verify(blobMock).length();
+		verify(blobMock).getBinaryStream();
+		verify(servletResponseMock).addHeader(CONTENT_TYPE, contentType);
+		verify(servletResponseMock).addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
+		verify(servletResponseMock).setContentLength(content.length());
+		verify(servletResponseMock).getOutputStream();
+	}
+
+	@Test
+	void getMessageAttachmentStreamedWhenAttachmentIsNotFound() {
+		when(mockAttachmentRepository.findById(any())).thenReturn(Optional.empty());
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> emailService.getMessageAttachmentStreamed(123, servletResponseMock))
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND));
+
+		verify(mockAttachmentRepository).findById(123L);
+		verifyNoMoreInteractions(mockAttachmentRepository);
+		verifyNoInteractions(messageAttachmentEntityMock, blobMock, servletOutputStreamMock);
+	}
+
+	@Test
+	void getMessageAttachmentStreamedWhenExceptionIsThrown() {
+		when(mockAttachmentRepository.findById(any())).thenReturn(Optional.of(messageAttachmentEntityMock));
+		when(messageAttachmentEntityMock.getContent()).thenAnswer(t -> { throw new IOException(); });
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> emailService.getMessageAttachmentStreamed(123, servletResponseMock))
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR));
+
+		verify(mockAttachmentRepository).findById(123L);
+		verify(messageAttachmentEntityMock).getContent();
+		verifyNoMoreInteractions(mockAttachmentRepository, messageAttachmentEntityMock);
+		verifyNoInteractions(blobMock, servletOutputStreamMock);
 	}
 
 }

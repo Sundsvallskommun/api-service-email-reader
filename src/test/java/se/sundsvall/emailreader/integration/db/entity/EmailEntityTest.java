@@ -13,10 +13,12 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.emailreader.api.model.Header;
@@ -40,7 +42,7 @@ class EmailEntityTest {
 	}
 
 	@Test
-	void testBuilder() {
+	void testBuilder() throws SQLException {
 		// ARRANGE
 		final var id = String.valueOf(new Random().nextInt());
 		final var namespace = "someNamespace";
@@ -48,6 +50,10 @@ class EmailEntityTest {
 		final var recipients = List.of("someRecipient");
 		final var sender = "someSender";
 		final var subject = "someSubject";
+
+		final var blob = new SerialBlob(new byte[] {
+			1, 2, 3
+		});
 		final var headers = List.of(EmailHeaderEntity.builder()
 			.withHeader(Header.IN_REPLY_TO)
 			.withValues(List.of("someValue"))
@@ -58,7 +64,7 @@ class EmailEntityTest {
 		final var metadata = Map.of("someKey", "someValue");
 		final var attachments = List.of(AttachmentEntity.builder()
 			.withName("someName")
-			.withContent("someContent")
+			.withContent(blob)
 			.withContentType("someContentType")
 			.build());
 

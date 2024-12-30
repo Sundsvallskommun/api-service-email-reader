@@ -5,7 +5,7 @@
         content_type varchar(255),
         email_id varchar(255),
         name varchar(255),
-        content longtext,
+        content longblob,
         primary key (id)
     ) engine=InnoDB;
 

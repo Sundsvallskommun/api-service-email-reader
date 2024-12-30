@@ -13,8 +13,10 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Random;
+import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +39,14 @@ class AttachmentEntityTest {
 	}
 
 	@Test
-	void testFields() {
+	void testFields() throws SQLException {
 
 		final var object = AttachmentEntity.builder()
 			.withId(new Random().nextLong())
 			.withName("someName")
-			.withContent("someContent")
+			.withContent(new SerialBlob(new byte[] {
+				1, 2, 3
+			}))
 			.withContentType("someContentType")
 			.withCreatedAt(now())
 			.build();
