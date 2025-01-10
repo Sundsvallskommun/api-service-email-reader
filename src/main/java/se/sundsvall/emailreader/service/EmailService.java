@@ -136,7 +136,7 @@ public class EmailService {
 
 	boolean isAutoReply(final Email email) {
 		return email.headers().entrySet().stream()
-			.filter(entry -> AUTO_SUBMITTED.getName().equals(entry.getKey().getName()))
+			.filter(entry -> AUTO_SUBMITTED.getName().equalsIgnoreCase(entry.getKey().getName()))
 			.flatMap(entry -> entry.getValue().stream())
 			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
