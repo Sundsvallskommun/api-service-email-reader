@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.0"
 servers:
-  - url: http://localhost:61425
+  - url: http://localhost:55654
     description: Generated server url
 tags:
   - name: Email
@@ -45,32 +45,21 @@ paths:
       responses:
         "204":
           description: No content
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
@@ -99,32 +88,21 @@ paths:
       responses:
         "204":
           description: No content
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
@@ -153,37 +131,21 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Credentials"
-            application/problem+json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Credentials"
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
@@ -211,32 +173,21 @@ paths:
       responses:
         "204":
           description: No content
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
@@ -272,22 +223,22 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Email"
-        "502":
-          description: Bad Gateway
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            application/json:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            application/json:
+            application/problem+json:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
@@ -316,22 +267,22 @@ paths:
             format: int32
           example: 123
       responses:
-        "502":
-          description: Bad Gateway
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            '*/*':
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            '*/*':
+            application/problem+json:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
@@ -378,22 +329,22 @@ paths:
       responses:
         "204":
           description: No content
-        "502":
-          description: Bad Gateway
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Problem"
         "500":
           description: Internal Server Error
           content:
-            '*/*':
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
         "400":
           description: Bad request
           content:
-            '*/*':
+            application/problem+json:
               schema:
                 oneOf:
                   - $ref: "#/components/schemas/Problem"
@@ -473,12 +424,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -608,12 +559,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
