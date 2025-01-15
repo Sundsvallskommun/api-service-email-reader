@@ -35,24 +35,21 @@ import se.sundsvall.emailreader.service.CredentialsService;
 @RestController
 @Validated
 @Tag(name = "Credentials", description = "Credentials")
-@RequestMapping(path = "/{municipalityId}/credentials",
-	produces = {
-		APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-	})
+@RequestMapping(path = "/{municipalityId}/credentials")
 @ApiResponse(
 	responseCode = "400",
 	description = "Bad request",
-	content = @Content(schema = @Schema(oneOf = {
+	content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {
 		Problem.class, ConstraintViolationProblem.class
 	})))
 @ApiResponse(
 	responseCode = "500",
 	description = "Internal Server Error",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
+	content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 @ApiResponse(
 	responseCode = "502",
 	description = "Bad Gateway",
-	content = @Content(schema = @Schema(implementation = Problem.class)))
+	content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 class CredentialsResource {
 
 	private final CredentialsService credentialsService;
@@ -64,7 +61,7 @@ class CredentialsResource {
 	@Operation(description = "Get a list of credentials", responses = {
 		@ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true)
 	})
-	@GetMapping
+	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Credentials>> getAllByMunicipalityId(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId) {
 
@@ -74,7 +71,7 @@ class CredentialsResource {
 	@Operation(description = "Create credentials", responses = {
 		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
 	})
-	@PostMapping(consumes = APPLICATION_JSON_VALUE)
+	@PostMapping(consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> create(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Valid @RequestBody final Credentials credentials) {
@@ -89,7 +86,7 @@ class CredentialsResource {
 	@Operation(description = "Update credentials", responses = {
 		@ApiResponse(responseCode = "204", description = "No content")
 	})
-	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE)
+	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> update(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id,
@@ -105,7 +102,7 @@ class CredentialsResource {
 	@Operation(description = "Delete credentials by id", responses = {
 		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
 	})
-	@DeleteMapping(path = "/{id}")
+	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> delete(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
 		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
