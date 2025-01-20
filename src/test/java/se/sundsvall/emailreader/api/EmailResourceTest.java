@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.api;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static se.sundsvall.emailreader.TestUtility.createEmail;
+import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmail;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +38,7 @@ class EmailResourceTest {
 	void testGetAllEmails() {
 
 		when(emailService.getAllEmails(any(String.class), any(String.class)))
-			.thenReturn(List.of(createEmail(null)));
+			.thenReturn(List.of(toEmail(createEmail(emptyMap()))));
 
 		final var response = webTestClient.get()
 			.uri("/2281/email/namespace")

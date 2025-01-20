@@ -1,6 +1,5 @@
 package se.sundsvall.emailreader.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.OffsetDateTime;
@@ -40,9 +39,7 @@ public record Email(
 
 		@Schema(description = "The attachment filename", example = "test.txt") String name,
 
-		@Schema(description = "The attachment content type", example = "text/plain") String contentType,
-
-		@JsonIgnore @Schema(description = "The attachment (file) content as a BASE64-encoded string", example = "aGVsbG8gd29ybGQK", hidden = true) String content) {
+		@Schema(description = "The attachment content type", example = "text/plain") String contentType) {
 
 	}
 

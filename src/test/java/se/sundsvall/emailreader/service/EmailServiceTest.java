@@ -1,10 +1,12 @@
 package se.sundsvall.emailreader.service;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -24,11 +26,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Blob;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
-import org.apache.commons.io.IOUtils;
+import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,13 +46,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
-import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.AttachmentRepository;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
@@ -240,10 +244,12 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
-		emailService.saveAndMoveEmail(createEmail(null), "someEmail", createCredentialsEntity());
+		var emailEntity = createEmail(emptyMap());
+		var credentials = createCredentialsEntity();
+		emailService.saveAndMoveEmail(emailEntity, "someEmail", credentials);
 
-		verify(emailRepositoryMock).save(any());
-		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verify(emailRepositoryMock).save(same(emailEntity));
+		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString("someId"), "someEmail", credentials.getDestinationFolder());
 		verifyNoMoreInteractions(emailRepositoryMock, ewsIntegrationMock);
 		verifyNoInteractions(credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
@@ -255,12 +261,19 @@ class EmailServiceTest {
 		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
-		service.saveAndMoveEmail(createEmail(null), "someEmail", credentialsEntity);
+		var emailId = UUID.randomUUID().toString();
+		var email = createEmail(emptyMap());
+		email.setOriginalId(emailId);
+		email.getAttachments().forEach(attachmentEntity -> attachmentEntity.setId(null));
+		email.setNamespace("namespace-1");
+		email.setMunicipalityId("municipality_id-1");
+
+		service.saveAndMoveEmail(email, "someEmail", credentialsEntity);
 
 		assertThat(credentialsRepository.findAll().getFirst().getMetadata()).isNotEmpty();
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isNotEmpty();
 
-		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString(emailId), "someEmail", "destination_folder-1");
 		verifyNoMoreInteractions(ewsIntegrationMock);
 		verifyNoInteractions(messagingIntegrationMock, mockEncryptionUtility);
 	}
@@ -279,7 +292,7 @@ class EmailServiceTest {
 
 	@Test
 	void hasTransactionalAnnotation() throws Exception {
-		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", Email.class, String.class, CredentialsEntity.class);
+		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", EmailEntity.class, String.class, CredentialsEntity.class);
 		assertThat(method.getAnnotation(Transactional.class)).isNotNull();
 	}
 
@@ -289,22 +302,17 @@ class EmailServiceTest {
 		final var content = "content";
 		final var contentType = "contentType";
 		final var fileName = "fileName";
-		final var inputStream = IOUtils.toInputStream(content, UTF_8);
 
 		when(mockAttachmentRepository.findById(any())).thenReturn(Optional.of(messageAttachmentEntityMock));
 		when(messageAttachmentEntityMock.getContentType()).thenReturn(contentType);
 		when(messageAttachmentEntityMock.getName()).thenReturn(fileName);
-		when(messageAttachmentEntityMock.getContent()).thenReturn(blobMock);
-		when(blobMock.length()).thenReturn((long) content.length());
-		when(blobMock.getBinaryStream()).thenReturn(inputStream);
+		when(messageAttachmentEntityMock.getContent()).thenReturn(Base64.getEncoder().encodeToString(content.getBytes(UTF_8)));
 		when(servletResponseMock.getOutputStream()).thenReturn(servletOutputStreamMock);
 
 		emailService.getMessageAttachmentStreamed(attachmentId, servletResponseMock);
 
 		verify(mockAttachmentRepository).findById(attachmentId);
 		verify(messageAttachmentEntityMock).getContent();
-		verify(blobMock).length();
-		verify(blobMock).getBinaryStream();
 		verify(servletResponseMock).addHeader(CONTENT_TYPE, contentType);
 		verify(servletResponseMock).addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"");
 		verify(servletResponseMock).setContentLength(content.length());

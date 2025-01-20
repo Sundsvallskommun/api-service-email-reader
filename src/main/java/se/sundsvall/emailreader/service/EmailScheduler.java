@@ -39,11 +39,14 @@ public class EmailScheduler {
 		for (final var credential : emailService.findAllByAction("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
 				LOG.info("Fetch mails for address '{}'", address);
-				for (final var email : EWSMapper.toEmails(emailService.getAllEmailsInInbox(credential, address))) {
+				for (final var email : EWSMapper.toEmails(emailService.getAllEmailsInInbox(credential, address),
+					credential.getMunicipalityId(),
+					credential.getNamespace(),
+					credential.getMetadata())) {
 					try {
 						emailService.saveAndMoveEmail(email, address, credential);
 					} catch (final Exception e) {
-						LOG.error("Failed to handle email with subject: {}", email.subject(), e);
+						LOG.error("Failed to handle email with subject: {}", email.getSubject(), e);
 					}
 				}
 			}

@@ -11,9 +11,8 @@ import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
+import java.util.Base64;
 import java.util.List;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
@@ -31,7 +30,6 @@ import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
-import se.sundsvall.emailreader.service.mapper.EmailMapper;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
@@ -124,20 +122,21 @@ public class EmailService {
 	}
 
 	@Transactional
-	public void saveAndMoveEmail(final Email email, final String emailAddress, final CredentialsEntity credential) throws Exception {
+	public void saveAndMoveEmail(final EmailEntity email, final String emailAddress, final CredentialsEntity credential) throws Exception {
 
 		if (isAutoReply(email)) {
-			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.id()));
+			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.getOriginalId()));
 			return;
 		}
-		emailRepository.save(EmailMapper.toEmailEntity(email, credential.getNamespace(), credential.getMunicipalityId(), new HashMap<>(credential.getMetadata())));
-		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.id()), emailAddress, credential.getDestinationFolder());
+
+		emailRepository.save(email);
+		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 	}
 
-	boolean isAutoReply(final Email email) {
-		return email.headers().entrySet().stream()
-			.filter(entry -> AUTO_SUBMITTED.getName().equalsIgnoreCase(entry.getKey().getName()))
-			.flatMap(entry -> entry.getValue().stream())
+	boolean isAutoReply(final EmailEntity email) {
+		return email.getHeaders().stream()
+			.filter(header -> AUTO_SUBMITTED.getName().equalsIgnoreCase(header.getHeader().getName()))
+			.flatMap(header -> header.getValues().stream())
 			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
 
@@ -148,13 +147,13 @@ public class EmailService {
 				.findById(attachmentId)
 				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
 
-			final var file = attachmentEntity.getContent();
+			final var file = Base64.getDecoder().decode(attachmentEntity.getContent());
 
 			response.addHeader(CONTENT_TYPE, attachmentEntity.getContentType());
 			response.addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentEntity.getName() + "\"");
-			response.setContentLength((int) file.length());
-			StreamUtils.copy(file.getBinaryStream(), response.getOutputStream());
-		} catch (final IOException | SQLException e) {
+			response.setContentLength(file.length);
+			StreamUtils.copy(file, response.getOutputStream());
+		} catch (final IOException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentId, e.getMessage()));
 		}
 	}

@@ -25,7 +25,6 @@ class EmailTest {
 			.withAttachments(List.of(Email.Attachment.builder()
 				.withId(1L)
 				.withName("someName")
-				.withContent("someContent")
 				.withContentType("someContentType")
 				.build()))
 			.build();
@@ -43,7 +42,6 @@ class EmailTest {
 			assertThat(attachment.id()).isEqualTo(1);
 			assertThat(attachment.name()).isEqualTo("someName");
 			assertThat(attachment.contentType()).isEqualTo("someContentType");
-			assertThat(attachment.content()).isEqualTo("someContent");
 		});
 
 	}
