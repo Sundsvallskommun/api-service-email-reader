@@ -45,7 +45,7 @@ public final class TestUtility {
 			.build();
 	}
 
-	public static EmailEntity createEmail(final Map<Header, List<String>> headers) {
+	public static EmailEntity createEmailEntity(final Map<Header, List<String>> headers) {
 
 		final var headerList = new ArrayList<EmailHeaderEntity>();
 		if (headers.isEmpty()) {
@@ -57,45 +57,24 @@ public final class TestUtility {
 		}
 
 		return EmailEntity.builder()
-			.withOriginalId("someId")
+			.withId("someId")
+			.withOriginalId("someOriginalId")
 			.withSubject("someSubject")
 			.withRecipients(List.of("someRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
 			.withHeaders(headerList)
 			.withMetadata(Map.of("someKey", "someValue"))
+			.withNamespace("someNamespace")
+			.withMunicipalityId("someMunicipalityId")
+			.withCreatedAt(OffsetDateTime.now())
+			.withReceivedAt(OffsetDateTime.now())
 			.withAttachments(List.of(AttachmentEntity.builder()
 				.withId(1L)
 				.withName("someName")
 				.withContent("someContent")
 				.withContentType("someContentType")
 				.build()))
-			.build();
-	}
-
-	public static EmailEntity createEmailEntity() {
-
-		return EmailEntity.builder()
-			.withSubject("someSubject")
-			.withRecipients(List.of("someRecipient"))
-			.withSender("someSender").withMessage("someMessage")
-			.withId("someId")
-			.withReceivedAt(OffsetDateTime.now())
-			.withHeaders(List.of(
-				EmailHeaderEntity.builder().withHeader(Header.MESSAGE_ID).withValues(List.of("someValue")).build(),
-				EmailHeaderEntity.builder().withHeader(Header.REFERENCES).withValues(List.of("someReferenceValue")).build(),
-				EmailHeaderEntity.builder().withHeader(Header.IN_REPLY_TO).withValues(List.of("someReplyToValue")).build()))
-			.withCreatedAt(OffsetDateTime.now())
-			.withNamespace("someNamespace")
-			.withMetadata(Map.of("someKey", "someValue"))
-			.withMunicipalityId("someMunicipalityId")
-			.withAttachments(List.of(
-				AttachmentEntity.builder()
-					.withId(1L)
-					.withName("someName")
-					.withContent("someContent")
-					.withContentType("someContentType")
-					.build()))
 			.build();
 	}
 }

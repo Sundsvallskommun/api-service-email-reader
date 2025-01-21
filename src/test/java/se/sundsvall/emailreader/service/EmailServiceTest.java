@@ -18,7 +18,6 @@ import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTest
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
-import static se.sundsvall.emailreader.TestUtility.createEmail;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import jakarta.servlet.ServletOutputStream;
@@ -46,6 +45,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.emailreader.TestUtility;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.AttachmentRepository;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -114,7 +114,7 @@ class EmailServiceTest {
 	@Test
 	void getAllEmails() {
 		when(emailRepositoryMock.findByMunicipalityIdAndNamespace("someMunicipalityId", "someNamespace"))
-			.thenReturn(List.of(createEmailEntity()));
+			.thenReturn(List.of(createEmailEntity(emptyMap())));
 
 		final var emails = emailService.getAllEmails("someMunicipalityId", "someNamespace");
 
@@ -207,10 +207,10 @@ class EmailServiceTest {
 
 	@Test
 	void getOldEmails() {
-		final var emailEntity = createEmailEntity();
+		final var emailEntity = createEmailEntity(emptyMap());
 		emailEntity.setCreatedAt(emailEntity.getCreatedAt().minusDays(2));
 
-		when(emailRepositoryMock.findAll()).thenReturn(List.of(emailEntity, createEmailEntity(), createEmailEntity()));
+		when(emailRepositoryMock.findAll()).thenReturn(List.of(emailEntity, createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
 
 		final var emails = emailService.getOldEmails();
 
@@ -224,7 +224,7 @@ class EmailServiceTest {
 	@Test
 	void sendReport() {
 		final var spy = Mockito.spy(emailService);
-		final var emailEntity = createEmailEntity();
+		final var emailEntity = createEmailEntity(emptyMap());
 		emailEntity.setId("Test!");
 		when(spy.getOldEmails()).thenReturn(List.of(emailEntity));
 		doNothing().when(messagingIntegrationMock).sendEmail(eq("someMunicipalityId"), any(), any());
@@ -244,12 +244,12 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
-		var emailEntity = createEmail(emptyMap());
+		var emailEntity = TestUtility.createEmailEntity(emptyMap());
 		var credentials = createCredentialsEntity();
 		emailService.saveAndMoveEmail(emailEntity, "someEmail", credentials);
 
 		verify(emailRepositoryMock).save(same(emailEntity));
-		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString("someId"), "someEmail", credentials.getDestinationFolder());
+		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString("someOriginalId"), "someEmail", credentials.getDestinationFolder());
 		verifyNoMoreInteractions(emailRepositoryMock, ewsIntegrationMock);
 		verifyNoInteractions(credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
@@ -262,7 +262,8 @@ class EmailServiceTest {
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
 		var emailId = UUID.randomUUID().toString();
-		var email = createEmail(emptyMap());
+		var email = TestUtility.createEmailEntity(emptyMap());
+		email.setId(null);
 		email.setOriginalId(emailId);
 		email.getAttachments().forEach(attachmentEntity -> attachmentEntity.setId(null));
 		email.setNamespace("namespace-1");
@@ -282,7 +283,7 @@ class EmailServiceTest {
 	void saveAndMoveEmailWithAutoReply() throws Exception {
 
 		final var headers = Map.of(Header.AUTO_SUBMITTED, List.of("auto-replied"));
-		final var email = createEmail(headers);
+		final var email = TestUtility.createEmailEntity(headers);
 		emailService.saveAndMoveEmail(email, "someEmail", createCredentialsEntity());
 
 		verify(ewsIntegrationMock).deleteEmail(any());

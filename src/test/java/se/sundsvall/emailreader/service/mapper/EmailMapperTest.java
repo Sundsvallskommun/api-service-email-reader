@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.service.mapper;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
@@ -14,7 +15,7 @@ class EmailMapperTest {
 	void toEmails() {
 
 		// Arrange
-		final var entity = createEmailEntity();
+		final var entity = createEmailEntity(emptyMap());
 
 		// Act
 		final var result = EmailMapper.toEmails(List.of(entity));
@@ -43,7 +44,7 @@ class EmailMapperTest {
 	void toEmail() {
 
 		// Arrange
-		final var entity = createEmailEntity();
+		final var entity = createEmailEntity(emptyMap());
 
 		// Act
 		final var result = EmailMapper.toEmail(entity);
@@ -73,7 +74,7 @@ class EmailMapperTest {
 	void toAttachment() {
 
 		// Arrange
-		final var attachmentEntity = createEmailEntity().getAttachments().getFirst();
+		final var attachmentEntity = createEmailEntity(emptyMap()).getAttachments().getFirst();
 
 		// Act
 		final var result = EmailMapper.toAttachment(attachmentEntity);
