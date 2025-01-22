@@ -1,7 +1,6 @@
 package se.sundsvall.emailreader.integration.ews;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
@@ -10,9 +9,9 @@ import static se.sundsvall.emailreader.utility.ServiceUtil.detectMimeType;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,8 +26,10 @@ import microsoft.exchange.webservices.data.property.complex.FileAttachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
+import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 
 @Component
 public final class EWSMapper {
@@ -37,14 +38,14 @@ public final class EWSMapper {
 
 	private EWSMapper() {}
 
-	public static List<Email> toEmails(final List<EmailMessage> emailMessages) {
+	public static List<EmailEntity> toEmails(final List<EmailMessage> emailMessages, String municipalityId, String namespace, Map<String, String> metadata) {
 		return emailMessages.stream()
-			.map(EWSMapper::toEmail)
+			.map(emailMessage -> toEmail(emailMessage, municipalityId, namespace, metadata))
 			.filter(Objects::nonNull)
 			.toList();
 	}
 
-	public static Email toEmail(final EmailMessage emailMessage) {
+	private static EmailEntity toEmail(final EmailMessage emailMessage, String municipalityId, String namespace, Map<String, String> metadata) {
 		try {
 
 			final var recipients = emailMessage.getToRecipients().getItems().stream()
@@ -65,8 +66,8 @@ public final class EWSMapper {
 				.map(OffsetDateTime::from)
 				.orElse(null);
 
-			return Email.builder()
-				.withId(emailMessage.getId().getUniqueId())
+			return EmailEntity.builder()
+				.withOriginalId(emailMessage.getId().getUniqueId())
 				.withSubject(emailMessage.getSubject())
 				.withSender(emailMessage.getFrom().getAddress())
 				.withRecipients(recipients)
@@ -75,6 +76,9 @@ public final class EWSMapper {
 				.withAttachments(attachments)
 				.withReceivedAt(receivedAt)
 				.withHeaders(toHeaders(emailMessage))
+				.withMunicipalityId(municipalityId)
+				.withNamespace(namespace)
+				.withMetadata(metadata)
 				.build();
 		} catch (final ServiceLocalException e) {
 			LOG.warn("Could not load email", e);
@@ -82,11 +86,11 @@ public final class EWSMapper {
 		}
 	}
 
-	private static Email.Attachment toAttachment(final FileAttachment fileAttachment) {
+	private static AttachmentEntity toAttachment(final FileAttachment fileAttachment) {
 
 		try {
 			fileAttachment.load();
-			return Email.Attachment.builder()
+			return AttachmentEntity.builder()
 				.withName(fileAttachment.getName())
 				.withContent(Base64.getEncoder().encodeToString(fileAttachment.getContent()))
 				.withContentType(detectMimeType(fileAttachment.getName(), fileAttachment.getContent()))
@@ -97,22 +101,26 @@ public final class EWSMapper {
 		}
 	}
 
-	private static Map<Header, List<String>> toHeaders(final EmailMessage emailMessage) {
+	private static List<EmailHeaderEntity> toHeaders(final EmailMessage emailMessage) {
 
 		try {
-			final var headers = new EnumMap<Header, List<String>>(Header.class);
+			final var headers = new ArrayList<EmailHeaderEntity>();
 
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.put(MESSAGE_ID, extractValues(value.getValue())), () -> headers.put(MESSAGE_ID, List.of("<" + UUID.randomUUID()
-				+ "@randomly-generated>")));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.put(REFERENCES, extractValues(value.getValue())));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.put(IN_REPLY_TO, extractValues(value.getValue())));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(AUTO_SUBMITTED.getName())).ifPresent(value -> headers.put(AUTO_SUBMITTED, extractValues(value.getValue())));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(value.getValue()))),
+				() -> headers.add(createEmailHeader(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>"))));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.add(createEmailHeader(REFERENCES, extractValues(value.getValue()))));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(value.getValue()))));
+			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(AUTO_SUBMITTED.getName())).ifPresent(value -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(value.getValue()))));
 
 			return headers;
 		} catch (final Exception e) {
 			LOG.warn("Could not load headers", e);
-			return emptyMap();
+			return emptyList();
 		}
+	}
+
+	private static EmailHeaderEntity createEmailHeader(Header header, List<String> values) {
+		return EmailHeaderEntity.builder().withHeader(header).withValues(values).build();
 	}
 
 	private static List<String> extractValues(final String input) {

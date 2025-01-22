@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.service;
 
+import static java.util.Collections.emptyMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -13,7 +14,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
-import static se.sundsvall.emailreader.TestUtility.createEmail;
+import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import generated.se.sundsvall.messaging.SmsRequest;
 import java.util.List;
@@ -73,10 +74,10 @@ class EmailSchedulerTest {
 		var emailMessage = mock(EmailMessage.class);
 		var credential = createCredentialsEntity();
 		var emailAddresses = "someEmailAddress";
-		var email = createEmail(null);
+		var email = createEmailEntity(emptyMap());
 		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(credential, emailAddresses)).thenReturn(List.of(emailMessage));
-		ewsMapperMock.when(() -> EWSMapper.toEmails(any())).thenReturn(List.of(email));
+		ewsMapperMock.when(() -> EWSMapper.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
 		doNothing().when(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
 
 		emailScheduler.checkForNewEmails();
@@ -105,7 +106,7 @@ class EmailSchedulerTest {
 		var emailMessage2 = mock(EmailMessage.class);
 		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
 		when(emailServiceMock.getAllEmailsInInbox(any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
-		ewsMapperMock.when(() -> EWSMapper.toEmails(any())).thenReturn(List.of(createEmail(null), createEmail(null)));
+		ewsMapperMock.when(() -> EWSMapper.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
 		doThrow(new Exception()).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
 
 		emailScheduler.checkForNewEmails();

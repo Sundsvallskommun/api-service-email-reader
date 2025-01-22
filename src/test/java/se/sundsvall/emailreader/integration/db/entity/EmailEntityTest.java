@@ -18,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import javax.sql.rowset.serial.SerialBlob;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.emailreader.api.model.Header;
@@ -45,15 +44,13 @@ class EmailEntityTest {
 	void testBuilder() throws SQLException {
 		// ARRANGE
 		final var id = String.valueOf(new Random().nextInt());
+		final var originalId = "originalId";
 		final var namespace = "someNamespace";
 		final var municipalityId = "someMunicipalityId";
 		final var recipients = List.of("someRecipient");
 		final var sender = "someSender";
 		final var subject = "someSubject";
 
-		final var blob = new SerialBlob(new byte[] {
-			1, 2, 3
-		});
 		final var headers = List.of(EmailHeaderEntity.builder()
 			.withHeader(Header.IN_REPLY_TO)
 			.withValues(List.of("someValue"))
@@ -64,13 +61,14 @@ class EmailEntityTest {
 		final var metadata = Map.of("someKey", "someValue");
 		final var attachments = List.of(AttachmentEntity.builder()
 			.withName("someName")
-			.withContent(blob)
+			.withContent("someContent")
 			.withContentType("someContentType")
 			.build());
 
 		// ACT
 		final var object = EmailEntity.builder()
 			.withId(id)
+			.withOriginalId(originalId)
 			.withNamespace(namespace)
 			.withMunicipalityId(municipalityId)
 			.withRecipients(recipients)
@@ -89,6 +87,7 @@ class EmailEntityTest {
 		// ASSERT
 		assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(object.getId()).isEqualTo(id);
+		assertThat(object.getOriginalId()).isEqualTo(originalId);
 		assertThat(object.getNamespace()).isEqualTo(namespace);
 		assertThat(object.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(object.getRecipients()).isEqualTo(recipients);

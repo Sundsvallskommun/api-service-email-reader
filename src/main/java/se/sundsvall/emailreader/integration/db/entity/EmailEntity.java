@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,9 @@ public class EmailEntity {
 	@UuidGenerator
 	@Column(name = "id")
 	private String id;
+
+	@Transient
+	private String originalId;
 
 	@ElementCollection
 	@CollectionTable(
