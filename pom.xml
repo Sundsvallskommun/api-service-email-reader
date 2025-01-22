@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.6</version>
+		<version>6.0.7</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
@@ -16,7 +16,6 @@
 		<!-- Generated sources properties -->
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
-		<shedlock.version>6.2.0</shedlock.version>
 		<tika-core.version>3.0.0</tika-core.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
@@ -30,6 +29,10 @@
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
 			<artifactId>dept44-common-validators</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>se.sundsvall.dept44</groupId>
+			<artifactId>dept44-starter-scheduler</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
@@ -47,16 +50,6 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.javacrumbs.shedlock</groupId>
-			<artifactId>shedlock-spring</artifactId>
-			<version>${shedlock.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.javacrumbs.shedlock</groupId>
-			<artifactId>shedlock-provider-jdbc-template</artifactId>
-			<version>${shedlock.version}</version>
 		</dependency>
 		<!-- Test -->
 		<dependency>
