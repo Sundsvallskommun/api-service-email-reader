@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,6 +101,9 @@ class EmailServiceTest {
 
 	@Mock
 	private ServletOutputStream servletOutputStreamMock;
+
+	@Mock
+	private Consumer<String> consumerMock;
 
 	@Mock
 	private Blob blobMock;
@@ -180,7 +184,7 @@ class EmailServiceTest {
 		when(ewsIntegrationMock.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
 			.thenReturn(List.of(emailMessage));
 
-		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
+		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress, consumerMock);
 
 		assertThat(emails).hasSize(1);
 
@@ -196,7 +200,7 @@ class EmailServiceTest {
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenThrow(new EncryptionException("someMessage"));
 
-		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress);
+		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress, consumerMock);
 
 		assertThat(emails).isEmpty();
 
@@ -244,8 +248,8 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
-		var emailEntity = TestUtility.createEmailEntity(emptyMap());
-		var credentials = createCredentialsEntity();
+		final var emailEntity = TestUtility.createEmailEntity(emptyMap());
+		final var credentials = createCredentialsEntity();
 		emailService.saveAndMoveEmail(emailEntity, "someEmail", credentials);
 
 		verify(emailRepositoryMock).save(same(emailEntity));
@@ -261,8 +265,8 @@ class EmailServiceTest {
 		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
-		var emailId = UUID.randomUUID().toString();
-		var email = TestUtility.createEmailEntity(emptyMap());
+		final var emailId = UUID.randomUUID().toString();
+		final var email = TestUtility.createEmailEntity(emptyMap());
 		email.setId(null);
 		email.setOriginalId(emailId);
 		email.getAttachments().forEach(attachmentEntity -> attachmentEntity.setId(null));

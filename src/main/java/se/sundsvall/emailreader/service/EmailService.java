@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.slf4j.Logger;
@@ -82,7 +83,7 @@ public class EmailService {
 		return credentialsRepository.findAllByAction(action);
 	}
 
-	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress) {
+	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress, final Consumer<String> emailConsumer) {
 		try {
 			final var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
 			return ewsIntegration.pageThroughEntireInbox(
@@ -90,6 +91,7 @@ public class EmailService {
 				credential.getDomain(), emailAddress);
 		} catch (final EncryptionException e) {
 			LOG.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
+			emailConsumer.accept("Failed to decrypt password for credential");
 		}
 		return emptyList();
 	}

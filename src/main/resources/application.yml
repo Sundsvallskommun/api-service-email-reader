@@ -18,6 +18,15 @@ spring:
   flyway:
     enabled: true
 scheduled:
+  check-for-new-emails:
+    name: checkForNewEmails
+    cron: "-"
+  check-for-old-emails:
+    name: checkForOldEmails
+    cron: "-"
+  check-for-new-sms-emails:
+    name: checkForNewSmsEmails
+    cron: "-"
   shedlock-lock-at-most-for: PT2M
 properties:
   credentials:
