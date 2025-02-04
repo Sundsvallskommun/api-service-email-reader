@@ -56,6 +56,7 @@ public class EmailScheduler {
 					try {
 						emailService.saveAndMoveEmail(email, address, credential);
 					} catch (final Exception e) {
+						LOG.error("Failed to handle individual email with id: '{}'. ", email.getId(), e);
 						dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, "Failed to handle individual email");
 					}
 				}
