@@ -113,7 +113,7 @@ class EmailSchedulerTest {
 		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
 		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
 		ewsMapperMock.when(() -> EWSMapper.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
-		doThrow(new Exception()).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
+		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
 
 		emailScheduler.checkForNewEmails();
 
