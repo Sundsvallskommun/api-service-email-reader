@@ -72,7 +72,6 @@ public final class EWSMapper {
 				.withSender(emailMessage.getFrom().getAddress())
 				.withRecipients(recipients)
 				.withMessage(emailMessage.getBody().toString())
-				.withId(String.valueOf(emailMessage.getId()))
 				.withAttachments(attachments)
 				.withReceivedAt(receivedAt)
 				.withHeaders(toHeaders(emailMessage))
