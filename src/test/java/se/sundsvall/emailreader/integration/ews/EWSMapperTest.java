@@ -74,14 +74,14 @@ class EWSMapperTest {
 		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA).getFirst();
 
 		// Assert
-		assertThat(result).hasNoNullFieldsOrPropertiesExcept("createdAt");
+		assertThat(result).hasNoNullFieldsOrPropertiesExcept("createdAt", "id");
 		assertThat(result.getSender()).isEqualTo("sender@example.com");
 		assertThat(result.getRecipients()).hasSize(1).satisfies(
 			recipient -> assertThat(recipient.getFirst()).isEqualTo("recipient@example.com"));
 		assertThat(result.getSubject()).isEqualTo("Test Email Subject");
 		assertThat(result.getMessage()).isEqualTo("Mocked email body");
 		assertThat(result.getReceivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
-		assertThat(result.getId()).isNotNull().isNotEmpty();
+		assertThat(result.getId()).isNull();
 		assertThat(result.getAttachments()).hasSize(1).satisfies(
 			attachment -> {
 				assertThat(attachment.getFirst().getName()).isEqualTo("Mocked attachment");
@@ -131,7 +131,7 @@ class EWSMapperTest {
 		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
 
 		// Assert
-		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "receivedAt", "createdAt");
+		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "receivedAt", "createdAt", "id");
 
 		assertThat(result.getSender()).isEqualTo("sender@example.com");
 		assertThat(result.getRecipients()).hasSize(1).satisfies(
@@ -139,7 +139,7 @@ class EWSMapperTest {
 		assertThat(result.getSubject()).isEqualTo("Test Email Subject");
 		assertThat(result.getMessage()).isEqualTo("Mocked email body");
 		assertThat(result.getReceivedAt()).isNull();
-		assertThat(result.getId()).isNotNull().isNotEmpty();
+		assertThat(result.getId()).isNull();
 		assertThat(result.getAttachments()).hasSize(1).satisfies(
 			attachment -> {
 				assertThat(attachment.getFirst().getName()).isEqualTo("Mocked attachment");
@@ -176,7 +176,7 @@ class EWSMapperTest {
 		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
 
 		// Assert
-		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt");
+		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt", "id");
 
 		assertThat(result.getSender()).isEqualTo("sender@example.com");
 		assertThat(result.getRecipients()).hasSize(1).satisfies(
@@ -184,7 +184,7 @@ class EWSMapperTest {
 		assertThat(result.getSubject()).isEqualTo("Test Email Subject");
 		assertThat(result.getMessage()).isEqualTo("Mocked email body");
 		assertThat(result.getReceivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
-		assertThat(result.getId()).isNotNull().isNotEmpty();
+		assertThat(result.getId()).isNull();
 		assertThat(result.getAttachments()).isEmpty();
 		assertThat(result.getHeaders()).hasSize(1).first().extracting("header").isEqualTo(MESSAGE_ID);
 	}
