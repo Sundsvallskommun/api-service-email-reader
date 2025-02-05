@@ -40,6 +40,13 @@ public final class EWSMapper {
 
 	public static List<EmailEntity> toEmails(final List<EmailMessage> emailMessages, String municipalityId, String namespace, Map<String, String> metadata) {
 		return emailMessages.stream()
+			.peek(emailMessage -> {
+				try {
+					LOG.info("Processing email id:'{}', uniqueId:'{}', isRead{}", emailMessage.getId(), emailMessage.getId().getUniqueId(), emailMessage.getIsRead());
+				} catch (Exception e) {
+					LOG.error("Logging failed", e);
+				}
+			})
 			.map(emailMessage -> toEmail(emailMessage, municipalityId, namespace, metadata))
 			.filter(Objects::nonNull)
 			.toList();

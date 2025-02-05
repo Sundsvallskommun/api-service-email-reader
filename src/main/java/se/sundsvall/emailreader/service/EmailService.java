@@ -131,7 +131,8 @@ public class EmailService {
 			return;
 		}
 
-		emailRepository.save(email);
+		var mail = emailRepository.save(email);
+		LOG.info("Saved entity id: '{}'", mail.getId());
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 	}
 

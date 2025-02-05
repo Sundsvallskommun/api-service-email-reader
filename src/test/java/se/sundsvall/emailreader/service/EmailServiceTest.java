@@ -250,6 +250,7 @@ class EmailServiceTest {
 	void saveAndMoveEmail() throws Exception {
 		final var emailEntity = TestUtility.createEmailEntity(emptyMap());
 		final var credentials = createCredentialsEntity();
+		when(emailRepositoryMock.save(any())).thenReturn(emailEntity);
 		emailService.saveAndMoveEmail(emailEntity, "someEmail", credentials);
 
 		verify(emailRepositoryMock).save(same(emailEntity));
