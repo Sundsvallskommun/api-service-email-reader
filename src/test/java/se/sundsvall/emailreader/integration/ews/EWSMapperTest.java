@@ -95,7 +95,8 @@ class EWSMapperTest {
 			Tuple.tuple(AUTO_SUBMITTED, List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")));
 		assertThat(result.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 		assertThat(result.getNamespace()).isEqualTo(NAMESPACE);
-		assertThat(result.getMetadata()).isSameAs(METADATA);
+		assertThat(result.getMetadata()).isNotSameAs(METADATA);
+		assertThat(result.getMetadata()).allSatisfy((key, value) -> assertThat(METADATA.get(key)).isEqualTo(value));
 	}
 
 	@Test
