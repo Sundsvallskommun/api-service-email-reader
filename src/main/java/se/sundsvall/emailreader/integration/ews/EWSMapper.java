@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
@@ -75,7 +76,7 @@ public final class EWSMapper {
 				.withHeaders(toHeaders(emailMessage))
 				.withMunicipalityId(municipalityId)
 				.withNamespace(namespace)
-				.withMetadata(metadata)
+				.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
 				.build();
 		} catch (final ServiceLocalException e) {
 			LOG.warn("Could not load email", e);
