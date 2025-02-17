@@ -108,6 +108,7 @@ public class EmailScheduler {
 				if (emailMap.get("Recipient") == null || emailMap.get("Message") == null) {
 					final var recipient = emailMap.get("Recipient");
 					final var message = emailMap.get("Message");
+					dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, "Recipient or Message is missing in email");
 					LOG.info("Either 'Recipient' or 'Message' is missing in email. Recipient: {}, Message: {}. Skipping email.", recipient, message);
 					ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 					continue;
@@ -121,11 +122,13 @@ public class EmailScheduler {
 					sendSms(credentials, validNumbers, emailMap);
 				}
 				if (invalidNumbers != null) {
+					dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, "Can not send sms to invalid numbers");
 					LOG.info("Can not send sms to invalid numbers: {}", invalidNumbers);
 				}
 				LOG.debug("Moving sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 			} catch (final Exception e) {
+				dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, "Failed to handle sms-email");
 				LOG.error("Failed to handle sms-email", e);
 				LOG.debug("Moving failed sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());

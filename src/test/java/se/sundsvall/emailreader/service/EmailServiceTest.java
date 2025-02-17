@@ -181,14 +181,14 @@ class EmailServiceTest {
 		final var emailMessage = mock(EmailMessage.class);
 
 		when(mockEncryptionUtility.decrypt("somePassword")).thenReturn("somePassword");
-		when(ewsIntegrationMock.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress))
+		when(ewsIntegrationMock.pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress, consumerMock))
 			.thenReturn(List.of(emailMessage));
 
 		final var emails = emailService.getAllEmailsInInbox(credentials, emailAddress, consumerMock);
 
 		assertThat(emails).hasSize(1);
 
-		verify(ewsIntegrationMock).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress);
+		verify(ewsIntegrationMock).pageThroughEntireInbox(credentials.getUsername(), "somePassword", credentials.getDomain(), emailAddress, consumerMock);
 		verifyNoMoreInteractions(ewsIntegrationMock);
 		verifyNoInteractions(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock);
 	}

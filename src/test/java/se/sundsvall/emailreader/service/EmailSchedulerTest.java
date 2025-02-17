@@ -11,6 +11,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
@@ -155,6 +156,49 @@ class EmailSchedulerTest {
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+	}
+
+	@Test
+	void checkForNewSmsEmails_throwException() throws Exception {
+		final var credential = createCredentialsEntity();
+		final var emailMessage = mock(EmailMessage.class);
+		final var emailAddress = mock(EmailAddress.class);
+
+		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
+		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
+		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
+		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenThrow(new RuntimeException("Something went wrong"));
+		emailScheduler.checkForNewSmsEmails();
+
+		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
+		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
+		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verifyNoMoreInteractions(emailServiceMock, ewsIntegrationMock);
+		verifyNoInteractions(messagingIntegrationMock);
+	}
+
+	@Test
+	void checkForNewSmsEmails_withoutRecipient() throws Exception {
+		final var credential = createCredentialsEntity();
+		final var emailMessage = mock(EmailMessage.class);
+		final var emailAddress = mock(EmailAddress.class);
+		final var emailMap = Map.of("Message", "someMessage");
+
+		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
+		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
+		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
+		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
+
+		emailScheduler.checkForNewSmsEmails();
+
+		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
+		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
+		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
+		verifyNoInteractions(messagingIntegrationMock);
 	}
 
 	@Test

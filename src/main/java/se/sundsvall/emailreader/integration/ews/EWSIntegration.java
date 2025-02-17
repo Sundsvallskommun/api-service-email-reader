@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
@@ -54,7 +55,7 @@ public class EWSIntegration {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
 	}
 
-	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress) {
+	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress, final Consumer<String> emailConsumer) {
 
 		// These properties should be replaced with credentials from the database in a later step
 		exchangeService.setCredentials(new WebCredentials(username, password));
@@ -73,6 +74,7 @@ public class EWSIntegration {
 			try {
 				findResults = exchangeService.findItems(folderId, view);
 			} catch (final Exception e) {
+				emailConsumer.accept("Could not find items");
 				LOG.error("Could not find items", e);
 				return emails;
 			}
@@ -84,6 +86,7 @@ public class EWSIntegration {
 						emails.add(message);
 					}
 				} catch (final Exception e) {
+					emailConsumer.accept("Could not load message");
 					LOG.error("Could not load message", e);
 				}
 			});

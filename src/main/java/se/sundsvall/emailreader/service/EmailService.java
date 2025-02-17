@@ -88,7 +88,8 @@ public class EmailService {
 			final var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
 			return ewsIntegration.pageThroughEntireInbox(
 				credential.getUsername(), decryptedPassword,
-				credential.getDomain(), emailAddress);
+				credential.getDomain(), emailAddress,
+				emailConsumer);
 		} catch (final EncryptionException e) {
 			LOG.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
 			emailConsumer.accept("Failed to decrypt password for credential");
