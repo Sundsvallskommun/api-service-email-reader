@@ -83,16 +83,16 @@ public class EmailService {
 		return credentialsRepository.findAllByAction(action);
 	}
 
-	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress, final Consumer<String> emailConsumer) {
+	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress, final Consumer<String> setUnHealthyConsumer) {
 		try {
 			final var decryptedPassword = encryptionUtility.decrypt(credential.getPassword());
 			return ewsIntegration.pageThroughEntireInbox(
 				credential.getUsername(), decryptedPassword,
 				credential.getDomain(), emailAddress,
-				emailConsumer);
+				setUnHealthyConsumer);
 		} catch (final EncryptionException e) {
 			LOG.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
-			emailConsumer.accept("Failed to decrypt password for credential");
+			setUnHealthyConsumer.accept("Failed to decrypt password for credential");
 		}
 		return emptyList();
 	}

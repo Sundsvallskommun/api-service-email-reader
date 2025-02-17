@@ -55,7 +55,7 @@ public class EWSIntegration {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
 	}
 
-	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress, final Consumer<String> emailConsumer) {
+	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress, final Consumer<String> setUnHealthyConsumer) {
 
 		// These properties should be replaced with credentials from the database in a later step
 		exchangeService.setCredentials(new WebCredentials(username, password));
@@ -74,7 +74,7 @@ public class EWSIntegration {
 			try {
 				findResults = exchangeService.findItems(folderId, view);
 			} catch (final Exception e) {
-				emailConsumer.accept("Could not find items");
+				setUnHealthyConsumer.accept("Could not find items");
 				LOG.error("Could not find items", e);
 				return emails;
 			}
@@ -86,7 +86,7 @@ public class EWSIntegration {
 						emails.add(message);
 					}
 				} catch (final Exception e) {
-					emailConsumer.accept("Could not load message");
+					setUnHealthyConsumer.accept("Could not load message");
 					LOG.error("Could not load message", e);
 				}
 			});
