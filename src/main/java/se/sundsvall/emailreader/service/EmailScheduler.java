@@ -26,7 +26,9 @@ public class EmailScheduler {
 	private final EmailService emailService;
 	private final MessagingIntegration messagingIntegration;
 	private final EWSIntegration ewsIntegration;
-	private final Dept44HealthUtility dept44HealthUtility;
+	private final Consumer<String> emailSetUnHealthyConsumer;
+	private final Consumer<String> smsSetUnHealthyConsumer;
+
 	@Value("${scheduled.check-for-new-emails.name}")
 	private String emailJobName;
 	@Value("${scheduled.check-for-new-sms-emails.name}")
@@ -36,7 +38,8 @@ public class EmailScheduler {
 		this.emailService = emailService;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
-		this.dept44HealthUtility = dept44HealthUtility;
+		this.emailSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, String.format("Email error: %s", msg));
+		this.smsSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, String.format("Email error: %s", msg));
 	}
 
 	@Dept44Scheduled(
@@ -48,8 +51,7 @@ public class EmailScheduler {
 		for (final var credential : emailService.findAllByAction("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
 				LOG.info("Fetch mails for address '{}'", address);
-				final Consumer<String> emailConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, String.format("Email error: %s", msg));
-				for (final var email : EWSMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailConsumer),
+				for (final var email : EWSMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer),
 					credential.getMunicipalityId(),
 					credential.getNamespace(),
 					credential.getMetadata())) {
@@ -57,7 +59,7 @@ public class EmailScheduler {
 						emailService.saveAndMoveEmail(email, address, credential);
 					} catch (final Exception e) {
 						LOG.error("Failed to handle individual email with id: '{}'. ", email.getId(), e);
-						dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, "Failed to handle individual email");
+						emailSetUnHealthyConsumer.accept("Failed to handle individual email");
 					}
 				}
 			}
@@ -84,9 +86,8 @@ public class EmailScheduler {
 	}
 
 	private List<EmailMessage> getMessagesByCredentials(final CredentialsEntity credentials) {
-		final Consumer<String> emailConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, String.format("Email error: %s", msg));
 		return credentials.getEmailAddress().stream()
-			.map(address -> emailService.getAllEmailsInInbox(credentials, address, emailConsumer))
+			.map(address -> emailService.getAllEmailsInInbox(credentials, address, smsSetUnHealthyConsumer))
 			.flatMap(List::stream)
 			.toList();
 	}
@@ -105,9 +106,10 @@ public class EmailScheduler {
 		for (final var emailMessage : messages) {
 			try {
 				final var emailMap = ewsIntegration.extractValuesEmailMessage(emailMessage);
-				if (emailMap.get("Recipient") == null || emailMap.get("Message") == null) {
+				final var message = emailMap.get("Message");
+				if (emailMap.get("Recipient") == null || message == null) {
 					final var recipient = emailMap.get("Recipient");
-					final var message = emailMap.get("Message");
+					smsSetUnHealthyConsumer.accept("Recipient or Message is missing in email");
 					LOG.info("Either 'Recipient' or 'Message' is missing in email. Recipient: {}, Message: {}. Skipping email.", recipient, message);
 					ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 					continue;
@@ -121,11 +123,13 @@ public class EmailScheduler {
 					sendSms(credentials, validNumbers, emailMap);
 				}
 				if (invalidNumbers != null) {
+					smsSetUnHealthyConsumer.accept("Can not send sms to invalid numbers");
 					LOG.info("Can not send sms to invalid numbers: {}", invalidNumbers);
 				}
 				LOG.debug("Moving sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());
 			} catch (final Exception e) {
+				smsSetUnHealthyConsumer.accept("Failed to handle sms-email");
 				LOG.error("Failed to handle sms-email", e);
 				LOG.debug("Moving failed sms-email to folder '{}'", credentials.getDestinationFolder());
 				ewsIntegration.moveEmail(emailMessage.getId(), emailMessage.getReceivedBy().getAddress(), credentials.getDestinationFolder());

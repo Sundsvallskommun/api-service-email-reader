@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
@@ -62,6 +63,9 @@ class EWSIntegrationTest {
 	@Mock
 	private MessageBody messageBodyMock;
 
+	@Mock
+	private Consumer<String> consumerMock;
+
 	private static Stream<Arguments> recipientNumbersProvider() {
 		return Stream.of(
 			Arguments.of(Map.of("Recipient", "0713266789"), Map.of("VALID", List.of("+46713266789"))),
@@ -86,7 +90,7 @@ class EWSIntegrationTest {
 		when(exchangeServiceMock.findItems(any(FolderId.class), any())).thenReturn(findItemsResults);
 
 		final var result = ewsIntegration.pageThroughEntireInbox(
-			"someUsername", "somePassword", "someDomain", "someEmailAdress");
+			"someUsername", "somePassword", "someDomain", "someEmailAdress", consumerMock);
 
 		assertThat(result).isNotNull().hasSize(1).isEqualTo(emailMessages);
 	}
@@ -97,7 +101,7 @@ class EWSIntegrationTest {
 			.thenThrow(new HttpErrorException("Some cool error message from the server", 401));
 
 		final var result = ewsIntegration.pageThroughEntireInbox(
-			"someUsername", "somePassword", "someDomain", "someEmailAdress");
+			"someUsername", "somePassword", "someDomain", "someEmailAdress", consumerMock);
 
 		assertThat(result).isNotNull().isEmpty();
 		assertThat(output).contains("Could not find items")
