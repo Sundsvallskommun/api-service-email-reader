@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mariadb.jdbc.MariaDbBlob;
 
 class AttachmentEntityTest {
 
@@ -38,18 +39,32 @@ class AttachmentEntityTest {
 
 	@Test
 	void testFields() {
+		// Arrange
+		final var content = "content";
+		final var file = new MariaDbBlob(content.getBytes());
+		final var id = 1L;
+		final var name = "someName";
+		final var contentType = "someContentType";
+		final var now = now();
 
 		final var object = AttachmentEntity.builder()
-			.withId(new Random().nextLong())
-			.withName("someName")
-			.withContent("someContent")
-			.withContentType("someContentType")
-			.withCreatedAt(now())
+			.withId(id)
+			.withName(name)
+			.withContent(file)
+			.withContentType(contentType)
 			.build();
 
+		// Act
 		object.prePersist();
-		assertThat(object.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+
+		// Assert
 		assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(object.getId()).isEqualTo(id);
+		assertThat(object.getName()).isEqualTo(name);
+		assertThat(object.getContent()).isEqualTo(file);
+		assertThat(object.getContentType()).isEqualTo(contentType);
+		assertThat(object.getCreatedAt()).isCloseTo(now, within(1, SECONDS));
+
 	}
 
 }

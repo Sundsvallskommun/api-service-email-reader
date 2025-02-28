@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,15 +23,12 @@ import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.MessageBody;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
@@ -42,8 +38,8 @@ import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 @ExtendWith(MockitoExtension.class)
 class EmailSchedulerTest {
 
-	private MockedStatic<EWSMapper> ewsMapperMock;
-
+	@Mock
+	private EWSMapper ewsMapperMock;
 	@Mock
 	private Consumer<String> consumerMock;
 	@Mock
@@ -66,16 +62,6 @@ class EmailSchedulerTest {
 	@InjectMocks
 	private EmailScheduler emailScheduler;
 
-	@BeforeEach
-	public void setUp() {
-		ewsMapperMock = mockStatic(EWSMapper.class);
-	}
-
-	@AfterEach
-	public void tearDown() {
-		ewsMapperMock.close();
-	}
-
 	@Test
 	void checkForNewEmails() throws Exception {
 		final var emailMessage = mock(EmailMessage.class);
@@ -84,7 +70,7 @@ class EmailSchedulerTest {
 		final var email = createEmailEntity(emptyMap());
 		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq(emailAddresses), any())).thenReturn(List.of(emailMessage));
-		ewsMapperMock.when(() -> EWSMapper.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
+		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
 		doNothing().when(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
 
 		emailScheduler.checkForNewEmails();
@@ -113,7 +99,7 @@ class EmailSchedulerTest {
 		final var emailMessage2 = mock(EmailMessage.class);
 		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
 		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
-		ewsMapperMock.when(() -> EWSMapper.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
+		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
 		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
 
 		emailScheduler.checkForNewEmails();

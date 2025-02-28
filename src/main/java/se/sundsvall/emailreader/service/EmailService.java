@@ -11,8 +11,8 @@ import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.OffsetDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
@@ -150,13 +150,13 @@ public class EmailService {
 				.findById(attachmentId)
 				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
 
-			final var file = Base64.getDecoder().decode(attachmentEntity.getContent());
+			final var file = attachmentEntity.getContent();
 
 			response.addHeader(CONTENT_TYPE, attachmentEntity.getContentType());
 			response.addHeader(CONTENT_DISPOSITION, "attachment; filename=\"" + attachmentEntity.getName() + "\"");
-			response.setContentLength(file.length);
-			StreamUtils.copy(file, response.getOutputStream());
-		} catch (final IOException e) {
+			response.setContentLength((int) file.length());
+			StreamUtils.copy(file.getBinaryStream(), response.getOutputStream());
+		} catch (final IOException | SQLException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentId, e.getMessage()));
 		}
 	}
