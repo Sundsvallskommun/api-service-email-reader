@@ -10,11 +10,10 @@ import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
-import static se.sundsvall.emailreader.integration.ews.EWSMapper.toEmails;
 
+import java.sql.Blob;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,10 @@ import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.emailreader.utility.BlobBuilder;
 
 @ExtendWith({
 	MockitoExtension.class
@@ -41,6 +43,14 @@ class EWSMapperTest {
 	private static final String MUNICIPALITY_ID = "municipalityId";
 	private static final String NAMESPACE = "namespace";
 	private static final Map<String, String> METADATA = Map.of("key", "value");
+
+	@Mock
+	private Blob blobMock;
+	@Mock
+	private BlobBuilder blobBuilderMock;
+
+	@InjectMocks
+	private EWSMapper ewsmapper;
 
 	@Test
 	void testToEmails() throws Exception {
@@ -65,13 +75,16 @@ class EWSMapperTest {
 
 		when(emailMessage.getAttachments()).thenReturn(new AttachmentCollection());
 		final var attachments = emailMessage.getAttachments();
+		final var content = "mockedfile.jpg".getBytes();
 		final var fileAttachment = mock(FileAttachment.class);
 		when(fileAttachment.getName()).thenReturn("Mocked attachment");
-		when(fileAttachment.getContent()).thenReturn("mockedfile.jpg".getBytes());
+		when(fileAttachment.getContent()).thenReturn(content);
 		attachments.getItems().add(fileAttachment);
 
+		when(blobBuilderMock.createBlob(content)).thenReturn(blobMock);
+
 		// Act
-		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA).getFirst();
+		final var result = ewsmapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA).getFirst();
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("createdAt", "id");
@@ -86,7 +99,7 @@ class EWSMapperTest {
 			attachment -> {
 				assertThat(attachment.getFirst().getName()).isEqualTo("Mocked attachment");
 				assertThat(attachment.getFirst().getContentType()).isEqualTo("text/plain");
-				assertThat(attachment.getFirst().getContent()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
+				assertThat(attachment.getFirst().getContent()).isEqualTo(blobMock);
 			});
 		assertThat(result.getHeaders()).hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
 			Tuple.tuple(MESSAGE_ID, List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")),
@@ -124,12 +137,14 @@ class EWSMapperTest {
 		when(emailMessage.getAttachments()).thenReturn(new AttachmentCollection());
 		final var attachments = emailMessage.getAttachments();
 		final var fileAttachment = mock(FileAttachment.class);
+		final var content = "mockedfile.jpg".getBytes();
 		when(fileAttachment.getName()).thenReturn("Mocked attachment");
-		when(fileAttachment.getContent()).thenReturn("mockedfile.jpg".getBytes());
+		when(fileAttachment.getContent()).thenReturn(content);
 		attachments.getItems().add(fileAttachment);
+		when(blobBuilderMock.createBlob(content)).thenReturn(blobMock);
 
 		// Act
-		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
+		final var result = ewsmapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "receivedAt", "createdAt", "id");
@@ -145,7 +160,7 @@ class EWSMapperTest {
 			attachment -> {
 				assertThat(attachment.getFirst().getName()).isEqualTo("Mocked attachment");
 				assertThat(attachment.getFirst().getContentType()).isEqualTo("text/plain");
-				assertThat(attachment.getFirst().getContent()).isEqualTo(Base64.getEncoder().encodeToString("mockedfile.jpg".getBytes()));
+				assertThat(attachment.getFirst().getContent()).isEqualTo(blobMock);
 			});
 		assertThat(result.getHeaders()).hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
 			Tuple.tuple(MESSAGE_ID, List.of("<Test1@Test1.se>", "<Test2@Test2.se>", "<Test3@Test3.se>")),
@@ -174,7 +189,7 @@ class EWSMapperTest {
 		when(emailMessage.getInternetMessageHeaders()).thenReturn(new InternetMessageHeaderCollection());
 
 		// Act
-		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
+		final var result = ewsmapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
 
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt", "id");
@@ -197,7 +212,7 @@ class EWSMapperTest {
 		final var emailMessage = mock(EmailMessage.class);
 		when(emailMessage.getToRecipients()).thenThrow(new ServiceLocalException("Something went wrong"));
 		// Act
-		final var result = toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA);
+		final var result = ewsmapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA);
 		// Assert
 		assertThat(result).isEmpty();
 	}

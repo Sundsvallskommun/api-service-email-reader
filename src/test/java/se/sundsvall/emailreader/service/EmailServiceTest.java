@@ -25,7 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Blob;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +32,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -307,11 +307,13 @@ class EmailServiceTest {
 		final var content = "content";
 		final var contentType = "contentType";
 		final var fileName = "fileName";
-
+		final var inputStream = IOUtils.toInputStream(content, UTF_8);
 		when(mockAttachmentRepository.findById(any())).thenReturn(Optional.of(messageAttachmentEntityMock));
 		when(messageAttachmentEntityMock.getContentType()).thenReturn(contentType);
 		when(messageAttachmentEntityMock.getName()).thenReturn(fileName);
-		when(messageAttachmentEntityMock.getContent()).thenReturn(Base64.getEncoder().encodeToString(content.getBytes(UTF_8)));
+		when(messageAttachmentEntityMock.getContent()).thenReturn(blobMock);
+		when(blobMock.length()).thenReturn((long) content.length());
+		when(blobMock.getBinaryStream()).thenReturn(inputStream);
 		when(servletResponseMock.getOutputStream()).thenReturn(servletOutputStreamMock);
 
 		emailService.getMessageAttachmentStreamed(attachmentId, servletResponseMock);

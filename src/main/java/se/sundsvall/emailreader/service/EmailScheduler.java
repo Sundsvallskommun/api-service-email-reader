@@ -28,18 +28,20 @@ public class EmailScheduler {
 	private final EWSIntegration ewsIntegration;
 	private final Consumer<String> emailSetUnHealthyConsumer;
 	private final Consumer<String> smsSetUnHealthyConsumer;
+	private final EWSMapper ewsMapper;
 
 	@Value("${scheduled.check-for-new-emails.name}")
 	private String emailJobName;
 	@Value("${scheduled.check-for-new-sms-emails.name}")
 	private String smsJobName;
 
-	public EmailScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility) {
+	public EmailScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility, final EWSMapper ewsMapper) {
 		this.emailService = emailService;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
 		this.emailSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, String.format("Email error: %s", msg));
 		this.smsSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, String.format("Email error: %s", msg));
+		this.ewsMapper = ewsMapper;
 	}
 
 	@Dept44Scheduled(
@@ -51,7 +53,7 @@ public class EmailScheduler {
 		for (final var credential : emailService.findAllByAction("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
 				LOG.info("Fetch mails for address '{}'", address);
-				for (final var email : EWSMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer),
+				for (final var email : ewsMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer),
 					credential.getMunicipalityId(),
 					credential.getNamespace(),
 					credential.getMetadata())) {

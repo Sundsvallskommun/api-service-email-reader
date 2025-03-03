@@ -5,15 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.Length;
 
 @Entity
 @Table(name = "attachment")
@@ -31,8 +32,9 @@ public class AttachmentEntity {
 	@Column(name = "name")
 	private String name;
 
-	@Column(name = "content", length = Length.LONG32)
-	private String content;
+	@Column(name = "content", columnDefinition = "longblob")
+	@Lob
+	private Blob content;
 
 	@Column(name = "content_type")
 	private String contentType;

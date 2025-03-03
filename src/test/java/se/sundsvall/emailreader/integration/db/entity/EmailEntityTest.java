@@ -13,13 +13,13 @@ import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mariadb.jdbc.MariaDbBlob;
 import se.sundsvall.emailreader.api.model.Header;
 
 class EmailEntityTest {
@@ -41,7 +41,7 @@ class EmailEntityTest {
 	}
 
 	@Test
-	void testBuilder() throws SQLException {
+	void testBuilder() {
 		// ARRANGE
 		final var id = String.valueOf(new Random().nextInt());
 		final var originalId = "originalId";
@@ -59,9 +59,11 @@ class EmailEntityTest {
 		final var receivedAt = now();
 		final var createdAt = now();
 		final var metadata = Map.of("someKey", "someValue");
+		final var content = "content";
+		final var file = new MariaDbBlob(content.getBytes());
 		final var attachments = List.of(AttachmentEntity.builder()
 			.withName("someName")
-			.withContent("someContent")
+			.withContent(file)
 			.withContentType("someContentType")
 			.build());
 
