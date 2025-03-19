@@ -17,6 +17,8 @@
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
 		<tika-core.version>3.1.0</tika-core.version>
+		<graph-api.version>6.30.0</graph-api.version>
+		<azure-identity.version>1.15.0</azure-identity.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
 	<dependencies>
@@ -72,6 +74,17 @@
 			<groupId>javax.xml.ws</groupId>
 			<artifactId>jaxws-api</artifactId>
 			<version>${jaxws-api.version}</version>
+		</dependency>
+		<!-- Microsoft Graph -->
+		<dependency>
+			<groupId>com.microsoft.graph</groupId>
+			<artifactId>microsoft-graph</artifactId>
+			<version>${graph-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-identity</artifactId>
+			<version>${azure-identity.version}</version>
 		</dependency>
 		<!-- Other -->
 		<dependency>
