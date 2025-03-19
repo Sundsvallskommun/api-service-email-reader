@@ -22,9 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class GraphClientTest {
 
 	@Mock
-	MailFolderItemRequestBuilder mailFolderItemRequestBuilder;
+	private MailFolderItemRequestBuilder mailFolderItemRequestBuilder;
 	@Mock
-	MessagesRequestBuilder messagesRequestBuilder;
+	private MessagesRequestBuilder messagesRequestBuilder;
 	@Mock
 	private GraphServiceClient graphServiceClient;
 	@Mock
