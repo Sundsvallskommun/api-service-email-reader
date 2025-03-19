@@ -85,7 +85,8 @@ class GraphCredentialsResource {
 	}
 
 	@Operation(description = "Update Graph credentials", responses = {
-		@ApiResponse(responseCode = "204", description = "No content")
+		@ApiResponse(responseCode = "204", description = "No content"),
+		@ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
 	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> update(
@@ -101,7 +102,8 @@ class GraphCredentialsResource {
 	}
 
 	@Operation(description = "Delete Graph credentials by id", responses = {
-		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true)
+		@ApiResponse(responseCode = "204", description = "No content", useReturnTypeSchema = true),
+		@ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
 	})
 	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> delete(
