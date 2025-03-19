@@ -1,0 +1,13 @@
+{
+	"tenantId": "new_tenant_id",
+	"clientId": "new_client_id",
+	"clientSecret": "new_client_secret",
+	"emailAddress": [
+		"new_test@example.com"
+	],
+	"namespace": "new_namespace",
+	"metadata": {
+		"metadata_key": "new_metadata_value"
+	},
+	"destinationFolder": "new_destination_folder"
+}

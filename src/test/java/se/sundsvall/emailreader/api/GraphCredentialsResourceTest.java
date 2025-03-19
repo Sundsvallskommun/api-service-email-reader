@@ -49,6 +49,26 @@ class GraphCredentialsResourceTest {
 	}
 
 	@Test
+	void getByMunicipalityIdAndId() {
+		// Arrange
+		final var municipalityId = "2281";
+		final var someId = UUID.randomUUID().toString();
+		when(graphCredentialsService.getCredentialsByMunicipalityIdAndId(municipalityId, someId)).thenReturn(GraphCredentials.builder().build());
+
+		// Act
+		final var response = webTestClient.get()
+			.uri(builder -> builder.path(PATH + "/{id}").build(Map.of("municipalityId", municipalityId, "id", someId)))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(GraphCredentials.class)
+			.returnResult()
+			.getResponseBody();
+
+		// Assert
+		assertThat(response).isNotNull();
+	}
+
+	@Test
 	void create() {
 		// Arrange
 		final var municipalityId = "2281";
