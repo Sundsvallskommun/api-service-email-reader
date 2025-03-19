@@ -1,4 +1,4 @@
-create table graph_credentials
+create table if not exists graph_credentials
 (
     created_at         datetime(6),
     client_id          varchar(255),
@@ -11,13 +11,13 @@ create table graph_credentials
     primary key (id)
 ) engine = InnoDB;
 
-create table graph_credentials_email_address
+create table if not exists graph_credentials_email_address
 (
     email_address        varchar(255),
     graph_credentials_id varchar(255) not null
 ) engine = InnoDB;
 
-create table graph_credentials_metadata
+create table if not exists graph_credentials_metadata
 (
     graph_credentials_id varchar(255) not null,
     metadata             varchar(255),
@@ -28,10 +28,10 @@ create table graph_credentials_metadata
 
 alter table if exists graph_credentials_email_address
     add constraint fk_graph_credentials_email_address_graph_credentials_id
-        foreign key (graph_credentials_id)
+        foreign key if not exists (graph_credentials_id)
             references graph_credentials (id);
 
 alter table if exists graph_credentials_metadata
     add constraint fk_graph_credentials_metadata_graph_credentials_id
-        foreign key (graph_credentials_id)
+        foreign key if not exists (graph_credentials_id)
             references graph_credentials (id);
