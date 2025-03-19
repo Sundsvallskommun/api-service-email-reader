@@ -24,7 +24,7 @@ scheduled:
       cron: "-"
     graph:
       name: graphCheckForNewEmails
-      cron: '*/10 * * * * *'
+      cron: "-"
   check-for-old-emails:
     name: checkForOldEmails
     cron: "-"
