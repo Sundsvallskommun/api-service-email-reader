@@ -74,7 +74,7 @@ public class EWSIntegration {
 			try {
 				findResults = exchangeService.findItems(folderId, view);
 			} catch (final Exception e) {
-				setUnHealthyConsumer.accept("Could not find items");
+				setUnHealthyConsumer.accept("[EWS] Could not find items");
 				LOG.error("Could not find items", e);
 				return emails;
 			}
@@ -86,7 +86,7 @@ public class EWSIntegration {
 						emails.add(message);
 					}
 				} catch (final Exception e) {
-					setUnHealthyConsumer.accept("Could not load message");
+					setUnHealthyConsumer.accept("[EWS] Could not load message");
 					LOG.error("Could not load message", e);
 				}
 			});

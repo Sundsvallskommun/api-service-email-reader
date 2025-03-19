@@ -5,6 +5,7 @@ import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
 
+import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
 import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.InternetMessageHeader;
@@ -52,7 +53,6 @@ public class GraphMapper {
 			.withReceivedAt(message.getReceivedDateTime())
 			.withCreatedAt(message.getCreatedDateTime())
 			.withMetadata(metadata)
-			.withAttachments(toAttachments(message))
 			.build();
 	}
 
@@ -125,8 +125,8 @@ public class GraphMapper {
 			.toList();
 	}
 
-	private List<AttachmentEntity> toAttachments(final Message message) {
-		return Optional.ofNullable(message.getAttachments())
+	public List<AttachmentEntity> toAttachments(final List<Attachment> attachments) {
+		return Optional.ofNullable(attachments)
 			.orElse(emptyList()).stream()
 			.map(attachment -> {
 				if (attachment instanceof final FileAttachment fileAttachment) {

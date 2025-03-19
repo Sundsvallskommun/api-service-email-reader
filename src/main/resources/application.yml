@@ -19,8 +19,12 @@ spring:
     enabled: true
 scheduled:
   check-for-new-emails:
-    name: checkForNewEmails
-    cron: "-"
+    ews:
+      name: ewsCheckForNewEmails
+      cron: "-"
+    graph:
+      name: graphCheckForNewEmails
+      cron: '*/10 * * * * *'
   check-for-old-emails:
     name: checkForOldEmails
     cron: "-"
@@ -28,6 +32,7 @@ scheduled:
     name: checkForNewSmsEmails
     cron: "-"
   shedlock-lock-at-most-for: PT2M
+  maximum-execution-time: PT2M
 properties:
   credentials:
     secret-key: ${SECRET_KEY}
