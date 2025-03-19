@@ -38,7 +38,7 @@ import se.sundsvall.emailreader.service.GraphCredentialsService;
 
 @RestController
 @Validated
-@Tag(name = "Credentials", description = "Credentials for Microsoft Graph")
+@Tag(name = "Graph Credentials", description = "Credentials for Microsoft Graph")
 @RequestMapping(path = "/{municipalityId}/credentials/graph")
 @ApiResponse(
 	responseCode = "400",

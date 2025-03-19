@@ -7,13 +7,13 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:62667
+  - url: http://localhost:55896
     description: Generated server url
 tags:
-  - name: Credentials
-    description: Credentials for Microsoft Graph
   - name: Email
     description: Email
+  - name: Graph Credentials
+    description: Credentials for Microsoft Graph
   - name: Credentials
     description: Credentials
 paths:
@@ -113,7 +113,7 @@ paths:
   /{municipalityId}/credentials/graph/{id}:
     put:
       tags:
-        - Credentials
+        - Graph Credentials
       description: Update Graph credentials
       operationId: update_1
       parameters:
@@ -168,7 +168,7 @@ paths:
                 $ref: "#/components/schemas/Problem"
     delete:
       tags:
-        - Credentials
+        - Graph Credentials
       description: Delete Graph credentials by id
       operationId: delete_1
       parameters:
@@ -303,7 +303,7 @@ paths:
   /{municipalityId}/credentials/graph:
     get:
       tags:
-        - Credentials
+        - Graph Credentials
       description: Get a list of Graph credentials
       operationId: getAllByMunicipalityId_1
       parameters:
@@ -345,7 +345,7 @@ paths:
                 $ref: "#/components/schemas/Problem"
     post:
       tags:
-        - Credentials
+        - Graph Credentials
       description: Create Graph credentials
       operationId: create_1
       parameters:
@@ -621,12 +621,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -756,12 +756,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:

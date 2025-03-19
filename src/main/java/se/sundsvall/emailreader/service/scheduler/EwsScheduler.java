@@ -1,4 +1,4 @@
-package se.sundsvall.emailreader.service;
+package se.sundsvall.emailreader.service.scheduler;
 
 import static java.lang.Math.min;
 
@@ -18,11 +18,12 @@ import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
+import se.sundsvall.emailreader.service.EmailService;
 
 @Component
-public class EmailScheduler {
+public class EwsScheduler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EmailScheduler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EwsScheduler.class);
 	private final EmailService emailService;
 	private final MessagingIntegration messagingIntegration;
 	private final EWSIntegration ewsIntegration;
@@ -30,12 +31,12 @@ public class EmailScheduler {
 	private final Consumer<String> smsSetUnHealthyConsumer;
 	private final EWSMapper ewsMapper;
 
-	@Value("${scheduled.check-for-new-emails.name}")
+	@Value("${scheduled.check-for-new-emails.ews.name}")
 	private String emailJobName;
 	@Value("${scheduled.check-for-new-sms-emails.name}")
 	private String smsJobName;
 
-	public EmailScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility, final EWSMapper ewsMapper) {
+	public EwsScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility, final EWSMapper ewsMapper) {
 		this.emailService = emailService;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
@@ -45,8 +46,8 @@ public class EmailScheduler {
 	}
 
 	@Dept44Scheduled(
-		cron = "${scheduled.check-for-new-emails.cron}",
-		name = "${scheduled.check-for-new-emails.name}",
+		cron = "${scheduled.check-for-new-emails.ews.cron}",
+		name = "${scheduled.check-for-new-emails.ews.name}",
 		lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}",
 		maximumExecutionTime = "${scheduled.maximum-execution-time}")
 	public void checkForNewEmails() {

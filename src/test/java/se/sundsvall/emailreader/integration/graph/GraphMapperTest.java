@@ -1,7 +1,10 @@
 package se.sundsvall.emailreader.integration.graph;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
 import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.InternetMessageHeader;
@@ -18,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.utility.BlobBuilder;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,22 +38,38 @@ class GraphMapperTest {
 	@Test
 	void testToEmails() {
 		// Arrange
-		final Message message = createMessage();
-		final List<Message> messages = List.of(message);
-		final String municipalityId = "municipalityId";
-		final String namespace = "namespace";
-		final Map<String, String> metadata = Map.of("key", "value");
+		final var message = createMessage();
+		final var messages = List.of(message);
+		final var municipalityId = "municipalityId";
+		final var namespace = "namespace";
+		final var metadata = Map.of("key", "value");
 
 		// Act
-		final List<EmailEntity> emailEntities = graphMapper.toEmails(messages, municipalityId, namespace, metadata);
+		final var emailEntities = graphMapper.toEmails(messages, municipalityId, namespace, metadata);
 
 		// Assert
 		assertThat(emailEntities).isNotNull().hasSize(1);
-		final EmailEntity emailEntity = emailEntities.getFirst();
+		final var emailEntity = emailEntities.getFirst();
 		assertThat(emailEntity.getOriginalId()).isEqualTo(message.getId());
 		assertThat(emailEntity.getNamespace()).isEqualTo(namespace);
 		assertThat(emailEntity.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(emailEntity.getMetadata()).isEqualTo(metadata);
+	}
+
+	@Test
+	void toAttachments() {
+
+		// Arrange
+		final var attachments = createAttachments();
+
+		when(blobBuilder.createBlob(any())).thenReturn(blob);
+		// Act
+		final var result = graphMapper.toAttachments(attachments);
+		// Assert
+		assertThat(result).isNotNull().hasSize(1);
+		assertThat(result.getFirst().getName()).isEqualTo("test.txt");
+		assertThat(result.getFirst().getContentType()).isEqualTo("text/plain");
+		assertThat(result.getFirst().getContent()).isEqualTo(blob);
 	}
 
 	private Message createMessage() {
@@ -82,12 +100,15 @@ class GraphMapperTest {
 		header.setValue("<message-id@example.com>");
 		message.setInternetMessageHeaders(List.of(header));
 
+		return message;
+	}
+
+	private List<Attachment> createAttachments() {
 		final var attachment = new FileAttachment();
 		attachment.setName("test.txt");
 		attachment.setContentBytes("Test Content".getBytes());
 		attachment.setContentType("text/plain");
-		message.setAttachments(List.of(attachment));
 
-		return message;
+		return List.of(attachment);
 	}
 }

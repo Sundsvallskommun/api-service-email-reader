@@ -92,7 +92,7 @@ public class EmailService {
 				setUnHealthyConsumer);
 		} catch (final EncryptionException e) {
 			LOG.error("Failed to decrypt password for credential with id: {}", credential.getId(), e);
-			setUnHealthyConsumer.accept("Failed to decrypt password for credential");
+			setUnHealthyConsumer.accept("[EWS] Failed to decrypt password for credential");
 		}
 		return emptyList();
 	}
@@ -159,5 +159,14 @@ public class EmailService {
 		} catch (final IOException | SQLException e) {
 			throw Problem.valueOf(INTERNAL_SERVER_ERROR, "%s occurred when copying file with attachment id '%s' to response: %s".formatted(e.getClass().getSimpleName(), attachmentId, e.getMessage()));
 		}
+	}
+
+	@Transactional
+	public void saveEmail(final EmailEntity email) {
+		if (isAutoReply(email)) {
+			return;
+		}
+		emailRepository.save(email);
+
 	}
 }
