@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-email-reader</artifactId>
-	<version>4.0</version>
+	<version>4.1</version>
 	<name>api-service-email-reader</name>
 	<properties>
 		<!-- Generated sources properties -->
