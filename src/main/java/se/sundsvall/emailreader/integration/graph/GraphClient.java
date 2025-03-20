@@ -88,10 +88,10 @@ public class GraphClient {
 	}
 
 	public void moveEmail(final String userId, final String messageId, final String destinationFolder, final Consumer<String> setUnHealthyConsumer) {
-		final var request = new MovePostRequestBody();
-		request.setDestinationId(findFolderId(userId, destinationFolder, setUnHealthyConsumer));
-
 		try {
+			final var request = new MovePostRequestBody();
+			request.setDestinationId(findFolderId(userId, destinationFolder));
+
 			graphServiceClient
 				.users()
 				.byUserId(userId)
@@ -105,7 +105,7 @@ public class GraphClient {
 		}
 	}
 
-	private String findFolderId(final String userId, final String folderId, final Consumer<String> setUnHealthyConsumer) {
+	private String findFolderId(final String userId, final String folderId) {
 		try {
 			final var result = graphServiceClient
 				.users()
@@ -114,7 +114,7 @@ public class GraphClient {
 				.get();
 
 			if (result == null) {
-				return createFolder(userId, folderId, setUnHealthyConsumer);
+				return createFolder(userId, folderId);
 			}
 
 			final Optional<MailFolder> optionalFolder = Objects.requireNonNull(result.getValue())
@@ -125,17 +125,16 @@ public class GraphClient {
 			if (optionalFolder.isPresent()) {
 				return optionalFolder.get().getId();
 			} else {
-				return createFolder(userId, folderId, setUnHealthyConsumer);
+				return createFolder(userId, folderId);
 			}
 
 		} catch (final Exception e) {
-			LOG.error("Could not find folder", e);
-			setUnHealthyConsumer.accept("[GRAPH] Could not find folder");
-			return null;
+			LOG.error("Could not find folder");
+			throw e;
 		}
 	}
 
-	private String createFolder(final String userId, final String folderId, final Consumer<String> setUnHealthyConsumer) {
+	private String createFolder(final String userId, final String folderId) {
 		final MailFolder mailFolder = new MailFolder();
 		mailFolder.setDisplayName(folderId);
 		try {
@@ -146,9 +145,8 @@ public class GraphClient {
 				.post(mailFolder);
 			return Objects.requireNonNull(result).getId();
 		} catch (final Exception e) {
-			LOG.error("Could not create folder", e);
-			setUnHealthyConsumer.accept("[GRAPH] Could not create folder");
-			return null;
+			LOG.error("Could not create folder");
+			throw e;
 		}
 	}
 }

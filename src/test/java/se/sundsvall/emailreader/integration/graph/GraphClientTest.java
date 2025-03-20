@@ -239,15 +239,12 @@ class GraphClientTest {
 		when(graphServiceClient.users()).thenReturn(usersRequestBuilder);
 		when(usersRequestBuilder.byUserId(userId)).thenReturn(userItemRequestBuilder);
 		when(userItemRequestBuilder.mailFolders()).thenReturn(mailFoldersRequestBuilder);
-		when(userItemRequestBuilder.messages()).thenReturn(messagesRequestBuilder);
-		when(messagesRequestBuilder.byMessageId(messageId)).thenReturn(messageItemRequestBuilder);
-		when(messageItemRequestBuilder.move()).thenReturn(moveRequestBuilder);
 		when(mailFoldersRequestBuilder.get()).thenReturn(mailFolderCollectionResponse);
 		// Act
 		graphClient.moveEmail(userId, messageId, destinationFolder, consumerMock);
 
 		// Assert
-		verify(consumerMock).accept("[GRAPH] Could not create folder");
+		verify(consumerMock).accept("[GRAPH] Could not move email from inbox");
 	}
 
 }
