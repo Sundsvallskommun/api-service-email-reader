@@ -30,7 +30,10 @@ integration:
 
 scheduled:
   check-for-new-emails:
-    cron: "-"
+    ews:
+      cron: "-"
+    graph:
+      cron: "-"
   check-for-old-emails:
     cron: "-"
   check-for-new-sms-emails:

@@ -4,11 +4,14 @@ import static java.util.Collections.emptyList;
 
 import com.azure.core.credential.TokenCredential;
 import com.microsoft.graph.models.Attachment;
+import com.microsoft.graph.models.MailFolder;
 import com.microsoft.graph.models.MessageCollectionResponse;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
-import com.microsoft.graph.users.item.mailfolders.item.messages.item.move.MovePostRequestBody;
+import com.microsoft.graph.users.item.messages.item.move.MovePostRequestBody;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,14 +89,12 @@ public class GraphClient {
 
 	public void moveEmail(final String userId, final String messageId, final String destinationFolder, final Consumer<String> setUnHealthyConsumer) {
 		final var request = new MovePostRequestBody();
-		request.setDestinationId(destinationFolder);
+		request.setDestinationId(findFolderId(userId, destinationFolder, setUnHealthyConsumer));
 
 		try {
 			graphServiceClient
 				.users()
 				.byUserId(userId)
-				.mailFolders()
-				.byMailFolderId("inbox")
 				.messages()
 				.byMessageId(messageId)
 				.move()
@@ -101,6 +102,53 @@ public class GraphClient {
 		} catch (final Exception e) {
 			LOG.error("Could not move email", e);
 			setUnHealthyConsumer.accept("[GRAPH] Could not move email from inbox");
+		}
+	}
+
+	private String findFolderId(final String userId, final String folderId, final Consumer<String> setUnHealthyConsumer) {
+		try {
+			final var result = graphServiceClient
+				.users()
+				.byUserId(userId)
+				.mailFolders()
+				.get();
+
+			if (result == null) {
+				return createFolder(userId, folderId, setUnHealthyConsumer);
+			}
+
+			final Optional<MailFolder> optionalFolder = Objects.requireNonNull(result.getValue())
+				.stream()
+				.filter(mailFolder -> Objects.requireNonNull(mailFolder.getDisplayName()).equalsIgnoreCase(folderId))
+				.findFirst();
+
+			if (optionalFolder.isPresent()) {
+				return optionalFolder.get().getId();
+			} else {
+				return createFolder(userId, folderId, setUnHealthyConsumer);
+			}
+
+		} catch (final Exception e) {
+			LOG.error("Could not find folder", e);
+			setUnHealthyConsumer.accept("[GRAPH] Could not find folder");
+			return null;
+		}
+	}
+
+	private String createFolder(final String userId, final String folderId, final Consumer<String> setUnHealthyConsumer) {
+		final MailFolder mailFolder = new MailFolder();
+		mailFolder.setDisplayName(folderId);
+		try {
+			final var result = graphServiceClient
+				.users()
+				.byUserId(userId)
+				.mailFolders()
+				.post(mailFolder);
+			return Objects.requireNonNull(result).getId();
+		} catch (final Exception e) {
+			LOG.error("Could not create folder", e);
+			setUnHealthyConsumer.accept("[GRAPH] Could not create folder");
+			return null;
 		}
 	}
 }
