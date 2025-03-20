@@ -64,3 +64,15 @@ VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', '81471222-5798-11e9-ae24-57fa13b
 INSERT INTO email_header_value (header_id, value, order_index)
 VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someValue', 0),
        ('81471222-5798-11e9-ae24-57fa13b361e1', 'someOtherValue', 1);
+
+INSERT INTO graph_credentials(created_at, client_id, client_secret, destination_folder, id, municipality_id, namespace,
+                              tenant_id)
+VALUES ('2019-04-10 12:00:00', 'client_id', 'client_secret', 'destination_folder',
+        '81471222-5798-11e9-ae24-57fa13b361e1', '2281', 'namespace',
+        'tenant_id');
+
+insert into graph_credentials_email_address(graph_credentials_id, email_address)
+values ('81471222-5798-11e9-ae24-57fa13b361e1', 'test@example.com');
+
+insert into graph_credentials_metadata(graph_credentials_id, metadata_key, metadata)
+values ('81471222-5798-11e9-ae24-57fa13b361e1', 'metadata_key', 'metadata_value');

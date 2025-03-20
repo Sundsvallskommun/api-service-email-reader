@@ -72,6 +72,18 @@ class GraphCredentialsResource {
 		return ok(graphCredentialsService.getCredentialsByMunicipalityId(municipalityId));
 	}
 
+	@Operation(description = "Get Graph credentials by id", responses = {
+		@ApiResponse(responseCode = "200", description = "Ok", useReturnTypeSchema = true),
+		@ApiResponse(responseCode = "404", description = "Not found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	})
+	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
+	ResponseEntity<GraphCredentials> getByMunicipalityIdAndId(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
+
+		return ok(graphCredentialsService.getCredentialsByMunicipalityIdAndId(municipalityId, id));
+	}
+
 	@Operation(description = "Create Graph credentials", responses = {
 		@ApiResponse(responseCode = "201", headers = @Header(name = LOCATION, schema = @Schema(type = "string")), description = "Successful operation", useReturnTypeSchema = true)
 	})

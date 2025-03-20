@@ -16,6 +16,7 @@ import se.sundsvall.emailreader.utility.EncryptionUtility;
 @Service
 public class GraphCredentialsService {
 
+	private static final String ENTITY_NOT_FOUND = "Entity not found";
 	private final GraphCredentialsRepository graphCredentialsRepository;
 
 	private final EncryptionUtility encryptionUtility;
@@ -30,6 +31,13 @@ public class GraphCredentialsService {
 		return toGraphCredentials(graphCredentialsRepository.findAllByMunicipalityId(municipalityId));
 	}
 
+	public GraphCredentials getCredentialsByMunicipalityIdAndId(final String municipalityId, final String id) {
+
+		return graphCredentialsRepository.findByMunicipalityIdAndId(municipalityId, id)
+			.map(GraphCredentialsMapper::toGraphCredential)
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, ENTITY_NOT_FOUND));
+	}
+
 	@Transactional
 	public String create(final String municipalityId, final GraphCredentials credentials) {
 
@@ -42,7 +50,7 @@ public class GraphCredentialsService {
 	public void update(final String municipalityId, final String id, final GraphCredentials credentials) {
 
 		final var oldEntity = graphCredentialsRepository.findByMunicipalityIdAndId(municipalityId, id)
-			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Entity not found"));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, ENTITY_NOT_FOUND));
 
 		final var updatedEntity = GraphCredentialsMapper.toUpdatedGraphCredentialsEntity(oldEntity, encrypt(credentials));
 		graphCredentialsRepository.save(updatedEntity);
@@ -52,7 +60,7 @@ public class GraphCredentialsService {
 	@Transactional
 	public void delete(final String municipalityId, final String id) {
 		final var oldEntity = graphCredentialsRepository.findByMunicipalityIdAndId(municipalityId, id)
-			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "Entity not found"));
+			.orElseThrow(() -> Problem.valueOf(NOT_FOUND, ENTITY_NOT_FOUND));
 		graphCredentialsRepository.delete(oldEntity);
 	}
 
@@ -62,4 +70,5 @@ public class GraphCredentialsService {
 			.withClientSecret(encryptionUtility.encrypt(credentials.clientSecret().getBytes()))
 			.withTenantId(encryptionUtility.encrypt(credentials.tenantId().getBytes()));
 	}
+
 }

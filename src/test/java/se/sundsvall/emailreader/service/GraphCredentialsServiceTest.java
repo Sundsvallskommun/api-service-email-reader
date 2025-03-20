@@ -52,6 +52,23 @@ class GraphCredentialsServiceTest {
 	}
 
 	@Test
+	void getCredentialByMunicipalityIdAndId() {
+		// Arrange
+		final var entity = createEntity();
+		final var municipalityId = "2281";
+		final var id = "someId";
+		when(graphCredentialsRepository.findByMunicipalityIdAndId(municipalityId, id)).thenReturn(Optional.of(entity));
+
+		// Act
+		final var result = service.getCredentialsByMunicipalityIdAndId(municipalityId, id);
+
+		// Assert
+		assertThat(result).isNotNull();
+		verify(graphCredentialsRepository).findByMunicipalityIdAndId(municipalityId, id);
+		verifyNoMoreInteractions(graphCredentialsRepository);
+	}
+
+	@Test
 	void create() {
 		// Arrange
 		final var credentials = GraphCredentials.builder()

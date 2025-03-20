@@ -1,0 +1,11 @@
+{
+	"id": "${json-unit.any-string}",
+	"emailAddress": [
+		"new_test@example.com"
+	],
+	"namespace": "new_namespace",
+	"metadata": {
+		"metadata_key": "new_metadata_value"
+	},
+	"destinationFolder": "new_destination_folder"
+}

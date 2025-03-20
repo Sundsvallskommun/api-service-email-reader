@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:55896
+  - url: http://localhost:58841
     description: Generated server url
 tags:
   - name: Email
@@ -111,6 +111,59 @@ paths:
               schema:
                 $ref: "#/components/schemas/Problem"
   /{municipalityId}/credentials/graph/{id}:
+    get:
+      tags:
+        - Graph Credentials
+      description: Get Graph credentials by id
+      operationId: getByMunicipalityIdAndId
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: id
+          in: path
+          description: Email message ID
+          required: true
+          schema:
+            type: string
+          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GraphCredentials"
+        "404":
+          description: Not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "400":
+          description: Bad request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
     put:
       tags:
         - Graph Credentials
@@ -621,12 +674,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
@@ -756,12 +809,12 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:

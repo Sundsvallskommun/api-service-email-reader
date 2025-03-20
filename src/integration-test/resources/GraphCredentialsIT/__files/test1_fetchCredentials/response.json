@@ -1,0 +1,13 @@
+[
+	{
+		"id": "81471222-5798-11e9-ae24-57fa13b361e1",
+		"emailAddress": [
+			"test@example.com"
+		],
+		"namespace": "namespace",
+		"metadata": {
+			"metadata_key": "metadata_value"
+		},
+		"destinationFolder": "destination_folder"
+	}
+]
