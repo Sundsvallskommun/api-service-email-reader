@@ -1,5 +1,6 @@
 package se.sundsvall.emailreader.integration.graph;
 
+import static java.util.List.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -9,7 +10,8 @@ import static org.mockito.Mockito.when;
 import com.azure.core.credential.TokenCredential;
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.AttachmentCollectionResponse;
-import com.microsoft.graph.models.Message;
+import com.microsoft.graph.models.MailFolder;
+import com.microsoft.graph.models.MailFolderCollectionResponse;
 import com.microsoft.graph.models.MessageCollectionResponse;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.graph.users.UsersRequestBuilder;
@@ -21,7 +23,6 @@ import com.microsoft.graph.users.item.messages.item.MessageItemRequestBuilder;
 import com.microsoft.graph.users.item.messages.item.attachments.AttachmentsRequestBuilder;
 import com.microsoft.graph.users.item.messages.item.move.MovePostRequestBody;
 import com.microsoft.graph.users.item.messages.item.move.MoveRequestBuilder;
-import java.util.List;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +33,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class GraphClientTest {
 
-	@Mock
-	private com.microsoft.graph.users.item.mailfolders.item.messages.item.MessageItemRequestBuilder mailfolderMessageItemRequestBuilder;
-	@Mock
-	private com.microsoft.graph.users.item.mailfolders.item.messages.item.move.MoveRequestBuilder mailfolderMoveRequestBuilder;
 	@Mock
 	private MailFolderItemRequestBuilder mailFolderItemRequestBuilder;
 	@Mock
@@ -117,7 +114,7 @@ class GraphClientTest {
 		// Arrange
 		final var userId = "userId";
 		final var messageId = "messageId";
-		final var attachments = List.of(new Attachment());
+		final var attachments = of(new Attachment());
 		when(graphServiceClient.users()).thenReturn(usersRequestBuilder);
 		when(usersRequestBuilder.byUserId(userId)).thenReturn(userItemRequestBuilder);
 		when(userItemRequestBuilder.messages()).thenReturn(messagesRequestBuilder);
@@ -158,22 +155,28 @@ class GraphClientTest {
 		final var destinationFolder = "destinationFolder";
 		final var request = new MovePostRequestBody();
 		request.setDestinationId(destinationFolder);
-		final var test = new Message();
+
+		final var mailFolderCollectionResponse = mock(MailFolderCollectionResponse.class);
+		final var mailfolder = new MailFolder();
+		mailfolder.setDisplayName(destinationFolder);
+		mailfolder.setId("destinationFolderId");
+		final var mailFolders = of(mailfolder);
 
 		when(graphServiceClient.users()).thenReturn(usersRequestBuilder);
 		when(usersRequestBuilder.byUserId(userId)).thenReturn(userItemRequestBuilder);
 		when(userItemRequestBuilder.mailFolders()).thenReturn(mailFoldersRequestBuilder);
-		when(mailFoldersRequestBuilder.byMailFolderId("inbox")).thenReturn(mailFolderItemRequestBuilder);
-		when(mailFolderItemRequestBuilder.messages()).thenReturn(mailfolderMessagesRequestBuilder);
-		when(mailfolderMessagesRequestBuilder.byMessageId(any())).thenReturn(mailfolderMessageItemRequestBuilder);
-		when(mailfolderMessageItemRequestBuilder.move()).thenReturn(mailfolderMoveRequestBuilder);
-		when(mailfolderMoveRequestBuilder.post(any())).thenReturn(test);
+		when(userItemRequestBuilder.messages()).thenReturn(messagesRequestBuilder);
+		when(messagesRequestBuilder.byMessageId(messageId)).thenReturn(messageItemRequestBuilder);
+		when(messageItemRequestBuilder.move()).thenReturn(moveRequestBuilder);
+
+		when(mailFoldersRequestBuilder.get()).thenReturn(mailFolderCollectionResponse);
+		when(mailFolderCollectionResponse.getValue()).thenReturn(mailFolders);
 
 		// Act
 		graphClient.moveEmail(userId, messageId, destinationFolder, consumerMock);
 
 		// Assert
-		verify(mailfolderMoveRequestBuilder).post(any());
+		verify(moveRequestBuilder).post(any());
 	}
 
 	@Test
@@ -192,4 +195,56 @@ class GraphClientTest {
 		// Assert
 		verify(consumerMock).accept("[GRAPH] Could not move email from inbox");
 	}
+
+	@Test
+	void testMoveEmailCreateFolder() {
+		// Arrange
+		final var userId = "userId";
+		final var messageId = "messageId";
+		final var destinationFolder = "destinationFolder";
+		final var request = new MovePostRequestBody();
+		request.setDestinationId(destinationFolder);
+
+		final var mailFolderCollectionResponse = mock(MailFolderCollectionResponse.class);
+		final var mailfolder = new MailFolder();
+		mailfolder.setDisplayName(destinationFolder);
+		mailfolder.setId("destinationFolderId");
+
+		when(graphServiceClient.users()).thenReturn(usersRequestBuilder);
+		when(usersRequestBuilder.byUserId(userId)).thenReturn(userItemRequestBuilder);
+		when(userItemRequestBuilder.mailFolders()).thenReturn(mailFoldersRequestBuilder);
+		when(userItemRequestBuilder.messages()).thenReturn(messagesRequestBuilder);
+		when(messagesRequestBuilder.byMessageId(messageId)).thenReturn(messageItemRequestBuilder);
+		when(messageItemRequestBuilder.move()).thenReturn(moveRequestBuilder);
+		when(mailFoldersRequestBuilder.get()).thenReturn(mailFolderCollectionResponse);
+		when(mailFoldersRequestBuilder.post(any())).thenReturn(mailfolder);
+		// Act
+		graphClient.moveEmail(userId, messageId, destinationFolder, consumerMock);
+
+		// Assert
+		verify(moveRequestBuilder).post(any());
+	}
+
+	@Test
+	void testMoveEmailCreateFolderThrowsException() {
+		// Arrange
+		final var userId = "userId";
+		final var messageId = "messageId";
+		final var destinationFolder = "destinationFolder";
+		final var request = new MovePostRequestBody();
+		request.setDestinationId(destinationFolder);
+
+		final var mailFolderCollectionResponse = mock(MailFolderCollectionResponse.class);
+
+		when(graphServiceClient.users()).thenReturn(usersRequestBuilder);
+		when(usersRequestBuilder.byUserId(userId)).thenReturn(userItemRequestBuilder);
+		when(userItemRequestBuilder.mailFolders()).thenReturn(mailFoldersRequestBuilder);
+		when(mailFoldersRequestBuilder.get()).thenReturn(mailFolderCollectionResponse);
+		// Act
+		graphClient.moveEmail(userId, messageId, destinationFolder, consumerMock);
+
+		// Assert
+		verify(consumerMock).accept("[GRAPH] Could not move email from inbox");
+	}
+
 }
