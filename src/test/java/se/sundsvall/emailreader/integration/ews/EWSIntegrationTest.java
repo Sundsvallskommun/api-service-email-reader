@@ -49,6 +49,7 @@ class EWSIntegrationTest {
 		CustomerId = 123456789
 		User = testUser
 		Password = testPassword
+		Sender = user@host.com
 		Message = Nytt lösenord driftkonto: nyttLösenord
 		Recipient = 070123456789
 		""";
@@ -184,9 +185,7 @@ class EWSIntegrationTest {
 		final var resultMap = ewsIntegration.extractValuesEmailMessage(emailMessageMock);
 
 		assertThat(resultMap).isNotNull()
-			.containsEntry("CustomerId", "123456789")
-			.containsEntry("User", "testUser")
-			.containsEntry("Password", "testPassword")
+			.containsEntry("Sender", "user@host.com")
 			.containsEntry("Message", "Nytt lösenord driftkonto: nyttLösenord")
 			.containsEntry("Recipient", "070123456789");
 

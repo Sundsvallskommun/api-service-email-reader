@@ -46,6 +46,7 @@ import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstrai
 public class EWSIntegration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
+	private static final List<String> SMS_MAIL_MESSAGE_KEYS_TO_PARSE = List.of("Message", "Recipient", "Sender");
 
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
@@ -149,6 +150,7 @@ public class EWSIntegration {
 			return Arrays.stream(emailMessage.getBody().toString().split("\n"))
 				.map(line -> line.split("=", 2))
 				.filter(pairs -> pairs.length == 2)
+				.filter(pairs -> SMS_MAIL_MESSAGE_KEYS_TO_PARSE.stream().anyMatch(key -> key.equalsIgnoreCase(pairs[0].trim())))
 				.collect(Collectors.toMap(
 					pairs -> pairs[0].trim(),
 					pairs -> pairs[1].trim()));
