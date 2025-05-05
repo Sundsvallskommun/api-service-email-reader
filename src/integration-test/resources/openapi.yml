@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:58841
+  - url: http://localhost:64739
     description: Generated server url
 tags:
   - name: Email
@@ -602,13 +602,6 @@ paths:
 components:
   schemas:
     Credentials:
-      required:
-        - destinationFolder
-        - domain
-        - emailAddress
-        - namespace
-        - password
-        - username
       type: object
       properties:
         id:
@@ -617,15 +610,18 @@ components:
           readOnly: true
           example: 74531aac-ffea-42cc-8a0a-52715bb27850
         username:
+          minLength: 1
           type: string
           description: username to use for authentication against the email server
           example: joe01doe
         password:
+          minLength: 1
           type: string
           description: password to use for authentication against the email server
           writeOnly: true
           example: mySecretPassword
         emailAddress:
+          minItems: 1
           type: array
           description: List of email addresses to check for new emails. The provided
             user must have access to these email addresses.
@@ -635,10 +631,12 @@ components:
           items:
             type: string
         domain:
+          minLength: 1
           type: string
           description: domain for the email server
           example: https://mail.example.com/EWS/Exchange.asmx
         namespace:
+          minLength: 1
           type: string
           description: Namespace
           example: my.namespace
@@ -657,6 +655,7 @@ components:
             casetype: myCaseType
             key2: value2
         destinationFolder:
+          minLength: 1
           type: string
           description: The folder to move emails to after processing
           example: Processed
@@ -860,7 +859,6 @@ components:
         - clientId
         - clientSecret
         - destinationFolder
-        - emailAddress
         - metadata
         - namespace
         - tenantId
@@ -872,6 +870,7 @@ components:
           readOnly: true
           example: 74531aac-ffea-42cc-8a0a-52715bb27850
         clientSecret:
+          minLength: 1
           type: string
           description: Client secret to use for authentication against the Microsoft
             Graph server. Do note it should be the secret value and not the Secret
@@ -879,18 +878,21 @@ components:
           writeOnly: true
           example: mySecretClientSecret
         tenantId:
+          minLength: 1
           type: string
           description: Tenant ID to use for authentication against the Microsoft Graph
             server.
           writeOnly: true
           example: myTenantId
         clientId:
+          minLength: 1
           type: string
           description: Client ID to use for authentication against the Microsoft Graph
             server.
           writeOnly: true
           example: myClientId
         emailAddress:
+          minItems: 1
           type: array
           description: List of email addresses to check for new emails. The provided
             graph application must have access to these email addresses.
@@ -900,6 +902,7 @@ components:
           items:
             type: string
         namespace:
+          minLength: 1
           type: string
           description: Namespace
           example: my.namespace
@@ -914,6 +917,7 @@ components:
             casetype: myCaseType
             key2: value2
         destinationFolder:
+          minLength: 1
           type: string
           description: The folder to move emails to after processing.
           example: Processed
