@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:64739
+  - url: http://localhost:53813
     description: Generated server url
 tags:
   - name: Email
@@ -602,6 +602,13 @@ paths:
 components:
   schemas:
     Credentials:
+      required:
+        - destinationFolder
+        - domain
+        - emailAddress
+        - namespace
+        - password
+        - username
       type: object
       properties:
         id:
@@ -859,6 +866,7 @@ components:
         - clientId
         - clientSecret
         - destinationFolder
+        - emailAddress
         - metadata
         - namespace
         - tenantId
