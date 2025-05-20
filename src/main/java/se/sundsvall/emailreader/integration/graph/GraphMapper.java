@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
@@ -52,7 +53,7 @@ public class GraphMapper {
 			.withMessage(getMessage(message))
 			.withReceivedAt(message.getReceivedDateTime())
 			.withCreatedAt(message.getCreatedDateTime())
-			.withMetadata(metadata)
+			.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
 			.build();
 	}
 
