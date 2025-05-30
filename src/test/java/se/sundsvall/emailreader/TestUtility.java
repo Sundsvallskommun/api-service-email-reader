@@ -1,5 +1,7 @@
 package se.sundsvall.emailreader;
 
+import com.microsoft.graph.models.InternetMessageHeader;
+import com.microsoft.graph.models.Message;
 import java.sql.Blob;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -86,4 +88,30 @@ public final class TestUtility {
 				.build()))
 			.build();
 	}
+
+	public static EmailHeaderEntity createEmailHeaderEntity(Header header, List<String> values) {
+		return EmailHeaderEntity.builder()
+			.withHeader(header)
+			.withValues(values)
+			.build();
+	}
+
+	public static Message createMessageWithHeaders() {
+		var message = new Message();
+		var messageIdHeader = new InternetMessageHeader();
+		messageIdHeader.setName("message-id");
+		messageIdHeader.setValue("12345");
+		var referencesHeader = new InternetMessageHeader();
+		referencesHeader.setName("references");
+		referencesHeader.setValue("ref1, ref2");
+		var inReplyToHeader = new InternetMessageHeader();
+		inReplyToHeader.setName("in-reply-to");
+		inReplyToHeader.setValue("reply1");
+		var autoSubmittedHeader = new InternetMessageHeader();
+		autoSubmittedHeader.setName("auto-submitted");
+		autoSubmittedHeader.setValue("auto");
+		message.setInternetMessageHeaders(List.of(messageIdHeader, referencesHeader, inReplyToHeader, autoSubmittedHeader));
+		return message;
+	}
+
 }

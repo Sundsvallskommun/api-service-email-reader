@@ -40,7 +40,7 @@ public class GraphMapper {
 			.toList();
 	}
 
-	private EmailEntity toEmail(final Message message, final String municipalityId, final String namespace, final Map<String, String> metadata) {
+	EmailEntity toEmail(final Message message, final String municipalityId, final String namespace, final Map<String, String> metadata) {
 
 		return EmailEntity.builder()
 			.withOriginalId(message.getId())
@@ -57,7 +57,7 @@ public class GraphMapper {
 			.build();
 	}
 
-	private List<EmailHeaderEntity> toHeaders(final Message message) {
+	List<EmailHeaderEntity> toHeaders(final Message message) {
 
 		final var headers = new ArrayList<EmailHeaderEntity>();
 
@@ -77,19 +77,19 @@ public class GraphMapper {
 		return headers;
 	}
 
-	private Optional<String> findHeader(final Message emailMessage, final String headerName) {
+	Optional<String> findHeader(final Message emailMessage, final String headerName) {
 		if (emailMessage.getInternetMessageHeaders() == null) {
 			return Optional.empty();
 		}
 
 		return emailMessage.getInternetMessageHeaders().stream()
-			.filter(header -> headerName.equals(header.getName()))
+			.filter(header -> headerName.equalsIgnoreCase(header.getName()))
 			.map(InternetMessageHeader::getValue)
 			.filter(Objects::nonNull)
 			.findFirst();
 	}
 
-	private List<String> extractValues(final String input) {
+	List<String> extractValues(final String input) {
 		return Optional.ofNullable(input)
 			.map(inputString -> Pattern.compile(" ")
 				.splitAsStream(inputString)
@@ -97,24 +97,24 @@ public class GraphMapper {
 			.orElse(emptyList());
 	}
 
-	private EmailHeaderEntity createEmailHeader(final Header header, final List<String> values) {
+	EmailHeaderEntity createEmailHeader(final Header header, final List<String> values) {
 		return EmailHeaderEntity.builder().withHeader(header).withValues(values).build();
 	}
 
-	private String getMessage(final Message message) {
+	String getMessage(final Message message) {
 		return Optional.ofNullable(message.getBody())
 			.map(ItemBody::getContent)
 			.orElse(null);
 	}
 
-	private String getSender(final Message message) {
+	String getSender(final Message message) {
 		return Optional.ofNullable(message.getSender())
 			.flatMap(senderObj -> Optional.ofNullable(senderObj.getEmailAddress())
 				.map(EmailAddress::getAddress))
 			.orElse(null);
 	}
 
-	private List<String> getRecipients(final Message message) {
+	List<String> getRecipients(final Message message) {
 		return Optional.ofNullable(message.getToRecipients())
 			.orElse(emptyList())
 			.stream()
