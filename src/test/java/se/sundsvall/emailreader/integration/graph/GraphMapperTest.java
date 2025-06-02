@@ -1,8 +1,13 @@
 package se.sundsvall.emailreader.integration.graph;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createEmailHeaderEntity;
+import static se.sundsvall.emailreader.TestUtility.createMessageWithHeaders;
 
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
@@ -16,11 +21,18 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.utility.BlobBuilder;
 
 @ExtendWith(MockitoExtension.class)
@@ -72,6 +84,130 @@ class GraphMapperTest {
 		assertThat(result.getFirst().getContent()).isEqualTo(blob);
 	}
 
+	@Test
+	void toEmail() {
+		var message = createMessage();
+		var municipalityId = "municipalityId";
+		var namespace = "namespace";
+		var metadata = Map.of("key", "value");
+		var recipients = List.of("recipient@example.com");
+		var sender = "sender@example.com";
+		var messageIdHeader = createEmailHeaderEntity(Header.MESSAGE_ID, List.of("message-id"));
+		var headers = List.of(messageIdHeader);
+		var messageContent = "messageContent";
+
+		var spy = Mockito.spy(graphMapper);
+
+		when(spy.getRecipients(message)).thenReturn(recipients);
+		when(spy.getSender(message)).thenReturn(sender);
+		when(spy.toHeaders(message)).thenReturn(headers);
+		when(spy.getMessage(message)).thenReturn(messageContent);
+
+		var result = spy.toEmail(message, municipalityId, namespace, metadata);
+
+		assertThat(result).isNotNull().satisfies(emailEntity -> {
+			assertThat(emailEntity.getOriginalId()).isEqualTo(message.getId());
+			assertThat(emailEntity.getNamespace()).isEqualTo(namespace);
+			assertThat(emailEntity.getMunicipalityId()).isEqualTo(municipalityId);
+			assertThat(emailEntity.getRecipients()).isEqualTo(recipients);
+			assertThat(emailEntity.getSender()).isEqualTo(sender);
+			assertThat(emailEntity.getSubject()).isEqualTo(message.getSubject());
+			assertThat(emailEntity.getHeaders()).containsExactly(messageIdHeader);
+			assertThat(emailEntity.getMessage()).isEqualTo(messageContent);
+			assertThat(emailEntity.getReceivedAt()).isEqualTo(message.getReceivedDateTime());
+			assertThat(emailEntity.getCreatedAt()).isEqualTo(message.getCreatedDateTime());
+			assertThat(emailEntity.getMetadata()).isEqualTo(metadata);
+		});
+	}
+
+	@Test
+	void toHeaders() {
+		var message = createMessageWithHeaders();
+
+		var spy = Mockito.spy(graphMapper);
+		when(spy.createEmailHeader(any(), any())).thenCallRealMethod();
+
+		var result = spy.toHeaders(message);
+
+		assertThat(result).extracting("header", "values").containsExactlyInAnyOrder(
+			tuple(Header.MESSAGE_ID, List.of("12345")),
+			tuple(Header.REFERENCES, List.of("ref1,", "ref2")),
+			tuple(Header.IN_REPLY_TO, List.of("reply1")),
+			tuple(Header.AUTO_SUBMITTED, List.of("auto")));
+
+		verify(spy, times(4)).createEmailHeader(any(), any());
+		verify(spy).toHeaders(any());
+	}
+
+	@ParameterizedTest
+	@MethodSource("findHeaderArgumentProvider")
+	void findHeader(final Header header, final String value) {
+		var message = createMessageWithHeaders();
+
+		var result = graphMapper.findHeader(message, header.getName());
+
+		assertThat(result).isPresent();
+		assertThat(result.get()).isEqualTo(value);
+	}
+
+	@ParameterizedTest
+	@EnumSource(Header.class)
+	void createEmailHeader(final Header header) {
+		var values = List.of("value1", "value2");
+
+		var result = graphMapper.createEmailHeader(header, values);
+
+		assertThat(result).isNotNull().satisfies(emailHeader -> {
+			assertThat(emailHeader.getHeader()).isEqualTo(header);
+			assertThat(emailHeader.getValues()).isEqualTo(values);
+		});
+	}
+
+	@Test
+	void getMessage() {
+		var message = createMessage();
+
+		var result = graphMapper.getMessage(message);
+
+		assertThat(result).isNotNull().isEqualTo(message.getBody().getContent());
+	}
+
+	@Test
+	void getSender() {
+		var message = createMessage();
+
+		var result = graphMapper.getSender(message);
+
+		assertThat(result).isNotNull().isEqualTo(message.getSender().getEmailAddress().getAddress());
+	}
+
+	@Test
+	void extractValues() {
+		var input = "value1 value2 value3";
+
+		var result = graphMapper.extractValues(input);
+
+		assertThat(result).isNotNull().hasSize(3).containsExactly("value1", "value2", "value3");
+	}
+
+	@Test
+	void getRecipients() {
+		var message = createMessage();
+
+		var result = graphMapper.getRecipients(message);
+
+		assertThat(result).isNotNull().hasSameSizeAs(message.getToRecipients());
+		assertThat(result.getFirst()).isEqualTo(message.getToRecipients().getFirst().getEmailAddress().getAddress());
+	}
+
+	private static Stream<Arguments> findHeaderArgumentProvider() {
+		return Stream.of(
+			Arguments.of(Header.REFERENCES, "ref1, ref2"),
+			Arguments.of(Header.MESSAGE_ID, "12345"),
+			Arguments.of(Header.IN_REPLY_TO, "reply1"),
+			Arguments.of(Header.AUTO_SUBMITTED, "auto"));
+	}
+
 	private Message createMessage() {
 		final var message = new Message();
 		message.setId(UUID.randomUUID().toString());
@@ -111,4 +247,5 @@ class GraphMapperTest {
 
 		return List.of(attachment);
 	}
+
 }
