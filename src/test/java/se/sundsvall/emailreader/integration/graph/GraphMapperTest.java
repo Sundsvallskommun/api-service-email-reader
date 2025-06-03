@@ -115,7 +115,6 @@ class GraphMapperTest {
 			assertThat(emailEntity.getHeaders()).containsExactly(messageIdHeader);
 			assertThat(emailEntity.getMessage()).isEqualTo(messageContent);
 			assertThat(emailEntity.getReceivedAt()).isEqualTo(message.getReceivedDateTime());
-			assertThat(emailEntity.getCreatedAt()).isEqualTo(message.getCreatedDateTime());
 			assertThat(emailEntity.getMetadata()).isEqualTo(metadata);
 		});
 	}
@@ -213,7 +212,6 @@ class GraphMapperTest {
 		message.setId(UUID.randomUUID().toString());
 		message.setSubject("Test Subject");
 		message.setReceivedDateTime(OffsetDateTime.now());
-		message.setCreatedDateTime(OffsetDateTime.now());
 
 		final var body = new ItemBody();
 		body.setContent("Test Content");
