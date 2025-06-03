@@ -56,7 +56,12 @@ public class GraphClient {
 				.mailFolders()
 				.byMailFolderId("inbox")
 				.messages()
-				.get(requestConfiguration -> requestConfiguration.headers.add("Prefer", "outlook.body-content-type=\"text\""));
+				.get(requestConfiguration -> {
+					requestConfiguration.headers.add("Prefer", "outlook.body-content-type=\"text\"");
+					requestConfiguration.queryParameters.select = new String[] {
+						"id", "toRecipients", "sender", "subject", "internetMessageHeaders", "body", "receivedDateTime"
+					};
+				});
 
 		} catch (final Exception e) {
 			LOG.error("Could not get inbox", e);

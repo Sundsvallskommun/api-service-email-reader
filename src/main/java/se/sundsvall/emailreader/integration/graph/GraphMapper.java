@@ -52,7 +52,6 @@ public class GraphMapper {
 			.withHeaders(toHeaders(message))
 			.withMessage(getMessage(message))
 			.withReceivedAt(message.getReceivedDateTime())
-			.withCreatedAt(message.getCreatedDateTime())
 			.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
 			.build();
 	}
