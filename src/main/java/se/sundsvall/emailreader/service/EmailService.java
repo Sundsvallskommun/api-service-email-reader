@@ -9,7 +9,6 @@ import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -20,6 +19,7 @@ import microsoft.exchange.webservices.data.property.complex.ItemId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
