@@ -22,7 +22,6 @@ import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.sql.Blob;
 import java.util.List;
@@ -44,6 +43,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.emailreader.TestUtility;

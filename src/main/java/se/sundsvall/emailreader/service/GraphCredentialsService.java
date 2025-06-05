@@ -4,9 +4,9 @@ import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentials;
 import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentialsEntity;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Problem;
 import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.integration.db.GraphCredentialsRepository;
