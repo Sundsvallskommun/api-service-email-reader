@@ -18,11 +18,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
 import microsoft.exchange.webservices.data.property.complex.FileAttachment;
+import microsoft.exchange.webservices.data.property.complex.InternetMessageHeader;
+import microsoft.exchange.webservices.data.property.complex.InternetMessageHeaderCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -42,16 +43,17 @@ public final class EWSMapper {
 		this.blobBuilder = blobBuilder;
 	}
 
-	private static List<EmailHeaderEntity> toHeaders(final EmailMessage emailMessage) {
+	List<EmailHeaderEntity> toHeaders(final EmailMessage emailMessage) {
 
 		try {
 			final var headers = new ArrayList<EmailHeaderEntity>();
 
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(MESSAGE_ID.getName())).ifPresentOrElse(value -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(value.getValue()))),
+			var internetMessageHeaders = emailMessage.getInternetMessageHeaders();
+			findHeader(internetMessageHeaders, MESSAGE_ID).ifPresentOrElse(header -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(header.getValue()))),
 				() -> headers.add(createEmailHeader(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>"))));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(REFERENCES.getName())).ifPresent(value -> headers.add(createEmailHeader(REFERENCES, extractValues(value.getValue()))));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(IN_REPLY_TO.getName())).ifPresent(value -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(value.getValue()))));
-			Optional.ofNullable(emailMessage.getInternetMessageHeaders().find(AUTO_SUBMITTED.getName())).ifPresent(value -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(value.getValue()))));
+			findHeader(internetMessageHeaders, REFERENCES).ifPresent(header -> headers.add(createEmailHeader(REFERENCES, extractValues(header.getValue()))));
+			findHeader(internetMessageHeaders, IN_REPLY_TO).ifPresent(header -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(header.getValue()))));
+			findHeader(internetMessageHeaders, AUTO_SUBMITTED).ifPresent(header -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(header.getValue()))));
 
 			return headers;
 		} catch (final Exception e) {
@@ -60,11 +62,23 @@ public final class EWSMapper {
 		}
 	}
 
-	private static EmailHeaderEntity createEmailHeader(final Header header, final List<String> values) {
-		return EmailHeaderEntity.builder().withHeader(header).withValues(values).build();
+	Optional<InternetMessageHeader> findHeader(final InternetMessageHeaderCollection collection, final Header header) {
+		for (var internetMessageHeader : collection) {
+			if (internetMessageHeader.getName().equalsIgnoreCase(header.getName())) {
+				return Optional.of(internetMessageHeader);
+			}
+		}
+		return Optional.empty();
 	}
 
-	private static List<String> extractValues(final String input) {
+	EmailHeaderEntity createEmailHeader(final Header header, final List<String> values) {
+		return EmailHeaderEntity.builder()
+			.withHeader(header)
+			.withValues(values)
+			.build();
+	}
+
+	List<String> extractValues(final String input) {
 		return Optional.ofNullable(input)
 			.map(inputString -> Pattern.compile(" ")
 				.splitAsStream(inputString)
@@ -79,16 +93,15 @@ public final class EWSMapper {
 			.toList();
 	}
 
-	private EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) {
+	EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) {
 		try {
 
 			final var recipients = emailMessage.getToRecipients().getItems().stream()
 				.map(EmailAddress::getAddress)
 				.toList();
 
-			final var attachments = Optional.ofNullable(emailMessage.getAttachments())
-				.map(emailAttachments -> emailAttachments.getItems().stream())
-				.orElseGet(Stream::empty)
+			final var attachments = Optional.ofNullable(emailMessage.getAttachments()).stream()
+				.flatMap(emailAttachments -> emailAttachments.getItems().stream())
 				.filter(FileAttachment.class::isInstance)
 				.map(FileAttachment.class::cast)
 				.map(this::toAttachment)
@@ -119,7 +132,7 @@ public final class EWSMapper {
 		}
 	}
 
-	private AttachmentEntity toAttachment(final FileAttachment fileAttachment) {
+	AttachmentEntity toAttachment(final FileAttachment fileAttachment) {
 
 		try {
 			fileAttachment.load();
