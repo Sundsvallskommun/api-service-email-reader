@@ -79,8 +79,8 @@ public class EmailService {
 		return credentialsRepository.findAll();
 	}
 
-	public List<CredentialsEntity> findAllByAction(final String action) {
-		return credentialsRepository.findAllByAction(action);
+	public List<CredentialsEntity> findAllByActionAndActive(final String action) {
+		return credentialsRepository.findAllByActionAndEnabled(action, true);
 	}
 
 	public List<EmailMessage> getAllEmailsInInbox(final CredentialsEntity credential, final String emailAddress, final Consumer<String> setUnHealthyConsumer) {

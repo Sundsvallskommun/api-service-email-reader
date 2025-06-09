@@ -164,13 +164,13 @@ class EmailServiceTest {
 	}
 
 	@Test
-	void findAllByAction() {
-		when(credentialsRepositoryMock.findAllByAction(any())).thenReturn(List.of(createCredentialsEntity()));
+	void findAllByActionAndActive() {
+		when(credentialsRepositoryMock.findAllByActionAndEnabled(any(), eq(true))).thenReturn(List.of(createCredentialsEntity()));
 
-		final var credentials = emailService.findAllByAction("someAction");
+		final var credentials = emailService.findAllByActionAndActive("someAction");
 
 		assertThat(credentials).hasSize(1);
-		verify(credentialsRepositoryMock).findAllByAction("someAction");
+		verify(credentialsRepositoryMock).findAllByActionAndEnabled("someAction", true);
 		verifyNoMoreInteractions(credentialsRepositoryMock);
 	}
 

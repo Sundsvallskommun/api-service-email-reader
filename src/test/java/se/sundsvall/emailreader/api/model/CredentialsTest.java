@@ -18,6 +18,7 @@ class CredentialsTest {
 			.withUsername("someUsername")
 			.withMetadata(Collections.singletonMap("someKey", "someValue"))
 			.withPassword("somePassword")
+			.withEnabled(true)
 			.withId("someId").build();
 
 		assertThat(result).isNotNull();
@@ -29,6 +30,14 @@ class CredentialsTest {
 		assertThat(result.password()).isEqualTo("somePassword");
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.emailAddress()).hasSize(1).element(0).satisfies(emailAddress -> assertThat(emailAddress).isEqualTo("someEmailAddress"));
+		assertThat(result.enabled()).isTrue();
 
 	}
+
+	@Test
+	void testNoDirtOnCreatedBean() {
+		assertThat(GraphCredentials.builder().build()).hasAllNullFieldsOrPropertiesExcept("enabled").satisfies(
+			bean -> assertThat(bean.enabled()).isFalse());
+	}
+
 }

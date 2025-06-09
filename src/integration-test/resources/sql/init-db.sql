@@ -35,7 +35,8 @@ INSERT INTO credentials (created_at,
                          namespace,
                          password,
                          username,
-                         action)
+                         action,
+                         enabled)
 VALUES (CURRENT_TIMESTAMP,
         'someDestinationFolder',
         'someDomain',
@@ -44,7 +45,8 @@ VALUES (CURRENT_TIMESTAMP,
         'someNamespace',
         'somePassword',
         'someUsername',
-        'PERSIST');
+        'PERSIST',
+        1);
 
 -- Insert into credentials_entity_email_address
 INSERT INTO credentials_email_address (credentials_id, email_address)
@@ -66,10 +68,10 @@ VALUES ('81471222-5798-11e9-ae24-57fa13b361e1', 'someValue', 0),
        ('81471222-5798-11e9-ae24-57fa13b361e1', 'someOtherValue', 1);
 
 INSERT INTO graph_credentials(created_at, client_id, client_secret, destination_folder, id, municipality_id, namespace,
-                              tenant_id)
+                              tenant_id, enabled)
 VALUES ('2019-04-10 12:00:00', 'client_id', 'client_secret', 'destination_folder',
         '81471222-5798-11e9-ae24-57fa13b361e1', '2281', 'namespace',
-        'tenant_id');
+        'tenant_id', 1);
 
 insert into graph_credentials_email_address(graph_credentials_id, email_address)
 values ('81471222-5798-11e9-ae24-57fa13b361e1', 'test@example.com');

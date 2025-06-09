@@ -38,6 +38,8 @@ public record GraphCredentials(
 
 	@Schema(description = "Metadata to add to the email.", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}", requiredMode = REQUIRED) Map<String, String> metadata,
 
-	@NotBlank @Schema(description = "The folder to move emails to after processing.", example = "Processed", requiredMode = REQUIRED) String destinationFolder) {
+	@NotBlank @Schema(description = "The folder to move emails to after processing.", example = "Processed", requiredMode = REQUIRED) String destinationFolder,
+
+	@Schema(description = "If this configuration is active and should fetch emails") boolean enabled) {
 
 }
