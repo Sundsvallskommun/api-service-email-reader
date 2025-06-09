@@ -71,6 +71,9 @@ public class CredentialsEntity {
 			foreignKey = @ForeignKey(name = "fk_credentials_metadata_credentials_id")))
 	private Map<String, String> metadata;
 
+	@Column(name = "enabled")
+	private boolean enabled;
+
 	@PrePersist
 	void prePersist() {
 		createdAt = LocalDateTime.now();

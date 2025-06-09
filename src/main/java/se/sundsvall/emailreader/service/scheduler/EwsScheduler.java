@@ -51,7 +51,7 @@ public class EwsScheduler {
 		lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}",
 		maximumExecutionTime = "${scheduled.maximum-execution-time}")
 	public void checkForNewEmails() {
-		for (final var credential : emailService.findAllByAction("PERSIST")) {
+		for (final var credential : emailService.findAllByActionAndActive("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
 				LOG.info("Fetch mails for address '{}'", address);
 				for (final var email : ewsMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer),
@@ -82,7 +82,7 @@ public class EwsScheduler {
 		lockAtMostFor = "${scheduled.shedlock-lock-at-most-for}",
 		maximumExecutionTime = "${scheduled.maximum-execution-time}")
 	void checkForNewSmsEmails() throws Exception {
-		for (final var credential : emailService.findAllByAction("SEND_SMS")) {
+		for (final var credential : emailService.findAllByActionAndActive("SEND_SMS")) {
 			final var messages = getMessagesByCredentials(credential);
 			handleMessages(credential, messages);
 		}

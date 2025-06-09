@@ -24,6 +24,7 @@ public final class GraphCredentialsMapper {
 			.withEmailAddress(graphCredentialsEntity.getEmailAddress())
 			.withMetadata(graphCredentialsEntity.getMetadata())
 			.withId(graphCredentialsEntity.getId())
+			.withEnabled(graphCredentialsEntity.isEnabled())
 			.build();
 	}
 
@@ -38,6 +39,7 @@ public final class GraphCredentialsMapper {
 			.withNamespace(graphCredentials.namespace())
 			.withEmailAddress(graphCredentials.emailAddress())
 			.withMetadata(graphCredentials.metadata())
+			.withEnabled(graphCredentials.enabled())
 			.build();
 	}
 
@@ -50,6 +52,7 @@ public final class GraphCredentialsMapper {
 		Optional.ofNullable(credentials.namespace()).ifPresent(entity::setNamespace);
 		Optional.ofNullable(credentials.emailAddress()).ifPresent(entity::setEmailAddress);
 		Optional.ofNullable(credentials.metadata()).ifPresent(entity::setMetadata);
+		Optional.of(credentials.enabled()).ifPresent(entity::setEnabled);
 		return entity;
 	}
 }

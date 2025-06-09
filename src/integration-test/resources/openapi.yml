@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:53813
+  - url: http://localhost:62357
     description: Generated server url
 tags:
   - name: Email
@@ -666,6 +666,9 @@ components:
           type: string
           description: The folder to move emails to after processing
           example: Processed
+        enabled:
+          type: boolean
+          description: If this configuration is active and should fetch emails
       description: Email credentials to use for authentication against the email server
     Problem:
       type: object
@@ -680,20 +683,20 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -815,12 +818,12 @@ components:
           type: object
           additionalProperties:
             type: object
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         suppressed:
           type: array
           items:
@@ -929,6 +932,9 @@ components:
           type: string
           description: The folder to move emails to after processing.
           example: Processed
+        enabled:
+          type: boolean
+          description: If this configuration is active and should fetch emails
       description: Email credentials to use for authentication against a Microsoft
         Graph server.
     Email:

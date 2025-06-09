@@ -72,6 +72,9 @@ public class GraphCredentialsEntity {
 			foreignKey = @ForeignKey(name = "fk_graph_credentials_metadata_graph_credentials_id")))
 	private Map<String, String> metadata;
 
+	@Column(name = "enabled")
+	private boolean enabled;
+
 	@PrePersist
 	void prePersist() {
 		createdAt = OffsetDateTime.now();

@@ -18,6 +18,7 @@ class GraphCredentialsTest {
 		final var emailAddress = Collections.singletonList("someEmailAddress");
 		final var metadata = Collections.singletonMap("someKey", "someValue");
 		final var id = "someId";
+		final var enabled = true;
 
 		// Act
 		final var bean = GraphCredentials.builder()
@@ -29,6 +30,7 @@ class GraphCredentialsTest {
 			.withEmailAddress(emailAddress)
 			.withMetadata(metadata)
 			.withId(id)
+			.withEnabled(enabled)
 			.build();
 		// Assert
 		assertThat(bean).isNotNull().hasNoNullFieldsOrProperties();
@@ -41,11 +43,13 @@ class GraphCredentialsTest {
 		assertThat(bean.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(bean.emailAddress()).hasSize(1).element(0)
 			.satisfies(address -> assertThat(address).isEqualTo("someEmailAddress"));
+		assertThat(bean.enabled()).isEqualTo(enabled);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(GraphCredentials.builder().build()).hasAllNullFieldsOrProperties();
+		assertThat(GraphCredentials.builder().build()).hasAllNullFieldsOrPropertiesExcept("enabled").satisfies(
+			bean -> assertThat(bean.enabled()).isFalse());
 	}
 
 }

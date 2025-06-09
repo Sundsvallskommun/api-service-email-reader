@@ -8,6 +8,7 @@
 		"metadata": {
 			"metadata_key": "metadata_value"
 		},
-		"destinationFolder": "destination_folder"
+		"destinationFolder": "destination_folder",
+		"enabled": true
 	}
 ]

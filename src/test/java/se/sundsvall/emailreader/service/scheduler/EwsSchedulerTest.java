@@ -69,14 +69,14 @@ class EwsSchedulerTest {
 		final var credential = createCredentialsEntity();
 		final var emailAddresses = "someEmailAddress";
 		final var email = createEmailEntity(emptyMap());
-		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq(emailAddresses), any())).thenReturn(List.of(emailMessage));
 		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
 		doNothing().when(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
 
 		ewsScheduler.checkForNewEmails();
 
-		verify(emailServiceMock).findAllByAction("PERSIST");
+		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq(emailAddresses), any());
 		verify(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
 		verifyNoMoreInteractions(emailServiceMock);
@@ -84,11 +84,11 @@ class EwsSchedulerTest {
 
 	@Test
 	void checkForNewEmails_noCredentials() throws Exception {
-		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of());
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of());
 
 		ewsScheduler.checkForNewEmails();
 
-		verify(emailServiceMock).findAllByAction("PERSIST");
+		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock, never()).getAllEmailsInInbox(any(), any(), any());
 		verify(emailServiceMock, never()).saveAndMoveEmail(any(), any(), any());
 		verifyNoMoreInteractions(emailServiceMock);
@@ -98,14 +98,14 @@ class EwsSchedulerTest {
 	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
 		final var emailMessage1 = mock(EmailMessage.class);
 		final var emailMessage2 = mock(EmailMessage.class);
-		when(emailServiceMock.findAllByAction("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
 		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
 		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
 		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
 
 		ewsScheduler.checkForNewEmails();
 
-		verify(emailServiceMock, times(1)).findAllByAction("PERSIST");
+		verify(emailServiceMock, times(1)).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock, times(2)).getAllEmailsInInbox(any(), any(), any());
 		verify(emailServiceMock, times(4)).saveAndMoveEmail(any(), any(), any());
 	}
@@ -130,7 +130,7 @@ class EwsSchedulerTest {
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
-		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
 		when(ewsIntegrationMock.validateRecipientNumbers(any())).thenReturn(resultMap);
@@ -139,7 +139,7 @@ class EwsSchedulerTest {
 
 		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467012345678"));
 		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467112345678"));
-		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
@@ -153,12 +153,12 @@ class EwsSchedulerTest {
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
-		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenThrow(new RuntimeException("Something went wrong"));
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
@@ -175,13 +175,13 @@ class EwsSchedulerTest {
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
-		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
 
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
@@ -198,7 +198,7 @@ class EwsSchedulerTest {
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
-		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
 		when(ewsIntegrationMock.validateRecipientNumbers(any())).thenReturn(resultMap);
@@ -212,7 +212,7 @@ class EwsSchedulerTest {
 			assertThat(request.getMobileNumber()).isEqualTo("+4670123456789");
 		});
 
-		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());
@@ -228,14 +228,14 @@ class EwsSchedulerTest {
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
-		when(emailServiceMock.findAllByAction("SEND_SMS")).thenReturn(List.of(credential));
+		when(emailServiceMock.findAllByActionAndActive("SEND_SMS")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any())).thenReturn(List.of(emailMessage));
 		when(ewsIntegrationMock.extractValuesEmailMessage(any())).thenReturn(emailMap);
 		when(ewsIntegrationMock.validateRecipientNumbers(any())).thenReturn(resultMap);
 
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(emailServiceMock).findAllByAction("SEND_SMS");
+		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
 		verify(ewsIntegrationMock).moveEmail(any(), any(), any());

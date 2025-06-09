@@ -37,6 +37,8 @@ public record Credentials(
 
 	@Schema(description = "Metadata to add to the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}") Map<String, String> metadata,
 
-	@NotBlank @Schema(description = "The folder to move emails to after processing", example = "Processed") String destinationFolder) {
+	@NotBlank @Schema(description = "The folder to move emails to after processing", example = "Processed") String destinationFolder,
+
+	@Schema(description = "If this configuration is active and should fetch emails") boolean enabled) {
 
 }

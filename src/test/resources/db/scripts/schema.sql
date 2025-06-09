@@ -10,6 +10,7 @@
     ) engine=InnoDB;
 
     create table credentials (
+        enabled bit,
         created_at datetime(6),
         action varchar(255),
         destination_folder varchar(255),
@@ -73,6 +74,7 @@
     ) engine=InnoDB;
 
     create table graph_credentials (
+        enabled bit,
         created_at datetime(6),
         client_id varchar(255),
         client_secret varchar(255),

@@ -47,6 +47,7 @@ class GraphCredentialsEntityTest {
 		final var namespace = "someNamespace";
 		final var emailAddress = Collections.singletonList("someEmailAddress");
 		final var metadata = Collections.singletonMap("someKey", "someValue");
+		final var enabled = true;
 
 		// Act
 		final var bean = GraphCredentialsEntity.builder()
@@ -59,6 +60,7 @@ class GraphCredentialsEntityTest {
 			.withNamespace(namespace)
 			.withEmailAddress(emailAddress)
 			.withMetadata(metadata)
+			.withEnabled(enabled)
 			.build();
 
 		bean.prePersist();
@@ -76,11 +78,14 @@ class GraphCredentialsEntityTest {
 		assertThat(bean.getEmailAddress()).hasSize(1).element(0)
 			.satisfies(address -> assertThat(address).isEqualTo("someEmailAddress"));
 		assertThat(bean.getCreatedAt()).isCloseTo(now(), within(1, SECONDS));
+		assertThat(bean.isEnabled()).isEqualTo(enabled);
 	}
 
 	@Test
 	void testNoDirtOnCreatedBean() {
-		assertThat(GraphCredentialsEntity.builder().build()).hasAllNullFieldsOrProperties();
-		assertThat(new GraphCredentialsEntity()).hasAllNullFieldsOrProperties();
+		assertThat(GraphCredentialsEntity.builder().build()).hasAllNullFieldsOrPropertiesExcept("enabled").satisfies(
+			bean -> assertThat(bean.isEnabled()).isFalse());
+		assertThat(new GraphCredentialsEntity()).hasAllNullFieldsOrPropertiesExcept("enabled").satisfies(
+			bean -> assertThat(bean.isEnabled()).isFalse());
 	}
 }
