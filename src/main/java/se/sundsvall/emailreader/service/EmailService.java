@@ -127,13 +127,17 @@ public class EmailService {
 	@Transactional
 	public void saveAndMoveEmail(final EmailEntity email, final String emailAddress, final CredentialsEntity credential) throws Exception {
 
-		if (isAutoReply(email)) {
+		if (isAutoReply(email) || isSenderNoReply(email)) {
 			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.getOriginalId()));
 			return;
 		}
 
 		emailRepository.save(email);
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
+	}
+
+	boolean isSenderNoReply(final EmailEntity email) {
+		return email.getSender().toLowerCase().startsWith("no-reply") || email.getSender().toLowerCase().startsWith("noreply");
 	}
 
 	boolean isAutoReply(final EmailEntity email) {
