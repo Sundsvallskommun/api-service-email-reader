@@ -35,6 +35,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -46,6 +48,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.emailreader.TestUtility;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.AttachmentRepository;
@@ -59,7 +62,9 @@ import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({
+	MockitoExtension.class, ResourceLoaderExtension.class
+})
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)
 @ActiveProfiles("junit")
@@ -352,6 +357,18 @@ class EmailServiceTest {
 		verify(messageAttachmentEntityMock).getContent();
 		verifyNoMoreInteractions(mockAttachmentRepository, messageAttachmentEntityMock);
 		verifyNoInteractions(blobMock, servletOutputStreamMock);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = {
+		"no-reply@email.se", "noreply@email.se", "no-reply@email.se", "nOrEpLy@email.se", "nO-rEpLy@email.se"
+	})
+	void isSenderNoReply(final String sender) {
+		final var emailEntity = createEmailEntity(emptyMap());
+		emailEntity.setSender(sender);
+
+		assertThat(emailService.isSenderNoReply(emailEntity)).isTrue();
+
 	}
 
 }
