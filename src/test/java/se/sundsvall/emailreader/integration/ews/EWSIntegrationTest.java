@@ -2,6 +2,8 @@ package se.sundsvall.emailreader.integration.ews;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -75,7 +77,7 @@ class EWSIntegrationTest {
 	}
 
 	@BeforeEach
-	public void setUp() throws Exception {
+	void setUp() throws Exception {
 		ewsIntegration = new EWSIntegration();
 		exchangeServiceMock = mock(ExchangeService.class);
 		final var serviceField = ewsIntegration.getClass().getDeclaredField("exchangeService");
@@ -202,6 +204,27 @@ class EWSIntegrationTest {
 		assertThat(result.get("VALID")).isEqualTo(expected.get("VALID"));
 		assertThat(result.get("INVALID")).isEqualTo(expected.get("INVALID"));
 		assertThat(result).usingRecursiveComparison().isEqualTo(expected);
+	}
+
+	@Test
+	void loadMessage() throws Exception {
+
+		final var result = ewsIntegration.loadMessage(emailMessageMock, consumerMock);
+
+		assertThat(result).isNotNull().isEqualTo(emailMessageMock);
+		verify(emailMessageMock).load();
+		verify(exchangeServiceMock).loadPropertiesForItems(eq(List.of(emailMessageMock)), any(PropertySet.class));
+	}
+
+	@Test
+	void loadMessageThrowsException() throws Exception {
+		doThrow(ServiceLocalException.class).when(emailMessageMock).load();
+
+		final var result = ewsIntegration.loadMessage(emailMessageMock, consumerMock);
+
+		assertThat(result).isNull();
+		verify(consumerMock).accept("[EWS] Could not load message");
+		verify(emailMessageMock).load();
 	}
 
 }

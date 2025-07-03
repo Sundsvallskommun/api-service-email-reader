@@ -48,6 +48,8 @@ public class EWSIntegration {
 	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 	private static final List<String> SMS_MAIL_MESSAGE_KEYS_TO_PARSE = List.of("Message", "Recipient", "Sender");
 
+	private static final String MAX_FILE_SIZE = System.getProperty("properties.ews.maxFileSize", "10485760"); // Default to 10 MB
+
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
@@ -75,19 +77,22 @@ public class EWSIntegration {
 			try {
 				findResults = exchangeService.findItems(folderId, view);
 			} catch (final Exception e) {
-				setUnHealthyConsumer.accept("[EWS] Could not find items");
+				setUnHealthyConsumer.accept("[EWS] Could not find items, address: " + emailAddress);
 				LOG.error("Could not find items", e);
 				return emails;
 			}
 			findResults.getItems().forEach(item -> {
 				try {
 					if (item instanceof final EmailMessage message) {
-						message.load(); // Load the full message data
-						exchangeService.loadPropertiesForItems(List.of(message), propertySetTextBody);
+						if (message.getSize() > Long.parseLong(MAX_FILE_SIZE)) {
+							setUnHealthyConsumer.accept("[EWS] Email size exceeds maximum allowed size for address: " + emailAddress);
+							LOG.warn("Skipping email with size {} bytes, larger than max allowed size of {} bytes for address {}", message.getSize(), MAX_FILE_SIZE, emailAddress);
+							return;
+						}
 						emails.add(message);
 					}
 				} catch (final Exception e) {
-					setUnHealthyConsumer.accept("[EWS] Could not load message");
+					setUnHealthyConsumer.accept("[EWS] Could not load message for address: " + emailAddress);
 					LOG.error("Could not load message", e);
 				}
 			});
@@ -143,6 +148,19 @@ public class EWSIntegration {
 		}
 
 		return findFoldersResults.getFolders().getFirst();
+	}
+
+	public EmailMessage loadMessage(final EmailMessage emailMessage, final Consumer<String> setUnHealthyConsumer) {
+
+		try {
+			emailMessage.load(); // Load the full message data
+			exchangeService.loadPropertiesForItems(List.of(emailMessage), propertySetTextBody);
+			return emailMessage;
+		} catch (final Exception e) {
+			setUnHealthyConsumer.accept("[EWS] Could not load message");
+			LOG.error("Could not load message", e);
+		}
+		return null;
 	}
 
 	public Map<String, String> extractValuesEmailMessage(final EmailMessage emailMessage) {

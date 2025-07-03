@@ -56,8 +56,8 @@ import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
 import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
-import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
+import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
@@ -108,6 +108,9 @@ class EmailServiceTest {
 	private ServletOutputStream servletOutputStreamMock;
 
 	@Mock
+	private EWSMapper ewsMapperMock;
+
+	@Mock
 	private Consumer<String> consumerMock;
 
 	@Mock
@@ -117,7 +120,7 @@ class EmailServiceTest {
 
 	@BeforeEach
 	void init() {
-		emailService = new EmailService(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
+		emailService = new EmailService(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository, ewsMapperMock);
 	}
 
 	@Test
@@ -253,11 +256,18 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmail() throws Exception {
+		final var emailMessageMock = mock(EmailMessage.class);
 		final var emailEntity = TestUtility.createEmailEntity(emptyMap());
 		final var credentials = createCredentialsEntity();
-		emailService.saveAndMoveEmail(emailEntity, "someEmail", credentials);
 
-		verify(emailRepositoryMock).save(same(emailEntity));
+		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
+		when(ewsMapperMock.toEmail(any(), any(), any(), any()))
+			.thenReturn(emailEntity);
+
+		emailService.saveAndMoveEmail(emailMessageMock, "someEmail", credentials, consumerMock);
+
+		verify(emailRepositoryMock).saveAndFlush(same(emailEntity));
 		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString("someOriginalId"), "someEmail", credentials.getDestinationFolder());
 		verifyNoMoreInteractions(emailRepositoryMock, ewsIntegrationMock);
 		verifyNoInteractions(credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
@@ -266,8 +276,12 @@ class EmailServiceTest {
 	@Test
 	void saveAndMoveEmailWithoutMockedDB() throws Exception {
 
+		// Precondition
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isEmpty();
-		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository);
+
+		// Arrange
+		final var emailMessageMock = mock(EmailMessage.class);
+		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository, ewsMapperMock);
 		final var credentialsEntity = credentialsRepository.findAll().getFirst();
 
 		final var emailId = UUID.randomUUID().toString();
@@ -278,8 +292,16 @@ class EmailServiceTest {
 		email.setNamespace("namespace-1");
 		email.setMunicipalityId("municipality_id-1");
 
-		service.saveAndMoveEmail(email, "someEmail", credentialsEntity);
+		when(ewsMapperMock.toEmail(any(), any(), any(), any()))
+			.thenReturn(email);
 
+		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
+
+		// Act
+		service.saveAndMoveEmail(emailMessageMock, "someEmail", credentialsEntity, consumerMock);
+
+		// Assert
 		assertThat(credentialsRepository.findAll().getFirst().getMetadata()).isNotEmpty();
 		assertThat(emailRepository.findByMunicipalityIdAndNamespace("municipality_id-1", "namespace-1")).isNotEmpty();
 
@@ -290,10 +312,16 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmailWithAutoReply() throws Exception {
-
+		final var emailMessageMock = mock(EmailMessage.class);
 		final var headers = Map.of(Header.AUTO_SUBMITTED, List.of("auto-replied"));
 		final var email = TestUtility.createEmailEntity(headers);
-		emailService.saveAndMoveEmail(email, "someEmail", createCredentialsEntity());
+
+		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
+		when(ewsMapperMock.toEmail(any(), any(), any(), any()))
+			.thenReturn(email);
+
+		emailService.saveAndMoveEmail(emailMessageMock, "someEmail", createCredentialsEntity(), consumerMock);
 
 		verify(ewsIntegrationMock).deleteEmail(any());
 		verifyNoMoreInteractions(ewsIntegrationMock);
@@ -302,7 +330,7 @@ class EmailServiceTest {
 
 	@Test
 	void hasTransactionalAnnotation() throws Exception {
-		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", EmailEntity.class, String.class, CredentialsEntity.class);
+		final var method = EmailService.class.getDeclaredMethod("saveAndMoveEmail", EmailMessage.class, String.class, CredentialsEntity.class, Consumer.class);
 		assertThat(method.getAnnotation(Transactional.class)).isNotNull();
 	}
 

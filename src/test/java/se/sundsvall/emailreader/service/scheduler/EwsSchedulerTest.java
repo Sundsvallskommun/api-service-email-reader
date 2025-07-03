@@ -68,17 +68,19 @@ class EwsSchedulerTest {
 		final var emailMessage = mock(EmailMessage.class);
 		final var credential = createCredentialsEntity();
 		final var emailAddresses = "someEmailAddress";
+		final var emailMessageMock = mock(EmailMessage.class);
+
 		final var email = createEmailEntity(emptyMap());
 		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq(emailAddresses), any())).thenReturn(List.of(emailMessage));
 		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
-		doNothing().when(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
+		doNothing().when(emailServiceMock).saveAndMoveEmail(emailMessageMock, emailAddresses, credential, consumerMock);
 
 		ewsScheduler.checkForNewEmails();
 
 		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq(emailAddresses), any());
-		verify(emailServiceMock).saveAndMoveEmail(email, emailAddresses, credential);
+		verify(emailServiceMock).saveAndMoveEmail(any(), eq(emailAddresses), eq(credential), any());
 		verifyNoMoreInteractions(emailServiceMock);
 	}
 
@@ -90,7 +92,7 @@ class EwsSchedulerTest {
 
 		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock, never()).getAllEmailsInInbox(any(), any(), any());
-		verify(emailServiceMock, never()).saveAndMoveEmail(any(), any(), any());
+		verify(emailServiceMock, never()).saveAndMoveEmail(any(), any(), any(), any());
 		verifyNoMoreInteractions(emailServiceMock);
 	}
 
@@ -100,14 +102,13 @@ class EwsSchedulerTest {
 		final var emailMessage2 = mock(EmailMessage.class);
 		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
 		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
-		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(createEmailEntity(emptyMap()), createEmailEntity(emptyMap())));
-		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any());
+		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any(), any());
 
 		ewsScheduler.checkForNewEmails();
 
 		verify(emailServiceMock, times(1)).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock, times(2)).getAllEmailsInInbox(any(), any(), any());
-		verify(emailServiceMock, times(4)).saveAndMoveEmail(any(), any(), any());
+		verify(emailServiceMock, times(4)).saveAndMoveEmail(any(), any(), any(), any());
 	}
 
 	@Test
