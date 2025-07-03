@@ -48,7 +48,7 @@ public final class EWSMapper {
 		try {
 			final var headers = new ArrayList<EmailHeaderEntity>();
 
-			var internetMessageHeaders = emailMessage.getInternetMessageHeaders();
+			final var internetMessageHeaders = emailMessage.getInternetMessageHeaders();
 			findHeader(internetMessageHeaders, MESSAGE_ID).ifPresentOrElse(header -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(header.getValue()))),
 				() -> headers.add(createEmailHeader(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>"))));
 			findHeader(internetMessageHeaders, REFERENCES).ifPresent(header -> headers.add(createEmailHeader(REFERENCES, extractValues(header.getValue()))));
@@ -63,7 +63,7 @@ public final class EWSMapper {
 	}
 
 	Optional<InternetMessageHeader> findHeader(final InternetMessageHeaderCollection collection, final Header header) {
-		for (var internetMessageHeader : collection) {
+		for (final var internetMessageHeader : collection) {
 			if (internetMessageHeader.getName().equalsIgnoreCase(header.getName())) {
 				return Optional.of(internetMessageHeader);
 			}
@@ -93,7 +93,7 @@ public final class EWSMapper {
 			.toList();
 	}
 
-	EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) {
+	public EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) {
 		try {
 
 			final var recipients = emailMessage.getToRecipients().getItems().stream()

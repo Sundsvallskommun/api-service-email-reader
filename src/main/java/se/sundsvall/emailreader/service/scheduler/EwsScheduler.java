@@ -16,7 +16,6 @@ import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
-import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.EmailService;
 
@@ -29,20 +28,18 @@ public class EwsScheduler {
 	private final EWSIntegration ewsIntegration;
 	private final Consumer<String> emailSetUnHealthyConsumer;
 	private final Consumer<String> smsSetUnHealthyConsumer;
-	private final EWSMapper ewsMapper;
 
 	@Value("${scheduled.check-for-new-emails.ews.name}")
 	private String emailJobName;
 	@Value("${scheduled.check-for-new-sms-emails.name}")
 	private String smsJobName;
 
-	public EwsScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility, final EWSMapper ewsMapper) {
+	public EwsScheduler(final EmailService emailService, final MessagingIntegration messagingIntegration, final EWSIntegration ewsIntegration, final Dept44HealthUtility dept44HealthUtility) {
 		this.emailService = emailService;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
 		this.emailSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(emailJobName, String.format("Email error: %s", msg));
 		this.smsSetUnHealthyConsumer = msg -> dept44HealthUtility.setHealthIndicatorUnhealthy(smsJobName, String.format("Email error: %s", msg));
-		this.ewsMapper = ewsMapper;
 	}
 
 	@Dept44Scheduled(
@@ -54,14 +51,11 @@ public class EwsScheduler {
 		for (final var credential : emailService.findAllByActionAndActive("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
 				LOG.info("Fetch mails for address '{}'", address);
-				for (final var email : ewsMapper.toEmails(emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer),
-					credential.getMunicipalityId(),
-					credential.getNamespace(),
-					credential.getMetadata())) {
+				for (final var email : emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer)) {
 					try {
-						emailService.saveAndMoveEmail(email, address, credential);
+						emailService.saveAndMoveEmail(email, address, credential, emailSetUnHealthyConsumer);
 					} catch (final Exception e) {
-						LOG.error("Failed to handle individual email with id: '{}'. ", email.getId(), e);
+						LOG.error("Failed to handle individual email", e);
 						emailSetUnHealthyConsumer.accept("Failed to handle individual email");
 					}
 				}

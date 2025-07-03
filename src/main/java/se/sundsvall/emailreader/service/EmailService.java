@@ -30,6 +30,7 @@ import se.sundsvall.emailreader.integration.db.EmailRepository;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
+import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
@@ -52,17 +53,20 @@ public class EmailService {
 
 	private final AttachmentRepository attachmentRepository;
 
+	private final EWSMapper ewsMapper;
+
 	public EmailService(final EmailRepository emailRepository,
 		final CredentialsRepository credentialsRepository,
 		final MessagingIntegration messagingIntegration,
 		final EWSIntegration ewsIntegration,
-		final EncryptionUtility encryptionUtility, final AttachmentRepository attachmentRepository) {
+		final EncryptionUtility encryptionUtility, final AttachmentRepository attachmentRepository, final EWSMapper ewsMapper) {
 		this.emailRepository = emailRepository;
 		this.credentialsRepository = credentialsRepository;
 		this.messagingIntegration = messagingIntegration;
 		this.ewsIntegration = ewsIntegration;
 		this.encryptionUtility = encryptionUtility;
 		this.attachmentRepository = attachmentRepository;
+		this.ewsMapper = ewsMapper;
 	}
 
 	public List<Email> getAllEmails(final String municipalityId, final String namespace) {
@@ -125,14 +129,21 @@ public class EmailService {
 	}
 
 	@Transactional
-	public void saveAndMoveEmail(final EmailEntity email, final String emailAddress, final CredentialsEntity credential) throws Exception {
+	public void saveAndMoveEmail(final EmailMessage ewsEmail, final String emailAddress, final CredentialsEntity credential, final Consumer<String> setUnHealthyConsumer) throws Exception {
+
+		final var email = ewsMapper.toEmail(ewsIntegration.loadMessage(ewsEmail, setUnHealthyConsumer), credential.getMunicipalityId(), credential.getNamespace(), credential.getMetadata());
+
+		if (email == null) {
+			LOG.warn("Email could not be mapped from EWS message, skipping email with id: {}", ewsEmail.getId().getUniqueId());
+			return;
+		}
 
 		if (isAutoReply(email) || isSenderNoReply(email)) {
 			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.getOriginalId()));
 			return;
 		}
 
-		emailRepository.save(email);
+		emailRepository.saveAndFlush(email);
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 	}
 
