@@ -19,7 +19,6 @@ import microsoft.exchange.webservices.data.core.enumeration.property.BasePropert
 import microsoft.exchange.webservices.data.core.enumeration.property.BodyType;
 import microsoft.exchange.webservices.data.core.enumeration.property.WellKnownFolderName;
 import microsoft.exchange.webservices.data.core.enumeration.service.ConflictResolutionMode;
-import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
 import microsoft.exchange.webservices.data.core.service.folder.Folder;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.core.service.item.Item;
@@ -165,6 +164,10 @@ public class EWSIntegration {
 
 	public Map<String, String> extractValuesEmailMessage(final EmailMessage emailMessage) {
 		try {
+
+			emailMessage.load();
+			exchangeService.loadPropertiesForItems(List.of(emailMessage), propertySetTextBody);
+
 			return Arrays.stream(emailMessage.getBody().toString().split("\n"))
 				.map(line -> line.split("=", 2))
 				.filter(pairs -> pairs.length == 2)
@@ -172,7 +175,7 @@ public class EWSIntegration {
 				.collect(Collectors.toMap(
 					pairs -> pairs[0].trim(),
 					pairs -> pairs[1].trim()));
-		} catch (final ServiceLocalException e) {
+		} catch (final Exception e) {
 			LOG.error("Exception in extractValuesEmailMessage method", e);
 			return emptyMap();
 		}
