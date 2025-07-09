@@ -138,17 +138,14 @@ public class EmailService {
 			return;
 		}
 
-		if (isAutoReply(email) || isSenderNoReply(email)) {
+		if (isAutoReply(email)) {
+			LOG.info("Email with original id '{}' has been interpreted as an auto-reply and will be deleted.", email.getOriginalId());
 			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.getOriginalId()));
 			return;
 		}
 
 		emailRepository.saveAndFlush(email);
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
-	}
-
-	boolean isSenderNoReply(final EmailEntity email) {
-		return email.getSender().toLowerCase().startsWith("no-reply") || email.getSender().toLowerCase().startsWith("noreply");
 	}
 
 	boolean isAutoReply(final EmailEntity email) {
