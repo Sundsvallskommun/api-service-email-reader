@@ -34,6 +34,7 @@ import microsoft.exchange.webservices.data.search.ItemView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstraintValidator;
 
@@ -44,10 +45,11 @@ import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstrai
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
 
+	@Value("${scheduled.check-for-new-emails.ews.maxFileSize:10485760}") // Default to 10 MB
+	private String maxFileSize;
+
 	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 	private static final List<String> SMS_MAIL_MESSAGE_KEYS_TO_PARSE = List.of("Message", "Recipient", "Sender");
-
-	private static final String MAX_FILE_SIZE = System.getProperty("properties.ews.maxFileSize", "10485760"); // Default to 10 MB
 
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
@@ -83,9 +85,9 @@ public class EWSIntegration {
 			findResults.getItems().forEach(item -> {
 				try {
 					if (item instanceof final EmailMessage message) {
-						if (message.getSize() > Long.parseLong(MAX_FILE_SIZE)) {
+						if (message.getSize() > Long.parseLong(maxFileSize)) {
 							setUnHealthyConsumer.accept("[EWS] Email size exceeds maximum allowed size for address: " + emailAddress);
-							LOG.warn("Skipping email with size {} bytes, larger than max allowed size of {} bytes for address {}", message.getSize(), MAX_FILE_SIZE, emailAddress);
+							LOG.warn("Skipping email with size {} bytes, larger than max allowed size of {} bytes for address {}", message.getSize(), maxFileSize, emailAddress);
 							return;
 						}
 						emails.add(message);
