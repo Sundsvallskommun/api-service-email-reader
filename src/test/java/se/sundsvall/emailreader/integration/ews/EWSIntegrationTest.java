@@ -41,6 +41,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith({
 	MockitoExtension.class, OutputCaptureExtension.class
@@ -83,6 +84,7 @@ class EWSIntegrationTest {
 		final var serviceField = ewsIntegration.getClass().getDeclaredField("exchangeService");
 		serviceField.setAccessible(true);
 		serviceField.set(ewsIntegration, exchangeServiceMock);
+		ReflectionTestUtils.setField(ewsIntegration, "maxFileSize", "10485760"); // Set max file size to 10 MB
 	}
 
 	@Test
