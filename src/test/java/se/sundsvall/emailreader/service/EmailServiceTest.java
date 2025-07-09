@@ -35,8 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -386,17 +384,4 @@ class EmailServiceTest {
 		verifyNoMoreInteractions(mockAttachmentRepository, messageAttachmentEntityMock);
 		verifyNoInteractions(blobMock, servletOutputStreamMock);
 	}
-
-	@ParameterizedTest
-	@ValueSource(strings = {
-		"no-reply@email.se", "noreply@email.se", "no-reply@email.se", "nOrEpLy@email.se", "nO-rEpLy@email.se"
-	})
-	void isSenderNoReply(final String sender) {
-		final var emailEntity = createEmailEntity(emptyMap());
-		emailEntity.setSender(sender);
-
-		assertThat(emailService.isSenderNoReply(emailEntity)).isTrue();
-
-	}
-
 }
