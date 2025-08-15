@@ -238,7 +238,7 @@ class EWSMapperTest {
 			assertThat(emailEntity.getMunicipalityId()).isEqualTo(MUNICIPALITY_ID);
 			assertThat(emailEntity.getNamespace()).isEqualTo(NAMESPACE);
 			assertThat(emailEntity.getMetadata()).isNotSameAs(METADATA);
-			assertThat(emailEntity.getMetadata()).allSatisfy((key, value) -> assertThat(METADATA.get(key)).isEqualTo(value));
+			assertThat(emailEntity.getMetadata()).allSatisfy((key, value) -> assertThat(METADATA).containsEntry(key, value));
 			assertThat(emailEntity.getAttachments()).hasSize(1).containsExactly(attachmentEntity);
 		});
 	}
