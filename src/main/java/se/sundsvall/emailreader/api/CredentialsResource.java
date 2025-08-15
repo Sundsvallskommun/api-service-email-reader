@@ -63,7 +63,7 @@ class CredentialsResource {
 	})
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Credentials>> getAllByMunicipalityId(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId) {
 
 		return ok(credentialsService.getCredentialsByMunicipalityId(municipalityId));
 	}
@@ -73,7 +73,7 @@ class CredentialsResource {
 	})
 	@PostMapping(consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> create(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
 		@Valid @RequestBody final Credentials credentials) {
 
 		credentialsService.create(municipalityId, credentials);
@@ -88,8 +88,8 @@ class CredentialsResource {
 	})
 	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> update(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id,
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id,
 		@Valid @RequestBody final Credentials credentials) {
 
 		credentialsService.update(municipalityId, id, credentials);
@@ -104,8 +104,8 @@ class CredentialsResource {
 	})
 	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> delete(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id) {
 
 		credentialsService.delete(municipalityId, id);
 

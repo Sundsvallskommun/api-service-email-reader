@@ -10,6 +10,7 @@ import static se.sundsvall.dept44.util.ResourceUtils.asString;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.io.IOException;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,8 +26,7 @@ import se.sundsvall.emailreader.Application;
 	properties = {
 		"spring.main.banner-mode=off",
 		"logging.level.se.sundsvall.dept44.payload=OFF"
-	}
-)
+	})
 @ActiveProfiles("it")
 class OpenApiSpecificationIT {
 
@@ -49,13 +49,12 @@ class OpenApiSpecificationIT {
 		final var existingOpenApiSpecification = asString(openApiResource);
 		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
-		writeString(java.nio.file.Path.of("target/api.yaml"), currentOpenApiSpecification);
+		writeString(Path.of("target/api.yaml"), currentOpenApiSpecification);
 
 		assertThatJson(toJson(existingOpenApiSpecification))
 			.withOptions(IGNORING_ARRAY_ORDER)
 			.whenIgnoringPaths("servers")
 			.isEqualTo(toJson(currentOpenApiSpecification));
-
 	}
 
 	/**
@@ -73,8 +72,8 @@ class OpenApiSpecificationIT {
 	/**
 	 * Attempts to convert the given YAML (no YAML-check...) to JSON.
 	 *
-	 * @param yaml the YAML to convert
-	 * @return a JSON string
+	 * @param  yaml the YAML to convert
+	 * @return      a JSON string
 	 */
 	private String toJson(final String yaml) {
 		try {

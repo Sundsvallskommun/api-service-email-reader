@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
-    url: jdbc:tc:mariadb:10.6.12:///
+    url: jdbc:tc:mariadb:10.6:///junittest
   jpa:
     properties:
       jakarta:
@@ -19,7 +19,6 @@ spring:
             script:
               append: false
         format_sql: true
-
 integration:
   messaging:
     base-url: https://api.localhost.se/messaging
@@ -27,7 +26,6 @@ integration:
     token-uri: https://api.localhost.se/oauth/token
     client-id: some-client-id
     client-secret: some-client-secret
-
 scheduled:
   check-for-new-emails:
     ews:

@@ -67,7 +67,7 @@ class GraphCredentialsResource {
 	})
 	@GetMapping(produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<GraphCredentials>> getAllByMunicipalityId(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId) {
 
 		return ok(graphCredentialsService.getCredentialsByMunicipalityId(municipalityId));
 	}
@@ -78,8 +78,8 @@ class GraphCredentialsResource {
 	})
 	@GetMapping(path = "/{id}", produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<GraphCredentials> getByMunicipalityIdAndId(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id) {
 
 		return ok(graphCredentialsService.getCredentialsByMunicipalityIdAndId(municipalityId, id));
 	}
@@ -89,7 +89,7 @@ class GraphCredentialsResource {
 	})
 	@PostMapping(consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> create(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
 		@Valid @RequestBody final GraphCredentials credentials) {
 		return created(fromPath("/{municipalityId}/credentials/graph/{id}").buildAndExpand(municipalityId, graphCredentialsService.create(municipalityId, credentials)).toUri())
 			.header(CONTENT_TYPE, ALL_VALUE)
@@ -102,8 +102,8 @@ class GraphCredentialsResource {
 	})
 	@PutMapping(path = "/{id}", consumes = APPLICATION_JSON_VALUE, produces = ALL_VALUE)
 	ResponseEntity<Void> update(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id,
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id,
 		@Valid @RequestBody final GraphCredentials credentials) {
 
 		graphCredentialsService.update(municipalityId, id, credentials);
@@ -119,8 +119,8 @@ class GraphCredentialsResource {
 	})
 	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> delete(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id) {
 
 		graphCredentialsService.delete(municipalityId, id);
 

@@ -145,8 +145,9 @@ class GraphMapperTest {
 
 		var result = graphMapper.findHeader(message, header.getName());
 
-		assertThat(result).isPresent();
-		assertThat(result.get()).isEqualTo(value);
+		assertThat(result)
+			.isPresent()
+			.contains(value);
 	}
 
 	@ParameterizedTest

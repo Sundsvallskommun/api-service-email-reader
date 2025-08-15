@@ -7,11 +7,10 @@ spring:
             database:
               action: validate
   datasource:
-    url: jdbc:tc:mariadb:10.6.12:///
+    url: jdbc:tc:mariadb:10.6:///ittest
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
   flyway:
     enabled: true
-
 integration:
   messaging:
     base-url: https://api.localhost.se/messaging
