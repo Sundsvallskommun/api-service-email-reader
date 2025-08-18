@@ -52,8 +52,8 @@ class EmailResource {
 	})
 	@GetMapping(path = "/{namespace}", produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Email>> getAllEmails(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "namespace", description = "A specific namespace", example = "CONTACTCENTER") @PathVariable("namespace") final String namespace) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "namespace", description = "A specific namespace", example = "CONTACTCENTER") @PathVariable final String namespace) {
 
 		return ok(service.getAllEmails(municipalityId, namespace));
 	}
@@ -63,8 +63,8 @@ class EmailResource {
 		@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true)
 	})
 	void getAttachment(
-		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable("attachmentId") final int attachmentId, final HttpServletResponse response) {
+		@Parameter(name = "municipalityId", description = "Municipality Id", example = "2281", required = true) @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "attachmentId", description = "MessageId to fetch attachment for", example = "123", required = true) @PathVariable final int attachmentId, final HttpServletResponse response) {
 
 		service.getMessageAttachmentStreamed(attachmentId, response);
 	}
@@ -74,8 +74,8 @@ class EmailResource {
 	})
 	@DeleteMapping(path = "/{id}", produces = ALL_VALUE)
 	ResponseEntity<Void> deleteEmail(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable("municipalityId") @ValidMunicipalityId final String municipalityId,
-		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable("id") @ValidUuid final String id) {
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @PathVariable @ValidMunicipalityId final String municipalityId,
+		@Parameter(name = "id", description = "Email message ID", example = "81471222-5798-11e9-ae24-57fa13b361e1") @PathVariable @ValidUuid final String id) {
 
 		service.deleteEmail(municipalityId, id);
 		return noContent()

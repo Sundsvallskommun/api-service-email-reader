@@ -11,7 +11,7 @@ public class MessagingProperties {
 
 	private String recipientAdress;
 
-	/// BASE PROPERTIES
+	// BASE PROPERTIES
 	private String baseUrl;
 
 	private int readTimeout = 15;
