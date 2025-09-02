@@ -47,15 +47,19 @@ public class GraphScheduler {
 						LOG.info("Fetched {} emails for address '{}'", emails.size(), emailAddress);
 						emails.forEach(email -> {
 							try {
+								LOG.info("Saving email with original id '{}'", email.getOriginalId());
 								emailService.saveEmail(email);
-
+								LOG.info("Fetching attachments for email with original id '{}'", email.getOriginalId());
 								email.setAttachments(graphIntegration.getAttachments(emailAddress, credential, email.getOriginalId(), emailSetUnHealthyConsumer));
+								LOG.info("Fetched {} attachments for email with original id '{}'", email.getAttachments().size(), email.getOriginalId());
+								LOG.info("Saving attachments for email with original id '{}'", email.getOriginalId());
 								emailService.saveEmail(email);
 
 							} catch (final Exception e) {
 								LOG.error("Failed to handle individual email with id: '{}'. ", email.getId(), e);
 								emailSetUnHealthyConsumer.accept("[Graph] Failed to handle individual email");
 							} finally {
+								LOG.info("Moving email with original id '{}' to folder '{}'", email.getOriginalId(), credential.getDestinationFolder());
 								graphIntegration.moveEmail(emailAddress, email.getOriginalId(), credential, emailSetUnHealthyConsumer);
 							}
 						});

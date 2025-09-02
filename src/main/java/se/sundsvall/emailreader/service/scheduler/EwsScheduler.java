@@ -50,15 +50,19 @@ public class EwsScheduler {
 	public void checkForNewEmails() {
 		for (final var credential : emailService.findAllByActionAndActive("PERSIST")) {
 			for (final var address : credential.getEmailAddress()) {
-				LOG.info("Fetch mails for address '{}'", address);
-				for (final var email : emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer)) {
+				LOG.info("[{}]: Fetching mails for address", address);
+				final var emails = emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer);
+				LOG.info("[{}]: Fetched {} emails", address, emails.size());
+				for (final var email : emails) {
 					try {
+						LOG.info("[{}]: Processing email with id '{}'", address, email.getId());
 						emailService.saveAndMoveEmail(email, address, credential, emailSetUnHealthyConsumer);
 					} catch (final Exception e) {
-						LOG.error("Failed to handle individual email", e);
-						emailSetUnHealthyConsumer.accept("Failed to handle individual email");
+						LOG.error("[{}]: Failed to handle individual email", address, e);
+						emailSetUnHealthyConsumer.accept("Failed to handle individual email for " + address);
 					}
 				}
+				LOG.info("Done fetching mails for address '{}'.", address);
 			}
 		}
 	}
@@ -78,6 +82,7 @@ public class EwsScheduler {
 	void checkForNewSmsEmails() throws Exception {
 		for (final var credential : emailService.findAllByActionAndActive("SEND_SMS")) {
 			final var messages = getMessagesByCredentials(credential);
+			LOG.info("Fetched {} sms-emails for address '{}'", messages.size(), credential.getEmailAddress());
 			handleMessages(credential, messages);
 		}
 	}

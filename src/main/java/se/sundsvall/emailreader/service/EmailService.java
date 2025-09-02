@@ -5,6 +5,7 @@ import static java.util.Collections.emptyList;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
@@ -76,6 +77,8 @@ public class EmailService {
 
 	@Transactional
 	public void deleteEmail(final String municipalityId, final String id) {
+		final var sanitizedId = sanitizeForLogging(id);
+		LOG.info("Deleting email with id '{}'", sanitizedId);
 		emailRepository.deleteByMunicipalityIdAndId(municipalityId, id);
 	}
 
@@ -134,17 +137,19 @@ public class EmailService {
 		final var email = ewsMapper.toEmail(ewsIntegration.loadMessage(ewsEmail, setUnHealthyConsumer), credential.getMunicipalityId(), credential.getNamespace(), credential.getMetadata());
 
 		if (email == null) {
-			LOG.warn("Email could not be mapped from EWS message, skipping email with id: {}", ewsEmail.getId().getUniqueId());
+			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}, ", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
 			return;
 		}
 
 		if (isAutoReply(email)) {
-			LOG.info("Email with original id '{}' has been interpreted as an auto-reply and will be moved to {} without further processing.", email.getOriginalId(), credential.getDestinationFolder());
+			LOG.info("[{}]: Email with original id '{}' has been interpreted as an auto-reply and will be moved to {} without further processing.", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());
 			ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 			return;
 		}
 
+		LOG.info("[{}]: Saving ews email with original id '{}'", credential.getEmailAddress(), email.getOriginalId());
 		emailRepository.saveAndFlush(email);
+		LOG.info("[{}]: Moving ews email with original id '{}' to folder '{}'", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 	}
 
@@ -178,6 +183,7 @@ public class EmailService {
 		if (isAutoReply(email)) {
 			return;
 		}
+		LOG.info("Saving graph email with original id '{}'", email.getOriginalId());
 		emailRepository.save(email);
 
 	}
