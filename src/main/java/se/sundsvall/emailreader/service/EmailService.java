@@ -139,8 +139,8 @@ public class EmailService {
 		}
 
 		if (isAutoReply(email)) {
-			LOG.info("Email with original id '{}' has been interpreted as an auto-reply and will be deleted.", email.getOriginalId());
-			ewsIntegration.deleteEmail(ItemId.getItemIdFromString(email.getOriginalId()));
+			LOG.info("Email with original id '{}' has been interpreted as an auto-reply and will be moved to {} without further processing.", email.getOriginalId(), credential.getDestinationFolder());
+			ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
 			return;
 		}
 

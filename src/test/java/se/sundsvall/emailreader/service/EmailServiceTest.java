@@ -310,18 +310,33 @@ class EmailServiceTest {
 
 	@Test
 	void saveAndMoveEmailWithAutoReply() throws Exception {
-		final var emailMessageMock = mock(EmailMessage.class);
-		final var headers = Map.of(Header.AUTO_SUBMITTED, List.of("auto-replied"));
-		final var email = TestUtility.createEmailEntity(headers);
 
-		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
-			.thenReturn(emailMessageMock);
+		// Arrange
+		final var emailMessageMock = mock(EmailMessage.class);
+		final var service = new EmailService(emailRepository, credentialsRepository, messagingIntegrationMock, ewsIntegrationMock, mockEncryptionUtility, mockAttachmentRepository, ewsMapperMock);
+		final var credentialsEntity = credentialsRepository.findAll().getFirst();
+
+		final var headers = Map.of(Header.AUTO_SUBMITTED, List.of("auto-replied"));
+		final var emailId = UUID.randomUUID().toString();
+
+		final var email = TestUtility.createEmailEntity(headers);
+		email.setId(null);
+		email.setOriginalId(emailId);
+		email.getAttachments().forEach(attachmentEntity -> attachmentEntity.setId(null));
+		email.setNamespace("namespace-1");
+		email.setMunicipalityId("municipality_id-1");
+
 		when(ewsMapperMock.toEmail(any(), any(), any(), any()))
 			.thenReturn(email);
 
-		emailService.saveAndMoveEmail(emailMessageMock, "someEmail", createCredentialsEntity(), consumerMock);
+		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
 
-		verify(ewsIntegrationMock).deleteEmail(any());
+		// Act
+		service.saveAndMoveEmail(emailMessageMock, "someEmail", credentialsEntity, consumerMock);
+
+		// Assert
+		verify(ewsIntegrationMock).moveEmail(ItemId.getItemIdFromString(emailId), "someEmail", "destination_folder-1");
 		verifyNoMoreInteractions(ewsIntegrationMock);
 		verifyNoInteractions(emailRepositoryMock, credentialsRepositoryMock, messagingIntegrationMock, mockEncryptionUtility);
 	}
