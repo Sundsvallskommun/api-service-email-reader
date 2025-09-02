@@ -84,26 +84,26 @@ class EWSMapperTest {
 		when(iterator.hasNext()).thenReturn(true, true, true, true, false);
 		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader);
 
-		var messageIdHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, MESSAGE_ID);
+		final var messageIdHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, MESSAGE_ID);
 		assertThat(messageIdHeaderResult).isPresent();
 		assertThat(messageIdHeaderResult.get().getValue()).isEqualTo("<Test1@test.se>");
-		var referenceHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, REFERENCES);
+		final var referenceHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, REFERENCES);
 		assertThat(referenceHeaderResult).isPresent();
 		assertThat(referenceHeaderResult.get().getValue()).isEqualTo("<Test2@test.se>");
-		var inReplyToHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, IN_REPLY_TO);
+		final var inReplyToHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, IN_REPLY_TO);
 		assertThat(inReplyToHeaderResult).isPresent();
 		assertThat(inReplyToHeaderResult.get().getValue()).isEqualTo("<Test3@test.se>");
-		var autoSubmittedHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED);
+		final var autoSubmittedHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED);
 		assertThat(autoSubmittedHeaderResult).isPresent();
 		assertThat(autoSubmittedHeaderResult.get().getValue()).isEqualTo("auto-generated");
 	}
 
 	@Test
 	void toHeaders() throws ServiceLocalException {
-		var iterator = mock(Iterator.class);
-		var spy = Mockito.spy(ewsMapper);
-		var emailMessageMock = mock(EmailMessage.class);
-		var internetMessageHeaderCollection = mock(InternetMessageHeaderCollection.class);
+		final var iterator = mock(Iterator.class);
+		final var spy = Mockito.spy(ewsMapper);
+		final var emailMessageMock = mock(EmailMessage.class);
+		final var internetMessageHeaderCollection = mock(InternetMessageHeaderCollection.class);
 		when(emailMessageMock.getInternetMessageHeaders()).thenReturn(internetMessageHeaderCollection);
 		when(internetMessageHeaderCollection.iterator()).thenReturn(iterator);
 
@@ -129,7 +129,47 @@ class EWSMapperTest {
 		when(spy.createEmailHeader(any(Header.class), anyList())).thenCallRealMethod();
 		when(spy.extractValues(anyString())).thenCallRealMethod();
 
-		var result = spy.toHeaders(emailMessageMock);
+		final var result = spy.toHeaders(emailMessageMock);
+
+		assertThat(result).isNotNull().hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
+			tuple(MESSAGE_ID, List.of("<Test1@test.se>")),
+			tuple(REFERENCES, List.of("<Test2@test.se>")),
+			tuple(IN_REPLY_TO, List.of("<Test3@test.se>")),
+			tuple(AUTO_SUBMITTED, List.of("auto-generated")));
+	}
+
+	@Test
+	void toHeadersWithWhitespace() throws ServiceLocalException {
+		final var iterator = mock(Iterator.class);
+		final var spy = Mockito.spy(ewsMapper);
+		final var emailMessageMock = mock(EmailMessage.class);
+		final var internetMessageHeaderCollection = mock(InternetMessageHeaderCollection.class);
+		when(emailMessageMock.getInternetMessageHeaders()).thenReturn(internetMessageHeaderCollection);
+		when(internetMessageHeaderCollection.iterator()).thenReturn(iterator);
+
+		final var messageIdHeader = mock(InternetMessageHeader.class);
+		when(messageIdHeader.getName()).thenReturn("message-ID");
+		when(messageIdHeader.getValue()).thenReturn("<Test1@test.se> ");
+		final var referenceHeader = mock(InternetMessageHeader.class);
+		when(referenceHeader.getName()).thenReturn("reFeRenCes");
+		when(referenceHeader.getValue()).thenReturn("<Test2@test.se>    \t");
+		final var inReplyToHeader = mock(InternetMessageHeader.class);
+		when(inReplyToHeader.getName()).thenReturn("in-REPLY-to");
+		when(inReplyToHeader.getValue()).thenReturn("<Test3@test.se>     ");
+		final var autoSubmittedHeader = mock(InternetMessageHeader.class);
+		when(autoSubmittedHeader.getName()).thenReturn("auto-submitted");
+		when(autoSubmittedHeader.getValue()).thenReturn("auto-generated ");
+
+		when(iterator.hasNext()).thenReturn(true, true, true, true, false);
+		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader);
+		when(spy.findHeader(internetMessageHeaderCollection, MESSAGE_ID)).thenReturn(Optional.of(messageIdHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, REFERENCES)).thenReturn(Optional.of(referenceHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, IN_REPLY_TO)).thenReturn(Optional.of(inReplyToHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED)).thenReturn(Optional.of(autoSubmittedHeader));
+		when(spy.createEmailHeader(any(Header.class), anyList())).thenCallRealMethod();
+		when(spy.extractValues(anyString())).thenCallRealMethod();
+
+		final var result = spy.toHeaders(emailMessageMock);
 
 		assertThat(result).isNotNull().hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
 			tuple(MESSAGE_ID, List.of("<Test1@test.se>")),
@@ -141,9 +181,9 @@ class EWSMapperTest {
 	@ParameterizedTest
 	@EnumSource(Header.class)
 	void createEmailHeader(final Header header) {
-		var values = List.of("<test1@test.se>");
+		final var values = List.of("<test1@test.se>");
 
-		var emailHeaderEntity = ewsMapper.createEmailHeader(header, values);
+		final var emailHeaderEntity = ewsMapper.createEmailHeader(header, values);
 
 		assertThat(emailHeaderEntity).isNotNull().satisfies(headerEntity -> {
 			assertThat(headerEntity.getHeader()).isEqualTo(header);
@@ -163,15 +203,15 @@ class EWSMapperTest {
 
 	@Test
 	void toAttachment() {
-		var fileAttachment = mock(FileAttachment.class);
-		var contentArray = new byte[] {
+		final var fileAttachment = mock(FileAttachment.class);
+		final var contentArray = new byte[] {
 			1, 2, 3
 		};
 		when(fileAttachment.getName()).thenReturn("test.txt");
 		when(fileAttachment.getContent()).thenReturn(contentArray);
 		when(blobBuilderMock.createBlob(contentArray)).thenReturn(blobMock);
 
-		var result = ewsMapper.toAttachment(fileAttachment);
+		final var result = ewsMapper.toAttachment(fileAttachment);
 
 		assertThat(result).isNotNull().satisfies(attachmentEntity -> {
 			assertThat(attachmentEntity.getName()).isEqualTo("test.txt");
@@ -184,15 +224,15 @@ class EWSMapperTest {
 
 	@Test
 	void toAttachment_throws() {
-		var fileAttachment = mock(FileAttachment.class);
-		var contentArray = new byte[] {
+		final var fileAttachment = mock(FileAttachment.class);
+		final var contentArray = new byte[] {
 			1, 2, 3
 		};
 		when(fileAttachment.getName()).thenReturn("test.txt");
 		when(fileAttachment.getContent()).thenReturn(contentArray);
 		when(blobBuilderMock.createBlob(contentArray)).thenThrow(new RuntimeException());
 
-		var result = ewsMapper.toAttachment(fileAttachment);
+		final var result = ewsMapper.toAttachment(fileAttachment);
 
 		assertThat(result).isNull();
 		verify(blobBuilderMock).createBlob(contentArray);
@@ -200,10 +240,10 @@ class EWSMapperTest {
 
 	@Test
 	void toEmail() throws Exception {
-		var spy = Mockito.spy(ewsMapper);
-		var emailMessageMock = mock(EmailMessage.class);
-		var attachmentEntity = new AttachmentEntity();
-		var emailHeaderEntity = new EmailHeaderEntity();
+		final var spy = Mockito.spy(ewsMapper);
+		final var emailMessageMock = mock(EmailMessage.class);
+		final var attachmentEntity = new AttachmentEntity();
+		final var emailHeaderEntity = new EmailHeaderEntity();
 
 		when(emailMessageMock.getId()).thenReturn(new ItemId("123456789"));
 		when(emailMessageMock.getBody()).thenReturn(new MessageBody("Mocked email body"));
@@ -221,7 +261,7 @@ class EWSMapperTest {
 
 		when(spy.toHeaders(emailMessageMock)).thenReturn(List.of(emailHeaderEntity));
 
-		var result = spy.toEmail(emailMessageMock, MUNICIPALITY_ID, NAMESPACE, METADATA);
+		final var result = spy.toEmail(emailMessageMock, MUNICIPALITY_ID, NAMESPACE, METADATA);
 
 		assertThat(result).isNotNull().satisfies(emailEntity -> {
 			assertThat(emailEntity).hasNoNullFieldsOrPropertiesExcept("createdAt", "id");
