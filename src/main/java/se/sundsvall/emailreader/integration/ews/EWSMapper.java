@@ -49,11 +49,11 @@ public final class EWSMapper {
 			final var headers = new ArrayList<EmailHeaderEntity>();
 
 			final var internetMessageHeaders = emailMessage.getInternetMessageHeaders();
-			findHeader(internetMessageHeaders, MESSAGE_ID).ifPresentOrElse(header -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(header.getValue()))),
+			findHeader(internetMessageHeaders, MESSAGE_ID).ifPresentOrElse(header -> headers.add(createEmailHeader(MESSAGE_ID, extractValues(header.getValue().strip()))),
 				() -> headers.add(createEmailHeader(MESSAGE_ID, List.of("<" + UUID.randomUUID() + "@randomly-generated>"))));
-			findHeader(internetMessageHeaders, REFERENCES).ifPresent(header -> headers.add(createEmailHeader(REFERENCES, extractValues(header.getValue()))));
-			findHeader(internetMessageHeaders, IN_REPLY_TO).ifPresent(header -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(header.getValue()))));
-			findHeader(internetMessageHeaders, AUTO_SUBMITTED).ifPresent(header -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(header.getValue()))));
+			findHeader(internetMessageHeaders, REFERENCES).ifPresent(header -> headers.add(createEmailHeader(REFERENCES, extractValues(header.getValue().strip()))));
+			findHeader(internetMessageHeaders, IN_REPLY_TO).ifPresent(header -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(header.getValue().strip()))));
+			findHeader(internetMessageHeaders, AUTO_SUBMITTED).ifPresent(header -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(header.getValue().strip()))));
 
 			return headers;
 		} catch (final Exception e) {
