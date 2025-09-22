@@ -16,8 +16,8 @@
 		<!-- Generated sources properties -->
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
-		<tika-core.version>3.2.2</tika-core.version>
 		<graph-api.version>6.53.0</graph-api.version>
+		<tika-core.version>3.2.3</tika-core.version>
 		<azure-identity.version>1.17.0</azure-identity.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
