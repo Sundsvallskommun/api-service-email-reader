@@ -101,9 +101,12 @@ public class GraphMapper {
 	}
 
 	String getMessage(final Message message) {
-		return Optional.ofNullable(message.getBody())
+		final var rawBody = Optional.ofNullable(message.getBody())
 			.map(ItemBody::getContent)
 			.orElse(null);
+
+		// Normalize Windows CRLF and collapse excessive blank lines to avoid double linebreaks from Windows senders
+		return Optional.ofNullable(rawBody).map(body -> body.replace("\r\n\r\n", "\n")).orElse(null);
 	}
 
 	String getSender(final Message message) {

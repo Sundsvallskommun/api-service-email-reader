@@ -47,6 +47,14 @@ class GraphMapperTest {
 	@InjectMocks
 	private GraphMapper graphMapper;
 
+	private static Stream<Arguments> findHeaderArgumentProvider() {
+		return Stream.of(
+			Arguments.of(Header.REFERENCES, "ref1, ref2"),
+			Arguments.of(Header.MESSAGE_ID, "12345"),
+			Arguments.of(Header.IN_REPLY_TO, "reply1"),
+			Arguments.of(Header.AUTO_SUBMITTED, "auto"));
+	}
+
 	@Test
 	void testToEmails() {
 		// Arrange
@@ -86,24 +94,24 @@ class GraphMapperTest {
 
 	@Test
 	void toEmail() {
-		var message = createMessage();
-		var municipalityId = "municipalityId";
-		var namespace = "namespace";
-		var metadata = Map.of("key", "value");
-		var recipients = List.of("recipient@example.com");
-		var sender = "sender@example.com";
-		var messageIdHeader = createEmailHeaderEntity(Header.MESSAGE_ID, List.of("message-id"));
-		var headers = List.of(messageIdHeader);
-		var messageContent = "messageContent";
+		final var message = createMessage();
+		final var municipalityId = "municipalityId";
+		final var namespace = "namespace";
+		final var metadata = Map.of("key", "value");
+		final var recipients = List.of("recipient@example.com");
+		final var sender = "sender@example.com";
+		final var messageIdHeader = createEmailHeaderEntity(Header.MESSAGE_ID, List.of("message-id"));
+		final var headers = List.of(messageIdHeader);
+		final var messageContent = "messageContent";
 
-		var spy = Mockito.spy(graphMapper);
+		final var spy = Mockito.spy(graphMapper);
 
 		when(spy.getRecipients(message)).thenReturn(recipients);
 		when(spy.getSender(message)).thenReturn(sender);
 		when(spy.toHeaders(message)).thenReturn(headers);
 		when(spy.getMessage(message)).thenReturn(messageContent);
 
-		var result = spy.toEmail(message, municipalityId, namespace, metadata);
+		final var result = spy.toEmail(message, municipalityId, namespace, metadata);
 
 		assertThat(result).isNotNull().satisfies(emailEntity -> {
 			assertThat(emailEntity.getOriginalId()).isEqualTo(message.getId());
@@ -121,12 +129,12 @@ class GraphMapperTest {
 
 	@Test
 	void toHeaders() {
-		var message = createMessageWithHeaders();
+		final var message = createMessageWithHeaders();
 
-		var spy = Mockito.spy(graphMapper);
+		final var spy = Mockito.spy(graphMapper);
 		when(spy.createEmailHeader(any(), any())).thenCallRealMethod();
 
-		var result = spy.toHeaders(message);
+		final var result = spy.toHeaders(message);
 
 		assertThat(result).extracting("header", "values").containsExactlyInAnyOrder(
 			tuple(Header.MESSAGE_ID, List.of("12345")),
@@ -141,9 +149,9 @@ class GraphMapperTest {
 	@ParameterizedTest
 	@MethodSource("findHeaderArgumentProvider")
 	void findHeader(final Header header, final String value) {
-		var message = createMessageWithHeaders();
+		final var message = createMessageWithHeaders();
 
-		var result = graphMapper.findHeader(message, header.getName());
+		final var result = graphMapper.findHeader(message, header.getName());
 
 		assertThat(result)
 			.isPresent()
@@ -153,9 +161,9 @@ class GraphMapperTest {
 	@ParameterizedTest
 	@EnumSource(Header.class)
 	void createEmailHeader(final Header header) {
-		var values = List.of("value1", "value2");
+		final var values = List.of("value1", "value2");
 
-		var result = graphMapper.createEmailHeader(header, values);
+		final var result = graphMapper.createEmailHeader(header, values);
 
 		assertThat(result).isNotNull().satisfies(emailHeader -> {
 			assertThat(emailHeader.getHeader()).isEqualTo(header);
@@ -165,47 +173,54 @@ class GraphMapperTest {
 
 	@Test
 	void getMessage() {
-		var message = createMessage();
+		final var message = createMessage();
 
-		var result = graphMapper.getMessage(message);
+		final var result = graphMapper.getMessage(message);
 
 		assertThat(result).isNotNull().isEqualTo(message.getBody().getContent());
 	}
 
 	@Test
-	void getSender() {
-		var message = createMessage();
+	void getMessageCleaned() {
+		final var message = createMessage();
+		final var body = new ItemBody();
+		body.setContent("Test Content\r\n\r\nSecond Line");
+		message.setBody(body);
 
-		var result = graphMapper.getSender(message);
+		// Act
+		final var result = graphMapper.getMessage(message);
+
+		// Assert
+		assertThat(result).isNotNull().isEqualTo("Test Content\nSecond Line");
+
+	}
+
+	@Test
+	void getSender() {
+		final var message = createMessage();
+
+		final var result = graphMapper.getSender(message);
 
 		assertThat(result).isNotNull().isEqualTo(message.getSender().getEmailAddress().getAddress());
 	}
 
 	@Test
 	void extractValues() {
-		var input = "value1 value2 value3";
+		final var input = "value1 value2 value3";
 
-		var result = graphMapper.extractValues(input);
+		final var result = graphMapper.extractValues(input);
 
 		assertThat(result).isNotNull().hasSize(3).containsExactly("value1", "value2", "value3");
 	}
 
 	@Test
 	void getRecipients() {
-		var message = createMessage();
+		final var message = createMessage();
 
-		var result = graphMapper.getRecipients(message);
+		final var result = graphMapper.getRecipients(message);
 
 		assertThat(result).isNotNull().hasSameSizeAs(message.getToRecipients());
 		assertThat(result.getFirst()).isEqualTo(message.getToRecipients().getFirst().getEmailAddress().getAddress());
-	}
-
-	private static Stream<Arguments> findHeaderArgumentProvider() {
-		return Stream.of(
-			Arguments.of(Header.REFERENCES, "ref1, ref2"),
-			Arguments.of(Header.MESSAGE_ID, "12345"),
-			Arguments.of(Header.IN_REPLY_TO, "reply1"),
-			Arguments.of(Header.AUTO_SUBMITTED, "auto"));
 	}
 
 	private Message createMessage() {

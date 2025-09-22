@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -86,50 +85,46 @@ public final class EWSMapper {
 			.orElse(emptyList());
 	}
 
-	public List<EmailEntity> toEmails(final List<EmailMessage> emailMessages, final String municipalityId, final String namespace, final Map<String, String> metadata) {
-		return emailMessages.stream()
-			.map(emailMessage -> toEmail(emailMessage, municipalityId, namespace, metadata))
-			.filter(Objects::nonNull)
+	public EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) throws ServiceLocalException {
+
+		final var recipients = emailMessage.getToRecipients().getItems().stream()
+			.map(EmailAddress::getAddress)
 			.toList();
-	}
 
-	public EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) {
-		try {
+		final var attachments = Optional.ofNullable(emailMessage.getAttachments()).stream()
+			.flatMap(emailAttachments -> emailAttachments.getItems().stream())
+			.filter(FileAttachment.class::isInstance)
+			.map(FileAttachment.class::cast)
+			.map(this::toAttachment)
+			.toList();
 
-			final var recipients = emailMessage.getToRecipients().getItems().stream()
-				.map(EmailAddress::getAddress)
-				.toList();
+		final var receivedAt = Optional.ofNullable(emailMessage.getDateTimeReceived())
+			.map(Date::toInstant)
+			.map(instant -> instant.atZone(ZoneId.systemDefault().getRules().getOffset(instant)))
+			.map(OffsetDateTime::from)
+			.orElse(null);
 
-			final var attachments = Optional.ofNullable(emailMessage.getAttachments()).stream()
-				.flatMap(emailAttachments -> emailAttachments.getItems().stream())
-				.filter(FileAttachment.class::isInstance)
-				.map(FileAttachment.class::cast)
-				.map(this::toAttachment)
-				.toList();
+		final var emailEntity = EmailEntity.builder()
+			.withOriginalId(emailMessage.getId().getUniqueId())
+			.withSubject(emailMessage.getSubject())
+			.withSender(emailMessage.getFrom().getAddress())
+			.withRecipients(recipients)
+			.withAttachments(attachments)
+			.withReceivedAt(receivedAt)
+			.withHeaders(toHeaders(emailMessage))
+			.withMunicipalityId(municipalityId)
+			.withNamespace(namespace)
+			.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
+			.build();
 
-			final var receivedAt = Optional.ofNullable(emailMessage.getDateTimeReceived())
-				.map(Date::toInstant)
-				.map(instant -> instant.atZone(ZoneId.systemDefault().getRules().getOffset(instant)))
-				.map(OffsetDateTime::from)
-				.orElse(null);
+		// Normalize Windows CRLF and collapse excessive blank lines to avoid double linebreaks from Windows senders
+		final var normalizedBody = Optional.ofNullable(emailMessage.getBody())
+			.map(body -> body.toString().replace("\r\n\r\n", "\n"))
+			.orElse(null);
 
-			return EmailEntity.builder()
-				.withOriginalId(emailMessage.getId().getUniqueId())
-				.withSubject(emailMessage.getSubject())
-				.withSender(emailMessage.getFrom().getAddress())
-				.withRecipients(recipients)
-				.withMessage(emailMessage.getBody().toString())
-				.withAttachments(attachments)
-				.withReceivedAt(receivedAt)
-				.withHeaders(toHeaders(emailMessage))
-				.withMunicipalityId(municipalityId)
-				.withNamespace(namespace)
-				.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
-				.build();
-		} catch (final ServiceLocalException e) {
-			LOG.warn("Could not load email", e);
-			return null;
-		}
+		emailEntity.setMessage(normalizedBody);
+
+		return emailEntity;
 	}
 
 	AttachmentEntity toAttachment(final FileAttachment fileAttachment) {
