@@ -119,8 +119,13 @@ public final class EWSMapper {
 
 		// Normalize Windows CRLF and collapse excessive blank lines to avoid double linebreaks from Windows senders
 		final var normalizedBody = Optional.ofNullable(emailMessage.getBody())
-			.map(body -> body.toString().replace("\r\n\r\n", "\n"))
+			.map(body -> body.toString()
+				.replace("\r\n", "\n")   // normalize CRLF → LF
+				.replace("\r", "\n"))    // just in case stray CRs
 			.orElse(null);
+
+		final int lfs = normalizedBody.length() - normalizedBody.replace("\n", "").length();
+		LOG.info("Line feeds: {}", lfs);
 
 		emailEntity.setMessage(normalizedBody);
 
