@@ -65,19 +65,22 @@ class EwsSchedulerTest {
 
 	@Test
 	void checkForNewEmails() throws Exception {
+		// Arrange
 		final var emailMessage = mock(EmailMessage.class);
 		final var credential = createCredentialsEntity();
 		final var emailAddresses = "someEmailAddress";
 		final var emailMessageMock = mock(EmailMessage.class);
-
 		final var email = createEmailEntity(emptyMap());
+
 		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq(emailAddresses), any())).thenReturn(List.of(emailMessage));
-		when(ewsMapperMock.toEmails(any(), any(), any(), any())).thenReturn(List.of(email));
+		when(ewsMapperMock.toEmail(any(), any(), any(), any())).thenReturn(email);
 		doNothing().when(emailServiceMock).saveAndMoveEmail(emailMessageMock, emailAddresses, credential, consumerMock);
 
+		// Act
 		ewsScheduler.checkForNewEmails();
 
+		// Assert
 		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq(emailAddresses), any());
 		verify(emailServiceMock).saveAndMoveEmail(any(), eq(emailAddresses), eq(credential), any());

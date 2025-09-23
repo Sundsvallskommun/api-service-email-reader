@@ -2,6 +2,7 @@ package se.sundsvall.emailreader.integration.ews;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.within;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
@@ -284,27 +285,21 @@ class EWSMapperTest {
 	}
 
 	@Test
-	void testToEmails_noHeaders_noAttachments() throws Exception {
-
+	void testToEmail_noHeaders_noAttachments() throws Exception {
 		// Mock
 		final var emailMessage = mock(EmailMessage.class);
-
 		when(emailMessage.getToRecipients()).thenReturn(new EmailAddressCollection());
 		emailMessage.getToRecipients().add("recipient@example.com");
-
 		when(emailMessage.getId()).thenReturn(new ItemId("123456789"));
 		when(emailMessage.getBody()).thenReturn(new MessageBody("Mocked email body"));
 		when(emailMessage.getSubject()).thenReturn("Test Email Subject");
 		when(emailMessage.getFrom()).thenReturn(new EmailAddress("test", "sender@example.com"));
 		when(emailMessage.getDateTimeReceived()).thenReturn(Date.from(Instant.now()));
 		when(emailMessage.getInternetMessageHeaders()).thenReturn(new InternetMessageHeaderCollection());
-
 		// Act
-		final var result = ewsMapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, null).getFirst();
-
+		final var result = ewsMapper.toEmail(emailMessage, MUNICIPALITY_ID, NAMESPACE, null);
 		// Assert
 		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt", "id");
-
 		assertThat(result.getSender()).isEqualTo("sender@example.com");
 		assertThat(result.getRecipients()).hasSize(1).satisfies(
 			recipient -> assertThat(recipient.getFirst()).isEqualTo("recipient@example.com"));
@@ -318,13 +313,14 @@ class EWSMapperTest {
 
 	@Test
 	void testToEmails_throwException() throws Exception {
-
 		// Mock
 		final var emailMessage = mock(EmailMessage.class);
 		when(emailMessage.getToRecipients()).thenThrow(new ServiceLocalException("Something went wrong"));
-		// Act
-		final var result = ewsMapper.toEmails(List.of(emailMessage), MUNICIPALITY_ID, NAMESPACE, METADATA);
-		// Assert
-		assertThat(result).isEmpty();
+		// Act & Assert
+
+		assertThatThrownBy(() -> ewsMapper.toEmail(emailMessage, MUNICIPALITY_ID, NAMESPACE, METADATA))
+			.isInstanceOf(ServiceLocalException.class)
+			.hasMessage("Something went wrong");
 	}
+
 }
