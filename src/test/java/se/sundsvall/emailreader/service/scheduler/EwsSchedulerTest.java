@@ -129,8 +129,8 @@ class EwsSchedulerTest {
 		final var credential = createCredentialsEntity();
 		final var emailMessage = mock(EmailMessage.class);
 		final var emailAddress = mock(EmailAddress.class);
-		final var emailMap = Map.of("Message", "someMessage", "Recipient", "07012345678,07112345678");
-		final var resultMap = Map.of("VALID", List.of("+467012345678", "+467112345678"));
+		final var emailMap = Map.of("Message", "someMessage", "Recipient", "07017406058,07112345678");
+		final var resultMap = Map.of("VALID", List.of("+467017406058", "+467112345678"));
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
@@ -141,7 +141,7 @@ class EwsSchedulerTest {
 
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467012345678"));
+		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467017406058"));
 		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467112345678"));
 		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
@@ -197,8 +197,8 @@ class EwsSchedulerTest {
 		final var credential = createCredentialsEntity();
 		final var emailMessage = mock(EmailMessage.class);
 		final var emailAddress = mock(EmailAddress.class);
-		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070123456789,071-23456789");
-		final var resultMap = Map.of("VALID", List.of("+4670123456789"), "INVALID", List.of("+4671-23456789"));
+		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070174060589,071-23456789");
+		final var resultMap = Map.of("VALID", List.of("+4670174060589"), "INVALID", List.of("+4671-23456789"));
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
@@ -213,7 +213,7 @@ class EwsSchedulerTest {
 		assertThat(smsRequestCaptor.getValue()).satisfies(request -> {
 			assertThat(request.getSender()).isEqualTo("Sundsvall");
 			assertThat(request.getMessage()).isEqualTo("someMessage");
-			assertThat(request.getMobileNumber()).isEqualTo("+4670123456789");
+			assertThat(request.getMobileNumber()).isEqualTo("+4670174060589");
 		});
 
 		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
@@ -227,8 +227,8 @@ class EwsSchedulerTest {
 		final var credential = createCredentialsEntity();
 		final var emailMessage = mock(EmailMessage.class);
 		final var emailAddress = mock(EmailAddress.class);
-		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070123456789123123,071-23456789");
-		final var resultMap = Map.of("INVALID", List.of("+4670123456789123123", "+4671-23456789"));
+		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070174060589123123,071-23456789");
+		final var resultMap = Map.of("INVALID", List.of("+4670174060589123123", "+4671-23456789"));
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");

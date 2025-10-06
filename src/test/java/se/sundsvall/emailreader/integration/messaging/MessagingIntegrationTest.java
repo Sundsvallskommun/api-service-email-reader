@@ -39,7 +39,7 @@ class MessagingIntegrationTest {
 	@Test
 	void sendSms() {
 		var municipalityId = "2281";
-		var smsRequest = new SmsRequest().mobileNumber("07012345678");
+		var smsRequest = new SmsRequest().mobileNumber("07017406058");
 
 		messagingIntegration.sendSms(municipalityId, smsRequest);
 
