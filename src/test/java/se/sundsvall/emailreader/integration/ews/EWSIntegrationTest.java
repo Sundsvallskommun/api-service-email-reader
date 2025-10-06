@@ -54,7 +54,7 @@ class EWSIntegrationTest {
 		Password = testPassword
 		Sender = user@host.com
 		Message = Nytt lösenord driftkonto: nyttLösenord
-		Recipient = 070123456789
+		Recipient = 070174060589
 		""";
 
 	private ExchangeService exchangeServiceMock;
@@ -191,7 +191,7 @@ class EWSIntegrationTest {
 		assertThat(resultMap).isNotNull()
 			.containsEntry("Sender", "user@host.com")
 			.containsEntry("Message", "Nytt lösenord driftkonto: nyttLösenord")
-			.containsEntry("Recipient", "070123456789");
+			.containsEntry("Recipient", "070174060589");
 
 		verify(emailMessageMock).getBody();
 	}
