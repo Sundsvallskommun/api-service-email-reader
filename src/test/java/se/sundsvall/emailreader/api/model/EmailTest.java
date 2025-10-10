@@ -20,6 +20,7 @@ class EmailTest {
 			.withRecipients(List.of("someRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
+			.withHtmlMessage("someHtmlMessage")
 			.withReceivedAt(OffsetDateTime.now())
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withAttachments(List.of(Email.Attachment.builder()
@@ -35,6 +36,7 @@ class EmailTest {
 		assertThat(result.recipients()).hasSize(1).element(0).satisfies(recipient -> assertThat(recipient).isEqualTo("someRecipient"));
 		assertThat(result.sender()).isEqualTo("someSender");
 		assertThat(result.message()).isEqualTo("someMessage");
+		assertThat(result.htmlMessage()).isEqualTo("someHtmlMessage");
 		assertThat(result.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 		assertThat(result.receivedAt()).isNotNull().isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
 		assertThat(result.attachments()).hasSize(1).element(0).satisfies(attachment -> {

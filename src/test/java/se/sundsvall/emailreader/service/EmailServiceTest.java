@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
+import microsoft.exchange.webservices.data.property.complex.MessageBody;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -260,6 +261,8 @@ class EmailServiceTest {
 
 		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
 			.thenReturn(emailMessageMock);
+		when(ewsIntegrationMock.loadHTMLMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
 		when(ewsMapperMock.toEmail(any(), any(), any(), any()))
 			.thenReturn(emailEntity);
 
@@ -296,6 +299,11 @@ class EmailServiceTest {
 		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
 			.thenReturn(emailMessageMock);
 
+		when(ewsIntegrationMock.loadHTMLMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
+
+		when(emailMessageMock.getBody()).thenReturn(new MessageBody("SomeBody"));
+
 		// Act
 		service.saveAndMoveEmail(emailMessageMock, "someEmail", credentialsEntity, consumerMock);
 
@@ -330,6 +338,8 @@ class EmailServiceTest {
 			.thenReturn(email);
 
 		when(ewsIntegrationMock.loadMessage(emailMessageMock, consumerMock))
+			.thenReturn(emailMessageMock);
+		when(ewsIntegrationMock.loadHTMLMessage(emailMessageMock, consumerMock))
 			.thenReturn(emailMessageMock);
 
 		// Act

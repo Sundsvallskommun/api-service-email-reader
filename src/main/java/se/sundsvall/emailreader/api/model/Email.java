@@ -22,6 +22,8 @@ public record Email(
 
 	@Schema(description = "E-mail plain-text body", example = "E-mail body") String message,
 
+	@Schema(description = "E-mail HTML body", example = "<p>E-mail body</p>") String htmlMessage,
+
 	@Schema(description = "E-mail message id", example = "74531aac-ffea-42cc-8a0a-52715bb27850") String id,
 	@Schema(description = "Metadata for the email", example = "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}") Map<String, String> metadata,
 

@@ -45,18 +45,19 @@ import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstrai
 @CircuitBreaker(name = "EWSIntegration")
 public class EWSIntegration {
 
-	@Value("${scheduled.check-for-new-emails.ews.maxFileSize:10485760}") // Default to 10 MB
-	private String maxFileSize;
-
 	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 	private static final List<String> SMS_MAIL_MESSAGE_KEYS_TO_PARSE = List.of("Message", "Recipient", "Sender");
-
+	private static final String COULD_NOT_LOAD_MESSAGE = "Could not load message";
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
+	private final PropertySet propertySetHTMLBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
+	@Value("${scheduled.check-for-new-emails.ews.maxFileSize:10485760}") // Default to 10 MB
+	private String maxFileSize;
 
 	public EWSIntegration() {
 		this.propertySetTextBody.setRequestedBodyType(BodyType.Text);
+		this.propertySetHTMLBody.setRequestedBodyType(BodyType.HTML);
 	}
 
 	public List<EmailMessage> pageThroughEntireInbox(final String username, final String password, final String domain, final String emailAddress, final Consumer<String> setUnHealthyConsumer) {
@@ -94,7 +95,7 @@ public class EWSIntegration {
 					}
 				} catch (final Exception e) {
 					setUnHealthyConsumer.accept("[EWS] Could not load message for address: " + emailAddress);
-					LOG.error("Could not load message", e);
+					LOG.error(COULD_NOT_LOAD_MESSAGE, e);
 				}
 			});
 
@@ -158,8 +159,21 @@ public class EWSIntegration {
 			exchangeService.loadPropertiesForItems(List.of(emailMessage), propertySetTextBody);
 			return emailMessage;
 		} catch (final Exception e) {
-			setUnHealthyConsumer.accept("[EWS] Could not load message");
-			LOG.error("Could not load message", e);
+			setUnHealthyConsumer.accept("[EWS] " + COULD_NOT_LOAD_MESSAGE);
+			LOG.error(COULD_NOT_LOAD_MESSAGE, e);
+		}
+		return null;
+	}
+
+	public EmailMessage loadHTMLMessage(final EmailMessage emailMessage, final Consumer<String> setUnHealthyConsumer) {
+
+		try {
+			emailMessage.load(); // Load the full message data
+			exchangeService.loadPropertiesForItems(List.of(emailMessage), propertySetHTMLBody);
+			return emailMessage;
+		} catch (final Exception e) {
+			setUnHealthyConsumer.accept("[EWS] " + COULD_NOT_LOAD_MESSAGE);
+			LOG.error(COULD_NOT_LOAD_MESSAGE, e);
 		}
 		return null;
 	}

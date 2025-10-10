@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.ItemId;
@@ -140,6 +142,13 @@ public class EmailService {
 			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}, ", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
 			return;
 		}
+
+		final var htmlEmail = ewsIntegration.loadHTMLMessage(ewsEmail, setUnHealthyConsumer);
+		if (htmlEmail == null) {
+			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}, ", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
+			return;
+		}
+		email.setHtmlMessage(Optional.ofNullable(htmlEmail.getBody()).map(Objects::toString).orElse(null));
 
 		if (isAutoReply(email)) {
 			LOG.info("[{}]: Email with original id '{}' has been interpreted as an auto-reply and will be moved to {} without further processing.", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());

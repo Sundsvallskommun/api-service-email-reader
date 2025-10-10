@@ -265,7 +265,7 @@ class EWSMapperTest {
 		final var result = spy.toEmail(emailMessageMock, MUNICIPALITY_ID, NAMESPACE, METADATA);
 
 		assertThat(result).isNotNull().satisfies(emailEntity -> {
-			assertThat(emailEntity).hasNoNullFieldsOrPropertiesExcept("createdAt", "id");
+			assertThat(emailEntity).hasNoNullFieldsOrPropertiesExcept("createdAt", "id", "htmlMessage");
 			assertThat(emailEntity.getOriginalId()).isEqualTo("123456789");
 			assertThat(emailEntity.getSubject()).isEqualTo("Test Email Subject");
 			assertThat(emailEntity.getSender()).isEqualTo("sender@example.com");
@@ -299,7 +299,7 @@ class EWSMapperTest {
 		// Act
 		final var result = ewsMapper.toEmail(emailMessage, MUNICIPALITY_ID, NAMESPACE, null);
 		// Assert
-		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt", "id");
+		assertThat(result).hasNoNullFieldsOrPropertiesExcept("metadata", "headers", "attachments", "createdAt", "id", "htmlMessage");
 		assertThat(result.getSender()).isEqualTo("sender@example.com");
 		assertThat(result.getRecipients()).hasSize(1).satisfies(
 			recipient -> assertThat(recipient.getFirst()).isEqualTo("recipient@example.com"));

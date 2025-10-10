@@ -5,9 +5,9 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "4.1"
+  version: "4.2"
 servers:
-  - url: http://localhost:62357
+  - url: http://localhost:59700
     description: Generated server url
 tags:
   - name: Email
@@ -673,6 +673,12 @@ components:
     Problem:
       type: object
       properties:
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -683,12 +689,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
     StatusType:
       type: object
       properties:
@@ -737,6 +737,8 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -744,8 +746,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -808,6 +808,12 @@ components:
                 type: boolean
         message:
           type: string
+        title:
+          type: string
+        detail:
+          type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -818,12 +824,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -960,6 +960,10 @@ components:
           type: string
           description: E-mail plain-text body
           example: E-mail body
+        htmlMessage:
+          type: string
+          description: E-mail HTML body
+          example: <p>E-mail body</p>
         id:
           type: string
           description: E-mail message id

@@ -43,6 +43,7 @@
         namespace varchar(255),
         sender varchar(255),
         subject varchar(255),
+        html_message longtext,
         message longtext,
         primary key (id)
     ) engine=InnoDB;

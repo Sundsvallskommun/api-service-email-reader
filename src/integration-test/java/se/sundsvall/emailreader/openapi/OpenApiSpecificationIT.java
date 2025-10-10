@@ -38,7 +38,7 @@ class OpenApiSpecificationIT {
 	@Value("${openapi.version}")
 	private String openApiVersion;
 
-	@Value("classpath:/openapi.yml")
+	@Value("classpath:/openapi.yaml")
 	private Resource openApiResource;
 
 	@Autowired
@@ -72,8 +72,8 @@ class OpenApiSpecificationIT {
 	/**
 	 * Attempts to convert the given YAML (no YAML-check...) to JSON.
 	 *
-	 * @param  yaml the YAML to convert
-	 * @return      a JSON string
+	 * @param yaml the YAML to convert
+	 * @return a JSON string
 	 */
 	private String toJson(final String yaml) {
 		try {
