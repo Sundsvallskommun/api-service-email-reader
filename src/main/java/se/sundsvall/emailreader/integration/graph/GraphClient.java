@@ -57,7 +57,7 @@ public class GraphClient {
 				.byMailFolderId("inbox")
 				.messages()
 				.get(requestConfiguration -> {
-					requestConfiguration.headers.add("Prefer", "outlook.body-content-type=\"text\"");
+					requestConfiguration.headers.add("Prefer", "outlook.body-content-type=\"html\"");
 					requestConfiguration.queryParameters.select = new String[] {
 						"id", "toRecipients", "sender", "subject", "internetMessageHeaders", "body", "receivedDateTime"
 					};

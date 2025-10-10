@@ -50,7 +50,8 @@ public class GraphMapper {
 			.withSender(getSender(message))
 			.withSubject(message.getSubject())
 			.withHeaders(toHeaders(message))
-			.withMessage(getMessage(message))
+			.withMessage(stripHTML(message))
+			.withHtmlMessage(Optional.ofNullable(message.getBody()).map(ItemBody::getContent).orElse(null))
 			.withReceivedAt(message.getReceivedDateTime())
 			.withMetadata(metadata != null ? metadata.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)) : null)
 			.build();
@@ -100,13 +101,32 @@ public class GraphMapper {
 		return EmailHeaderEntity.builder().withHeader(header).withValues(values).build();
 	}
 
-	String getMessage(final Message message) {
+	String stripHTML(final Message message) {
 		final var rawBody = Optional.ofNullable(message.getBody())
 			.map(ItemBody::getContent)
 			.orElse(null);
 
-		// Normalize Windows CRLF and collapse excessive blank lines to avoid double linebreaks from Windows senders
-		return Optional.ofNullable(rawBody).map(body -> body.replace("\r\n\r\n", "\n")).orElse(null);
+		if (rawBody == null) {
+			return null;
+		}
+
+		// Convert HTML to plain text by removing tags
+		final var plainText = rawBody
+			.replaceAll("<style[^>]*>.*?</style>", "") // Remove style blocks
+			.replaceAll("<script[^>]*>.*?</script>", "") // Remove script blocks
+			.replaceAll("<[^>]+>", "") // Remove all HTML tags
+			.replace("&nbsp;", " ") // Replace non-breaking spaces
+			.replace("&lt;", "<") // Replace HTML entities
+			.replace("&gt;", ">")
+			.replace("&amp;", "&")
+			.replace("&quot;", "\"")
+			.replace("&apos;", "'")
+			.replace("&#(\\d+);", "") // Remove numeric entities
+			.replace("\\r\\n", "\n") // Normalize line breaks
+			.replaceAll("\\n{3,}", "\n\n") // Collapse excessive blank lines
+			.trim();
+
+		return plainText.isEmpty() ? null : plainText;
 	}
 
 	String getSender(final Message message) {
