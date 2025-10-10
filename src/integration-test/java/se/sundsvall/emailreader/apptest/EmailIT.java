@@ -51,6 +51,7 @@ class EmailIT extends AbstractAppTest {
 				assertThat(email.id()).isEqualTo("81471222-5798-11e9-ae24-57fa13b361e1");
 				assertThat(email.subject()).isEqualTo("Sample subject");
 				assertThat(email.message()).isEqualTo("Hello, this is a sample email.");
+				assertThat(email.htmlMessage()).isEqualTo("<p>Hello, this is a sample email.</p>");
 				assertThat(email.sender()).isEqualTo("fromaddress@sundsvall.se");
 				assertThat(email.metadata()).hasSize(1).containsEntry("someKey", "someValue");
 				assertThat(email.recipients()).hasSize(2).element(0).satisfies(

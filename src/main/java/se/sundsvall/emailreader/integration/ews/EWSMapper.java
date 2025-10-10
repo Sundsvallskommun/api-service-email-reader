@@ -87,6 +87,10 @@ public final class EWSMapper {
 
 	public EmailEntity toEmail(final EmailMessage emailMessage, final String municipalityId, final String namespace, final Map<String, String> metadata) throws ServiceLocalException {
 
+		if (emailMessage == null) {
+			return null;
+		}
+
 		final var recipients = emailMessage.getToRecipients().getItems().stream()
 			.map(EmailAddress::getAddress)
 			.toList();

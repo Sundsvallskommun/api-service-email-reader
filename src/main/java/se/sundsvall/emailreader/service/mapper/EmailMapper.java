@@ -36,6 +36,7 @@ public final class EmailMapper {
 			.withRecipients(emailEntity.getRecipients())
 			.withSender(emailEntity.getSender())
 			.withMessage(emailEntity.getMessage())
+			.withHtmlMessage(emailEntity.getHtmlMessage())
 			.withId(emailEntity.getId())
 			.withAttachments(attachments)
 			.withReceivedAt(emailEntity.getReceivedAt())

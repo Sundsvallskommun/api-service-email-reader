@@ -74,6 +74,7 @@ public final class TestUtility {
 			.withRecipients(List.of("someRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
+			.withHtmlMessage("someHtmlMessage")
 			.withHeaders(headerList)
 			.withMetadata(Map.of("someKey", "someValue"))
 			.withNamespace("someNamespace")
@@ -89,7 +90,7 @@ public final class TestUtility {
 			.build();
 	}
 
-	public static EmailHeaderEntity createEmailHeaderEntity(Header header, List<String> values) {
+	public static EmailHeaderEntity createEmailHeaderEntity(final Header header, final List<String> values) {
 		return EmailHeaderEntity.builder()
 			.withHeader(header)
 			.withValues(values)
@@ -97,17 +98,17 @@ public final class TestUtility {
 	}
 
 	public static Message createMessageWithHeaders() {
-		var message = new Message();
-		var messageIdHeader = new InternetMessageHeader();
+		final var message = new Message();
+		final var messageIdHeader = new InternetMessageHeader();
 		messageIdHeader.setName("message-id");
 		messageIdHeader.setValue("12345");
-		var referencesHeader = new InternetMessageHeader();
+		final var referencesHeader = new InternetMessageHeader();
 		referencesHeader.setName("references");
 		referencesHeader.setValue("ref1, ref2");
-		var inReplyToHeader = new InternetMessageHeader();
+		final var inReplyToHeader = new InternetMessageHeader();
 		inReplyToHeader.setName("in-reply-to");
 		inReplyToHeader.setValue("reply1");
-		var autoSubmittedHeader = new InternetMessageHeader();
+		final var autoSubmittedHeader = new InternetMessageHeader();
 		autoSubmittedHeader.setName("auto-submitted");
 		autoSubmittedHeader.setValue("auto");
 		message.setInternetMessageHeaders(List.of(messageIdHeader, referencesHeader, inReplyToHeader, autoSubmittedHeader));

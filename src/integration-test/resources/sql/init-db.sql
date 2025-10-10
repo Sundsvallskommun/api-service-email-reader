@@ -1,12 +1,13 @@
 -- Insert into email
-INSERT INTO email (created_at, sender, id, municipality_id, namespace, subject, message)
+INSERT INTO email (created_at, sender, id, municipality_id, namespace, subject, message, html_message)
 VALUES (CURRENT_TIMESTAMP,
         'fromaddress@sundsvall.se',
         '81471222-5798-11e9-ae24-57fa13b361e1',
         '2281',
         'myNamespace',
         'Sample subject',
-        'Hello, this is a sample email.');
+        'Hello, this is a sample email.',
+        '<p>Hello, this is a sample email.</p>');
 
 -- Insert into email_entity_to
 INSERT INTO email_recipient (email_id, recipients)

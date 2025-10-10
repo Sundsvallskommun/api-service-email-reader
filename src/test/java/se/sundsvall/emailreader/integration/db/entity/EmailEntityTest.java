@@ -56,6 +56,7 @@ class EmailEntityTest {
 			.withValues(List.of("someValue"))
 			.build());
 		final var message = "someMessage";
+		final var htmlMessage = "someHtmlMessage";
 		final var receivedAt = now();
 		final var createdAt = now();
 		final var metadata = Map.of("someKey", "someValue");
@@ -78,6 +79,7 @@ class EmailEntityTest {
 			.withSubject(subject)
 			.withHeaders(headers)
 			.withMessage(message)
+			.withHtmlMessage(htmlMessage)
 			.withReceivedAt(receivedAt)
 			.withCreatedAt(createdAt)
 			.withMetadata(metadata)
@@ -97,6 +99,7 @@ class EmailEntityTest {
 		assertThat(object.getSubject()).isEqualTo(subject);
 		assertThat(object.getHeaders()).isEqualTo(headers);
 		assertThat(object.getMessage()).isEqualTo(message);
+		assertThat(object.getHtmlMessage()).isEqualTo(htmlMessage);
 		assertThat(object.getReceivedAt()).isCloseTo(receivedAt, within(1, SECONDS));
 		assertThat(object.getCreatedAt()).isCloseTo(createdAt, within(1, SECONDS));
 		assertThat(object.getMetadata()).isEqualTo(metadata);

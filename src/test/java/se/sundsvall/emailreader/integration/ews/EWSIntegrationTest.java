@@ -229,4 +229,25 @@ class EWSIntegrationTest {
 		verify(emailMessageMock).load();
 	}
 
+	@Test
+	void loadHTMLMessage() throws Exception {
+
+		final var result = ewsIntegration.loadHTMLMessage(emailMessageMock, consumerMock);
+
+		assertThat(result).isNotNull().isEqualTo(emailMessageMock);
+		verify(emailMessageMock).load();
+		verify(exchangeServiceMock).loadPropertiesForItems(eq(List.of(emailMessageMock)), any(PropertySet.class));
+	}
+
+	@Test
+	void loadHTMLMessageThrowsException() throws Exception {
+		doThrow(ServiceLocalException.class).when(emailMessageMock).load();
+
+		final var result = ewsIntegration.loadHTMLMessage(emailMessageMock, consumerMock);
+
+		assertThat(result).isNull();
+		verify(consumerMock).accept("[EWS] Could not load message");
+		verify(emailMessageMock).load();
+	}
+
 }

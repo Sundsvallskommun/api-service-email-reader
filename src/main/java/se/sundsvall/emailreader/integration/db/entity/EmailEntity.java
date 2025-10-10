@@ -59,6 +59,9 @@ public class EmailEntity {
 	@Column(name = "message", length = Length.LONG32)
 	private String message;
 
+	@Column(name = "html_message", length = Length.LONG32)
+	private String htmlMessage;
+
 	@Column(name = "municipality_id")
 	private String municipalityId;
 
