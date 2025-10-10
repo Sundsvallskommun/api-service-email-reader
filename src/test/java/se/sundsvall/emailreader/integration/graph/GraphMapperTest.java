@@ -109,7 +109,7 @@ class GraphMapperTest {
 		when(spy.getRecipients(message)).thenReturn(recipients);
 		when(spy.getSender(message)).thenReturn(sender);
 		when(spy.toHeaders(message)).thenReturn(headers);
-		when(spy.getMessage(message)).thenReturn(messageContent);
+		when(spy.stripHTML(message)).thenReturn(messageContent);
 
 		final var result = spy.toEmail(message, municipalityId, namespace, metadata);
 
@@ -172,27 +172,54 @@ class GraphMapperTest {
 	}
 
 	@Test
-	void getMessage() {
+	void stripHTML() {
 		final var message = createMessage();
+		final var body = new ItemBody();
+		body.setContent("<html><body><p>This is a <strong>test</strong> message with <em>HTML</em> tags.</p></body></html>");
+		message.setBody(body);
 
-		final var result = graphMapper.getMessage(message);
+		final var result = graphMapper.stripHTML(message);
 
-		assertThat(result).isNotNull().isEqualTo(message.getBody().getContent());
+		assertThat(result).isNotNull().isEqualTo("This is a test message with HTML tags.");
 	}
 
 	@Test
-	void getMessageCleaned() {
+	void stripHTMLCleaned() {
 		final var message = createMessage();
 		final var body = new ItemBody();
-		body.setContent("Test Content\r\n\r\nSecond Line");
+		body.setContent("""
+			<html><head><style>body { font-family: Arial; }</style></head>\
+			<body>\
+			<p>Test Content</p>\r
+			\r
+			<p>Second Line</p>\
+			<div>&nbsp;&nbsp;Some&nbsp;text with&nbsp;spaces</div>\
+			<p>Text with entities: &lt;tag&gt; &amp; &quot;quotes&quot;</p>\
+			<script>alert('test');</script>\
+			</body></html>\
+			""");
 		message.setBody(body);
 
 		// Act
-		final var result = graphMapper.getMessage(message);
+		final var result = graphMapper.stripHTML(message);
 
 		// Assert
-		assertThat(result).isNotNull().isEqualTo("Test Content\nSecond Line");
-
+		assertThat(result).isNotNull()
+			.contains("Test Content")
+			.contains("Second Line")
+			.contains("  Some text with spaces") // &nbsp; converts to single space
+			.contains("Text with entities: <tag> & \"quotes\"")
+			.doesNotContain("<html>")
+			.doesNotContain("<body>")
+			.doesNotContain("<p>")
+			.doesNotContain("<style>")
+			.doesNotContain("<script>")
+			.doesNotContain("alert('test');")
+			.doesNotContain("&nbsp;")
+			.doesNotContain("&lt;")
+			.doesNotContain("&gt;")
+			.doesNotContain("&amp;")
+			.doesNotContain("&quot;");
 	}
 
 	@Test
