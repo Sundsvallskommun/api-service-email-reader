@@ -114,6 +114,7 @@ public class GraphMapper {
 		final var plainText = rawBody
 			.replaceAll("<style[^>]*>.*?</style>", "") // Remove style blocks
 			.replaceAll("<script[^>]*>.*?</script>", "") // Remove script blocks
+			.replaceAll("<br\\s*/?>", "\n") // Replace <br> and <br/> tags with line breaks
 			.replaceAll("<[^>]+>", "") // Remove all HTML tags
 			.replace("&nbsp;", " ") // Replace non-breaking spaces
 			.replace("&lt;", "<") // Replace HTML entities
