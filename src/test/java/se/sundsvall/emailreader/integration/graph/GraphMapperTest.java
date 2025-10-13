@@ -187,17 +187,11 @@ class GraphMapperTest {
 	void stripHTMLCleaned() {
 		final var message = createMessage();
 		final var body = new ItemBody();
-		body.setContent("""
-			<html><head><style>body { font-family: Arial; }</style></head>\
-			<body>\
-			<p>Test Content</p>\r
-			\r
-			<p>Second Line</p>\
-			<div>&nbsp;&nbsp;Some&nbsp;text with&nbsp;spaces</div>\
-			<p>Text with entities: &lt;tag&gt; &amp; &quot;quotes&quot;</p>\
-			<script>alert('test');</script>\
-			</body></html>\
-			""");
+
+		final var bodyContant = """
+			<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style type="text/css" style="display:none"><!--p	{margin-top:0;	margin-bottom:0}--></style></head><body dir="ltr"><div id="divtagdefaultwrapper" dir="ltr" style="font-size:12pt; color:#000000; font-family:Calibri,Helvetica,sans-serif"><div>Hej.<br><br>En rad<br>En rad under den<br><br>En rad med dubbla radbryt.</div></div></body></html>
+			""";
+		body.setContent(bodyContant);
 		message.setBody(body);
 
 		// Act
@@ -205,21 +199,13 @@ class GraphMapperTest {
 
 		// Assert
 		assertThat(result).isNotNull()
-			.contains("Test Content")
-			.contains("Second Line")
-			.contains("  Some text with spaces") // &nbsp; converts to single space
-			.contains("Text with entities: <tag> & \"quotes\"")
-			.doesNotContain("<html>")
-			.doesNotContain("<body>")
-			.doesNotContain("<p>")
-			.doesNotContain("<style>")
-			.doesNotContain("<script>")
-			.doesNotContain("alert('test');")
-			.doesNotContain("&nbsp;")
-			.doesNotContain("&lt;")
-			.doesNotContain("&gt;")
-			.doesNotContain("&amp;")
-			.doesNotContain("&quot;");
+			.isEqualTo("""
+				Hej.
+
+				En rad
+				En rad under den
+
+				En rad med dubbla radbryt.""");
 	}
 
 	@Test
