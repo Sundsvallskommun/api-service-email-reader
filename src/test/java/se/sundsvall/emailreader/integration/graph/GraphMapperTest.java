@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -183,15 +184,26 @@ class GraphMapperTest {
 		assertThat(result).isNotNull().isEqualTo("This is a test message with HTML tags.");
 	}
 
-	@Test
-	void stripHTMLCleaned() {
+	@ParameterizedTest
+	@ValueSource(strings = {
+		"<html><head>\u2028<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><style type=\"text/css\" style=\"display:none\">\u2028<!--\u2028p\u2028\t{margin-top:0;\u2028\tmargin-bottom:0}\u2028-->\u2028</style></head><body dir=\"ltr\"><div id=\"divtagdefaultwrapper\" dir=\"ltr\" style=\"font-size:12pt; color:#000000; font-family:Calibri,Helvetica,sans-serif\"><p></p><div>Hej.<br><br>En rad<br>En rad under den<br><br>En rad med dubbla radbryt.</div><p></p></div></body></html>\n",
+		"""
+			<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+			<meta name="Generator" content="Microsoft Exchange Server"><!-- converted from text --><style><!-- .EmailQuote { margin-left: 1pt; padding-left: 4pt; border-left: #800000 2px solid; } --></style></head>
+			<body>
+			<font size="2"><span style="font-size:11pt;">
+			<div class="PlainText">Hej.<br><br>En rad<br>En rad under den<br><br>En rad med dubbla radbryt.&nbsp; <br></div></span></font>
+			</body>
+			</html>
+			""",
+		"<html><head>\u2028<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"><meta name=\"Generator\" content=\"Microsoft Word 15 (filtered medium)\"><style>\u2028<!--\u2028@font-face\u2028\t{font-family:\"Cambria Math\"}\u2028@font-face\u2028\t{font-family:Aptos}\u2028p.MsoNormal, li.MsoNormal, div.MsoNormal\u2028\t{margin:0in;\u2028\tfont-size:12.0pt;\u2028\tfont-family:\"Aptos\",sans-serif}\u2028span.EmailStyle17\u2028\t{font-family:\"Aptos\",sans-serif;\u2028\tcolor:windowtext}\u2028.MsoChpDefault\u2028\t{}\u2028@page WordSection1\u2028\t{margin:1.0in 1.0in 1.0in 1.0in}\u2028div.WordSection1\u2028\t{}\u2028-->\u2028</style></head><body lang=\"EN-US\" link=\"#467886\" vlink=\"#96607D\" style=\"word-wrap:break-word\"><div class=\"WordSection1\"><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">Hej.</span></p><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">&nbsp;</span></p><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">En rad</span></p><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">En rad under den</span></p><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">&nbsp;</span></p><p class=\"MsoNormal\"><span lang=\"SV\" style=\"font-size:11.0pt\">En rad med dubbla radbryt.</span></p></div></body></html>\n"
+
+	})
+	void stripHTMLCleaned(final String content) {
 		final var message = createMessage();
 		final var body = new ItemBody();
 
-		final var bodyContant = """
-			<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><style type="text/css" style="display:none"><!--p	{margin-top:0;	margin-bottom:0}--></style></head><body dir="ltr"><div id="divtagdefaultwrapper" dir="ltr" style="font-size:12pt; color:#000000; font-family:Calibri,Helvetica,sans-serif"><div>Hej.<br><br>En rad<br>En rad under den<br><br>En rad med dubbla radbryt.</div></div></body></html>
-			""";
-		body.setContent(bodyContant);
+		body.setContent(content);
 		message.setBody(body);
 
 		// Act

@@ -112,9 +112,13 @@ public class GraphMapper {
 
 		// Convert HTML to plain text by removing tags
 		final var plainText = rawBody
+			.replace("\u2028", "")
+			.replace("\\r\\n", "") // Remove line breaks
+			.replace("\\n", "") // Remove line breaks
 			.replaceAll("<style[^>]*>.*?</style>", "") // Remove style blocks
 			.replaceAll("<script[^>]*>.*?</script>", "") // Remove script blocks
 			.replaceAll("<br\\s*/?>", "\n") // Replace <br> and <br/> tags with line breaks
+			.replaceAll("</span[^>]*>", "\n") // Remove span tags (opening and closing)
 			.replaceAll("<[^>]+>", "") // Remove all HTML tags
 			.replace("&nbsp;", " ") // Replace non-breaking spaces
 			.replace("&lt;", "<") // Replace HTML entities
@@ -123,8 +127,7 @@ public class GraphMapper {
 			.replace("&quot;", "\"")
 			.replace("&apos;", "'")
 			.replace("&#(\\d+);", "") // Remove numeric entities
-			.replace("\\r\\n", "\n") // Normalize line breaks
-			.replaceAll("\\n{3,}", "\n\n") // Collapse excessive blank lines
+			.replaceAll(" ?\n ?", "\n") // Remove spaces around line breaks
 			.trim();
 
 		return plainText.isEmpty() ? null : plainText;
