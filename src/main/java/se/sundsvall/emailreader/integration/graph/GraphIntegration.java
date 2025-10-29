@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 
 import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
+import com.microsoft.graph.models.MessageCollectionResponse;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -29,7 +30,8 @@ public class GraphIntegration {
 		final var clientSecretCredential = getClientSecretCredential(credentials);
 		graphClient.initializeGraph(clientSecretCredential, setUnHealthyConsumer);
 
-		final var messages = Optional.ofNullable(graphClient.getInbox(userId, setUnHealthyConsumer).getValue())
+		final var messages = Optional.ofNullable(graphClient.getInbox(userId, setUnHealthyConsumer))
+			.map(MessageCollectionResponse::getValue)
 			.orElse(emptyList());
 
 		return graphMapper.toEmails(messages, credentials.getMunicipalityId(), credentials.getNamespace(), credentials.getMetadata());
