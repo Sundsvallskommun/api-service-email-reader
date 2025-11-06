@@ -141,8 +141,8 @@ class EwsSchedulerTest {
 
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467017406058"));
-		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467112345678"));
+		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467017406058").priority(SmsRequest.PriorityEnum.HIGH));
+		verify(messagingIntegrationMock, times(1)).sendSms(credential.getMunicipalityId(), new SmsRequest().sender("Sundsvall").message("someMessage").mobileNumber("+467112345678").priority(SmsRequest.PriorityEnum.HIGH));
 		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq("someEmailAddress"), any());
 		verify(ewsIntegrationMock).extractValuesEmailMessage(emailMessage);
