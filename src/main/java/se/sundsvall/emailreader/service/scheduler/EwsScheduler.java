@@ -99,7 +99,8 @@ public class EwsScheduler {
 			final var smsRequest = new SmsRequest()
 				.sender(Optional.ofNullable(emailMap.get("Sender")).map(sender -> sender.substring(0, min(sender.length(), 11))).orElse("Sundsvall"))
 				.message(emailMap.get("Message"))
-				.mobileNumber(validNumber);
+				.mobileNumber(validNumber)
+				.priority(SmsRequest.PriorityEnum.HIGH);
 			messagingIntegration.sendSms(credentials.getMunicipalityId(), smsRequest);
 		}
 	}
