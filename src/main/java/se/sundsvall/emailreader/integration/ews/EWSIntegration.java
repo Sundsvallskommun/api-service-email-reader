@@ -202,6 +202,7 @@ public class EWSIntegration {
 		final var validationMap = new HashMap<String, List<String>>();
 		final var numbers = Arrays.asList(commaSeparatedNumbers.split(","));
 		final var formattedNumbers = numbers.stream()
+			.map(number -> number.replace("-", ""))
 			.map(number -> {
 				if (number.startsWith("0")) {
 					return number.replaceFirst("^0", "+46");
