@@ -198,7 +198,7 @@ class EwsSchedulerTest {
 		final var emailMessage = mock(EmailMessage.class);
 		final var emailAddress = mock(EmailAddress.class);
 		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070174060589,071-23456789");
-		final var resultMap = Map.of("VALID", List.of("+4670174060589"), "INVALID", List.of("+4671-23456789"));
+		final var resultMap = Map.of("VALID", List.of("+4670174060589", "+467123456789"));
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");
@@ -209,11 +209,17 @@ class EwsSchedulerTest {
 
 		ewsScheduler.checkForNewSmsEmails();
 
-		verify(messagingIntegrationMock).sendSms(eq(credential.getMunicipalityId()), smsRequestCaptor.capture());
-		assertThat(smsRequestCaptor.getValue()).satisfies(request -> {
+		verify(messagingIntegrationMock, times(2)).sendSms(eq(credential.getMunicipalityId()), smsRequestCaptor.capture());
+		assertThat(smsRequestCaptor.getAllValues()).hasSize(2);
+		assertThat(smsRequestCaptor.getAllValues().get(0)).satisfies(request -> {
 			assertThat(request.getSender()).isEqualTo("Sundsvall");
 			assertThat(request.getMessage()).isEqualTo("someMessage");
 			assertThat(request.getMobileNumber()).isEqualTo("+4670174060589");
+		});
+		assertThat(smsRequestCaptor.getAllValues().get(1)).satisfies(request -> {
+			assertThat(request.getSender()).isEqualTo("Sundsvall");
+			assertThat(request.getMessage()).isEqualTo("someMessage");
+			assertThat(request.getMobileNumber()).isEqualTo("+467123456789");
 		});
 
 		verify(emailServiceMock).findAllByActionAndActive("SEND_SMS");
@@ -228,7 +234,7 @@ class EwsSchedulerTest {
 		final var emailMessage = mock(EmailMessage.class);
 		final var emailAddress = mock(EmailAddress.class);
 		final var emailMap = Map.of("Message", "someMessage", "Recipient", "070174060589123123,071-23456789");
-		final var resultMap = Map.of("INVALID", List.of("+4670174060589123123", "+4671-23456789"));
+		final var resultMap = Map.of("INVALID", List.of("+4670174060589123123", "+467123456789"));
 
 		when(emailMessage.getReceivedBy()).thenReturn(emailAddress);
 		when(emailAddress.getAddress()).thenReturn("someEmailAddress");

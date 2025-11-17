@@ -74,7 +74,7 @@ class EWSIntegrationTest {
 		return Stream.of(
 			Arguments.of(Map.of("Recipient", "0713266789"), Map.of("VALID", List.of("+46713266789"))),
 			Arguments.of(Map.of("Recipient", "0721232179,03ab2"), Map.of("VALID", List.of("+46721232179"), "INVALID", List.of("+463ab2"))),
-			Arguments.of(Map.of("Recipient", "0791234889,070213456789,12332ab,023-112"), Map.of("VALID", List.of("+46791234889", "+4670213456789"), "INVALID", List.of("12332ab", "+4623-112"))));
+			Arguments.of(Map.of("Recipient", "0791234889,070213456789,12332ab,023-112"), Map.of("VALID", List.of("+46791234889", "+4670213456789", "+4623112"), "INVALID", List.of("12332ab"))));
 	}
 
 	@BeforeEach
