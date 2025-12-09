@@ -1,13 +1,13 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: api-email-reader
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "4.2"
 servers:
-  - url: http://localhost:59700
+  - url: http://localhost:59476
     description: Generated server url
 tags:
   - name: Email
@@ -602,6 +602,68 @@ paths:
 components:
   schemas:
     Credentials:
+      type: object
+      description: Email credentials to use for authentication against the email server
+      properties:
+        id:
+          type: string
+          description: Credentials id
+          examples:
+            - 74531aac-ffea-42cc-8a0a-52715bb27850
+          readOnly: true
+        username:
+          type: string
+          description: username to use for authentication against the email server
+          examples:
+            - joe01doe
+          minLength: 1
+        password:
+          type: string
+          description: password to use for authentication against the email server
+          examples:
+            - mySecretPassword
+          minLength: 1
+          writeOnly: true
+        emailAddress:
+          type: array
+          description: List of email addresses to check for new emails. The provided
+            user must have access to these email addresses.
+          items:
+            type: string
+          minItems: 1
+        domain:
+          type: string
+          description: domain for the email server
+          examples:
+            - https://mail.examples.com/EWS/Exchange.asmx
+          minLength: 1
+        namespace:
+          type: string
+          description: Namespace
+          examples:
+            - my.namespace
+          minLength: 1
+        action:
+          type: string
+          description: Action to take for new emails
+          examples:
+            - PERSIST
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Metadata to add to the email
+          examples:
+            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+        destinationFolder:
+          type: string
+          description: The folder to move emails to after processing
+          examples:
+            - Processed
+          minLength: 1
+        enabled:
+          type: boolean
+          description: If this configuration is active and should fetch emails
       required:
         - destinationFolder
         - domain
@@ -609,76 +671,15 @@ components:
         - namespace
         - password
         - username
-      type: object
-      properties:
-        id:
-          type: string
-          description: Credentials id
-          readOnly: true
-          example: 74531aac-ffea-42cc-8a0a-52715bb27850
-        username:
-          minLength: 1
-          type: string
-          description: username to use for authentication against the email server
-          example: joe01doe
-        password:
-          minLength: 1
-          type: string
-          description: password to use for authentication against the email server
-          writeOnly: true
-          example: mySecretPassword
-        emailAddress:
-          minItems: 1
-          type: array
-          description: List of email addresses to check for new emails. The provided
-            user must have access to these email addresses.
-          example:
-            - myothersupportemail@sundsvall.se
-            - mysupportemail@sundsvall.se
-          items:
-            type: string
-        domain:
-          minLength: 1
-          type: string
-          description: domain for the email server
-          example: https://mail.example.com/EWS/Exchange.asmx
-        namespace:
-          minLength: 1
-          type: string
-          description: Namespace
-          example: my.namespace
-        action:
-          type: string
-          description: Action to take for new emails
-          example: PERSIST
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-            description: Metadata to add to the email
-            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
-          description: Metadata to add to the email
-          example:
-            casetype: myCaseType
-            key2: value2
-        destinationFolder:
-          minLength: 1
-          type: string
-          description: The folder to move emails to after processing
-          example: Processed
-        enabled:
-          type: boolean
-          description: If this configuration is active and should fetch emails
-      description: Email credentials to use for authentication against the email server
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -687,8 +688,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: {}
     StatusType:
       type: object
       properties:
@@ -744,8 +744,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -782,8 +781,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
+        cause: {}
         stackTrace:
           type: array
           items:
@@ -808,12 +806,12 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -822,8 +820,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -865,6 +862,70 @@ components:
         message:
           type: string
     GraphCredentials:
+      type: object
+      description: Email credentials to use for authentication against a Microsoft
+        Graph server.
+      properties:
+        id:
+          type: string
+          description: Credentials id
+          examples:
+            - 74531aac-ffea-42cc-8a0a-52715bb27850
+          readOnly: true
+        clientSecret:
+          type: string
+          description: Client secret to use for authentication against the Microsoft
+            Graph server. Do note it should be the secret value and not the Secret
+            ID.
+          examples:
+            - mySecretClientSecret
+          minLength: 1
+          writeOnly: true
+        tenantId:
+          type: string
+          description: Tenant ID to use for authentication against the Microsoft Graph
+            server.
+          examples:
+            - myTenantId
+          minLength: 1
+          writeOnly: true
+        clientId:
+          type: string
+          description: Client ID to use for authentication against the Microsoft Graph
+            server.
+          examples:
+            - myClientId
+          minLength: 1
+          writeOnly: true
+        emailAddress:
+          type: array
+          description: List of email addresses to check for new emails. The provided
+            graph application must have access to these email addresses.
+          items:
+            type: string
+          minItems: 1
+        namespace:
+          type: string
+          description: Namespace
+          examples:
+            - my.namespace
+          minLength: 1
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: Metadata to add to the email.
+          examples:
+            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+        destinationFolder:
+          type: string
+          description: The folder to move emails to after processing.
+          examples:
+            - Processed
+          minLength: 1
+        enabled:
+          type: boolean
+          description: If this configuration is active and should fetch emails
       required:
         - clientId
         - clientSecret
@@ -873,164 +934,86 @@ components:
         - metadata
         - namespace
         - tenantId
-      type: object
-      properties:
-        id:
-          type: string
-          description: Credentials id
-          readOnly: true
-          example: 74531aac-ffea-42cc-8a0a-52715bb27850
-        clientSecret:
-          minLength: 1
-          type: string
-          description: Client secret to use for authentication against the Microsoft
-            Graph server. Do note it should be the secret value and not the Secret
-            ID.
-          writeOnly: true
-          example: mySecretClientSecret
-        tenantId:
-          minLength: 1
-          type: string
-          description: Tenant ID to use for authentication against the Microsoft Graph
-            server.
-          writeOnly: true
-          example: myTenantId
-        clientId:
-          minLength: 1
-          type: string
-          description: Client ID to use for authentication against the Microsoft Graph
-            server.
-          writeOnly: true
-          example: myClientId
-        emailAddress:
-          minItems: 1
-          type: array
-          description: List of email addresses to check for new emails. The provided
-            graph application must have access to these email addresses.
-          example:
-            - myothersupportemail@sundsvall.se
-            - mysupportemail@sundsvall.se
-          items:
-            type: string
-        namespace:
-          minLength: 1
-          type: string
-          description: Namespace
-          example: my.namespace
-        metadata:
-          type: object
-          additionalProperties:
-            type: string
-            description: Metadata to add to the email.
-            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
-          description: Metadata to add to the email.
-          example:
-            casetype: myCaseType
-            key2: value2
-        destinationFolder:
-          minLength: 1
-          type: string
-          description: The folder to move emails to after processing.
-          example: Processed
-        enabled:
-          type: boolean
-          description: If this configuration is active and should fetch emails
-      description: Email credentials to use for authentication against a Microsoft
-        Graph server.
     Email:
       type: object
+      description: Email
       properties:
         recipients:
           type: array
           description: Recipient E-Mail addresses
-          example:
-            - myothersupportemail@sundsvall.se
-            - mysupportemail@sundsvall.se
           items:
             type: string
         sender:
           type: string
           description: Sender E-Mail address
-          example: sender@sundsvall.se
+          examples:
+            - sender@sundsvall.se
         subject:
           type: string
           description: E-mail subject
-          example: E-mail subject
+          examples:
+            - E-mail subject
         message:
           type: string
           description: E-mail plain-text body
-          example: E-mail body
+          examples:
+            - E-mail body
         htmlMessage:
           type: string
           description: E-mail HTML body
-          example: <p>E-mail body</p>
+          examples:
+            - <p>E-mail body</p>
         id:
           type: string
           description: E-mail message id
-          example: 74531aac-ffea-42cc-8a0a-52715bb27850
+          examples:
+            - 74531aac-ffea-42cc-8a0a-52715bb27850
         metadata:
           type: object
           additionalProperties:
             type: string
-            description: Metadata for the email
-            example: "{\"casetype\":\"myCaseType\",\"key2\":\"value2\"}"
           description: Metadata for the email
-          example:
-            casetype: myCaseType
-            key2: value2
+          examples:
+            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
         receivedAt:
           type: string
-          description: The date and time the email was received
           format: date-time
-          example: 2021-09-01T12:00:00+02:00
+          description: The date and time the email was received
+          examples:
+            - 2021-09-01T12:00:00+02:00
         headers:
           type: object
           additionalProperties:
             type: array
-            description: The email headers
-            example:
-              IN_REPLY_TO:
-                - reply-to@example.com
-              REFERENCES:
-                - reference1
-                - reference2
-              MESSAGE_ID:
-                - "123456789"
             items:
               type: string
-              description: The email headers
-              example: "{\"IN_REPLY_TO\":[\"reply-to@example.com\"],\"REFERENCES\"\
-                :[\"reference1\",\"reference2\"],\"MESSAGE_ID\":[\"123456789\"]}"
           description: The email headers
-          example:
-            IN_REPLY_TO:
-              - reply-to@example.com
-            REFERENCES:
-              - reference1
-              - reference2
-            MESSAGE_ID:
-              - "123456789"
+          examples:
+            - "{\"IN_REPLY_TO\": [\"reply-to@examples.com\"], \"REFERENCES\": [\"reference1\"\
+            , \"reference2\"], \"MESSAGE_ID\": [\"123456789\"]}"
         attachments:
           type: array
           items:
             $ref: "#/components/schemas/EmailAttachment"
-      description: Email
       readOnly: true
     EmailAttachment:
       type: object
+      description: Attachment
       properties:
         id:
           type: integer
-          description: The attachment id
           format: int64
-          example: 1
+          description: The attachment id
+          examples:
+            - "1"
         name:
           type: string
           description: The attachment filename
-          example: test.txt
+          examples:
+            - test.txt
         contentType:
           type: string
           description: The attachment content type
-          example: text/plain
-      description: Attachment
-  securitySchemes: { }
+          examples:
+            - text/plain
+  securitySchemes: {}
