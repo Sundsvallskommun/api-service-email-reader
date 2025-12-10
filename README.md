@@ -6,7 +6,7 @@ _Reads emails from mailboxes on a exchange web server. Processes these emails an
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**
 - **Git**
