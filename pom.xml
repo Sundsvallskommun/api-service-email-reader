@@ -18,7 +18,7 @@
 		<jaxws-api.version>2.3.1</jaxws-api.version>
 		<graph-api.version>6.60.0</graph-api.version>
 		<tika-core.version>3.2.3</tika-core.version>
-		<azure-identity.version>1.18.1</azure-identity.version>
+		<azure-identity.version>1.18.2</azure-identity.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
 	<dependencies>
