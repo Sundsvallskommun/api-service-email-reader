@@ -18,9 +18,21 @@
 		<jaxws-api.version>2.3.1</jaxws-api.version>
 		<graph-api.version>6.61.0</graph-api.version>
 		<tika-core.version>3.2.3</tika-core.version>
+		<testcontainers.version>2.0.3</testcontainers.version>
 		<azure-identity.version>1.18.2</azure-identity.version>
 		<generated-sources-path>${project.build.directory}/generated-sources</generated-sources-path>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -61,7 +73,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mariadb</artifactId>
+			<artifactId>testcontainers-mariadb</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<!-- EWS -->

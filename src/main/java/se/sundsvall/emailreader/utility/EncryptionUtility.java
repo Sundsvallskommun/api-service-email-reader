@@ -15,6 +15,7 @@ public class EncryptionUtility {
 	private static final String ENCRYPT_ALGO = "ChaCha20-Poly1305/None/NoPadding";
 
 	private static final int NONCE_LEN = 12; // bytes
+	private final SecureRandom random = new SecureRandom();
 
 	private final CredentialsProperties credentialsProperties;
 
@@ -30,7 +31,6 @@ public class EncryptionUtility {
 
 		final var key = getSecretKeySpec();
 
-		final var random = new SecureRandom();
 		final var nonce = new byte[NONCE_LEN];
 		random.nextBytes(nonce);
 
