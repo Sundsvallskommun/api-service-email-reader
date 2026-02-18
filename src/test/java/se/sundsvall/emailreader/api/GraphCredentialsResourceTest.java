@@ -1,10 +1,5 @@
 package se.sundsvall.emailreader.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.http.MediaType.ALL;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +13,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.service.GraphCredentialsService;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.MediaType.ALL;
 
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 @ActiveProfiles("junit")

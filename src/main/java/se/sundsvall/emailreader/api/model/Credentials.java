@@ -1,7 +1,5 @@
 package se.sundsvall.emailreader.api.model;
 
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -12,6 +10,8 @@ import lombok.Builder;
 import lombok.With;
 import se.sundsvall.dept44.common.validators.annotation.MemberOf;
 import se.sundsvall.emailreader.integration.db.entity.enums.Action;
+
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 
 @With
 @Builder(setterPrefix = "with")

@@ -1,12 +1,12 @@
 package se.sundsvall.emailreader.utility;
 
-import static org.springframework.util.MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.springframework.util.MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE;
 
 public final class ServiceUtil {
 

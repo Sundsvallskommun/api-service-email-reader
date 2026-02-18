@@ -1,7 +1,5 @@
 package se.sundsvall.emailreader.integration.graph;
 
-import static java.util.Collections.emptyList;
-
 import com.azure.core.credential.TokenCredential;
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.MailFolder;
@@ -16,6 +14,8 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import static java.util.Collections.emptyList;
 
 @Service
 @CircuitBreaker(name = "GraphIntegration")

@@ -1,21 +1,5 @@
 package se.sundsvall.emailreader.integration.ews;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.within;
-import static org.assertj.core.groups.Tuple.tuple;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
-import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
-import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
-import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
-
 import java.sql.Blob;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -46,6 +30,22 @@ import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 import se.sundsvall.emailreader.utility.BlobBuilder;
+
+import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.within;
+import static org.assertj.core.groups.Tuple.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
+import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
+import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
 
 @ExtendWith({
 	MockitoExtension.class

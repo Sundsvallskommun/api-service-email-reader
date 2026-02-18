@@ -1,9 +1,5 @@
 package se.sundsvall.emailreader.service;
 
-import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentials;
-import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentialsEntity;
-
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +8,10 @@ import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.integration.db.GraphCredentialsRepository;
 import se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentials;
+import static se.sundsvall.emailreader.service.mapper.GraphCredentialsMapper.toGraphCredentialsEntity;
 
 @Service
 public class GraphCredentialsService {

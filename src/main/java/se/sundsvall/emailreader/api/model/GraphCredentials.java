@@ -1,8 +1,5 @@
 package se.sundsvall.emailreader.api.model;
 
-import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import lombok.Builder;
 import lombok.With;
+
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.WRITE_ONLY;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @With
 @Builder(setterPrefix = "with")

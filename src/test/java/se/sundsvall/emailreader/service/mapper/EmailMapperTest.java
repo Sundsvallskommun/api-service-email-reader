@@ -1,13 +1,13 @@
 package se.sundsvall.emailreader.service.mapper;
 
-import static java.util.Collections.emptyMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
-
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.emailreader.api.model.Header;
+
+import static java.util.Collections.emptyMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
 class EmailMapperTest {
 

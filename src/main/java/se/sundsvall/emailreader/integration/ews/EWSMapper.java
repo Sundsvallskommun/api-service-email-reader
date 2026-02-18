@@ -1,12 +1,5 @@
 package se.sundsvall.emailreader.integration.ews;
 
-import static java.util.Collections.emptyList;
-import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
-import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
-import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
-import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
-import static se.sundsvall.emailreader.utility.ServiceUtil.detectMimeType;
-
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -31,6 +24,13 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 import se.sundsvall.emailreader.utility.BlobBuilder;
+
+import static java.util.Collections.emptyList;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
+import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
+import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.utility.ServiceUtil.detectMimeType;
 
 @Component
 public final class EWSMapper {

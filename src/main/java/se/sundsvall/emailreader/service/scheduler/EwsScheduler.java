@@ -1,7 +1,5 @@
 package se.sundsvall.emailreader.service.scheduler;
 
-import static java.lang.Math.min;
-
 import generated.se.sundsvall.messaging.SmsRequest;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +16,8 @@ import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.EmailService;
+
+import static java.lang.Math.min;
 
 @Component
 public class EwsScheduler {

@@ -1,8 +1,5 @@
 package se.sundsvall.emailreader.integration.ews;
 
-import static java.util.Collections.emptyMap;
-import static microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode.HardDelete;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.net.URI;
 import java.util.ArrayList;
@@ -37,6 +34,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.common.validators.annotation.impl.ValidMSISDNConstraintValidator;
+
+import static java.util.Collections.emptyMap;
+import static microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode.HardDelete;
 
 /**
  * Exchange Web Services Integration
