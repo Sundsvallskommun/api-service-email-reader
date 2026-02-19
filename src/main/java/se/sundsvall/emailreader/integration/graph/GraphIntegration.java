@@ -1,7 +1,5 @@
 package se.sundsvall.emailreader.integration.graph;
 
-import static java.util.Collections.emptyList;
-
 import com.azure.identity.ClientSecretCredential;
 import com.azure.identity.ClientSecretCredentialBuilder;
 import com.microsoft.graph.models.MessageCollectionResponse;
@@ -13,6 +11,8 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.db.entity.GraphCredentialsEntity;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import static java.util.Collections.emptyList;
 
 @Component
 public class GraphIntegration {

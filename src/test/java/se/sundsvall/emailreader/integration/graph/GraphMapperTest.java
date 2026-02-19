@@ -1,14 +1,5 @@
 package se.sundsvall.emailreader.integration.graph;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.emailreader.TestUtility.createEmailHeaderEntity;
-import static se.sundsvall.emailreader.TestUtility.createMessageWithHeaders;
-
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
 import com.microsoft.graph.models.FileAttachment;
@@ -35,6 +26,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.utility.BlobBuilder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createEmailHeaderEntity;
+import static se.sundsvall.emailreader.TestUtility.createMessageWithHeaders;
 
 @ExtendWith(MockitoExtension.class)
 class GraphMapperTest {

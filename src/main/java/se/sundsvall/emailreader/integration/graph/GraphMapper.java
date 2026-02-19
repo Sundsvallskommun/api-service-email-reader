@@ -1,10 +1,5 @@
 package se.sundsvall.emailreader.integration.graph;
 
-import static java.util.Collections.emptyList;
-import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
-import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
-import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
-
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
 import com.microsoft.graph.models.FileAttachment;
@@ -25,6 +20,11 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailHeaderEntity;
 import se.sundsvall.emailreader.utility.BlobBuilder;
+
+import static java.util.Collections.emptyList;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
+import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
 
 @Component
 public class GraphMapper {

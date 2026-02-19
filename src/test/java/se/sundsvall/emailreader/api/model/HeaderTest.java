@@ -1,12 +1,12 @@
 package se.sundsvall.emailreader.api.model;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
-
-import org.junit.jupiter.api.Test;
 
 class HeaderTest {
 

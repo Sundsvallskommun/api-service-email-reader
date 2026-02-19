@@ -1,14 +1,5 @@
 package se.sundsvall.emailreader.service;
 
-import static java.text.MessageFormat.format;
-import static java.util.Collections.emptyList;
-import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
-import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
-
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -37,6 +28,15 @@ import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.utility.EncryptionException;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import static java.text.MessageFormat.format;
+import static java.util.Collections.emptyList;
+import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
+import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
 @Service
 public class EmailService {

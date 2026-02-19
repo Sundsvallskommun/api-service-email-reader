@@ -1,16 +1,5 @@
 package se.sundsvall.emailreader.integration.graph;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import com.azure.identity.ClientSecretCredential;
 import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.Message;
@@ -27,6 +16,17 @@ import se.sundsvall.emailreader.integration.db.entity.AttachmentEntity;
 import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.db.entity.GraphCredentialsEntity;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GraphIntegrationTest {

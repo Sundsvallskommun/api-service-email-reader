@@ -1,14 +1,14 @@
 package se.sundsvall.emailreader.service.mapper;
 
-import static java.time.OffsetDateTime.now;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.integration.db.entity.GraphCredentialsEntity;
+
+import static java.time.OffsetDateTime.now;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class GraphCredentialsMapperTest {
 

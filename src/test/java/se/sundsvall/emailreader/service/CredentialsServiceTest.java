@@ -1,15 +1,5 @@
 package se.sundsvall.emailreader.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
-import static se.sundsvall.emailreader.TestUtility.createCredentialsWithPassword;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +9,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
 import se.sundsvall.emailreader.utility.EncryptionUtility;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
+import static se.sundsvall.emailreader.TestUtility.createCredentialsWithPassword;
 
 @ExtendWith(MockitoExtension.class)
 class CredentialsServiceTest {

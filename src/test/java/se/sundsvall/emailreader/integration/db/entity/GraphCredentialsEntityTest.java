@@ -1,5 +1,12 @@
 package se.sundsvall.emailreader.integration.db.entity;
 
+import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.Random;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
@@ -11,13 +18,6 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.hamcrest.CoreMatchers.allOf;
-
-import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.Random;
-import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 class GraphCredentialsEntityTest {
 	@BeforeAll
