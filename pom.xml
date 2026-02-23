@@ -16,7 +16,7 @@
 		<!-- Generated sources properties -->
 		<ews-java-api.version>2.0</ews-java-api.version>
 		<jaxws-api.version>2.3.1</jaxws-api.version>
-		<graph-api.version>6.61.0</graph-api.version>
+		<graph-api.version>6.62.0</graph-api.version>
 		<tika-core.version>3.2.3</tika-core.version>
 		<testcontainers.version>2.0.3</testcontainers.version>
 		<azure-identity.version>1.18.2</azure-identity.version>
