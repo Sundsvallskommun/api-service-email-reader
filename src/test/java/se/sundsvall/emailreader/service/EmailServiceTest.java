@@ -20,13 +20,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
-import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 import se.sundsvall.emailreader.TestUtility;
 import se.sundsvall.emailreader.api.model.Header;
@@ -55,9 +54,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
+import static org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace.NONE;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.emailreader.TestUtility.createCredentialsEntity;
 import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 
@@ -388,7 +389,7 @@ class EmailServiceTest {
 
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> emailService.getMessageAttachmentStreamed(123, servletResponseMock))
-			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.NOT_FOUND));
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(NOT_FOUND));
 
 		verify(mockAttachmentRepository).findById(123L);
 		verifyNoMoreInteractions(mockAttachmentRepository);
@@ -402,7 +403,7 @@ class EmailServiceTest {
 
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> emailService.getMessageAttachmentStreamed(123, servletResponseMock))
-			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(Status.INTERNAL_SERVER_ERROR));
+			.satisfies(problem -> assertThat(problem.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR));
 
 		verify(mockAttachmentRepository).findById(123L);
 		verify(messageAttachmentEntityMock).getContent();
