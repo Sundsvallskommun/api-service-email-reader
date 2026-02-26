@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.zalando.problem.Problem;
-import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
+import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.service.GraphCredentialsService;
 

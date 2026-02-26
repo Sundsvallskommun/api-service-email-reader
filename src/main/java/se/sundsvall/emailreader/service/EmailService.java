@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.integration.db.AttachmentRepository;
 import se.sundsvall.emailreader.integration.db.CredentialsRepository;
@@ -33,7 +32,8 @@ import static java.text.MessageFormat.format;
 import static java.util.Collections.emptyList;
 import static org.springframework.http.HttpHeaders.CONTENT_DISPOSITION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
@@ -174,7 +174,7 @@ public class EmailService {
 		try {
 			final var attachmentEntity = attachmentRepository
 				.findById(attachmentId)
-				.orElseThrow(() -> Problem.valueOf(Status.NOT_FOUND, "MessageAttachment not found"));
+				.orElseThrow(() -> Problem.valueOf(NOT_FOUND, "MessageAttachment not found"));
 
 			final var file = attachmentEntity.getContent();
 

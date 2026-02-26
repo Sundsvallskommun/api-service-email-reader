@@ -7,37 +7,37 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.2"
 servers:
-  - url: http://localhost:59476
-    description: Generated server url
+- url: http://localhost:61432
+  description: Generated server url
 tags:
-  - name: Email
-    description: Email
-  - name: Graph Credentials
-    description: Credentials for Microsoft Graph
-  - name: Credentials
-    description: Credentials
+- name: Email
+  description: Email
+- name: Graph Credentials
+  description: Credentials for Microsoft Graph
+- name: Credentials
+  description: Credentials
 paths:
   /{municipalityId}/credentials/{id}:
     put:
       tags:
-        - Credentials
+      - Credentials
       description: Update credentials
       operationId: update
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       requestBody:
         content:
           application/json:
@@ -53,8 +53,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -69,24 +69,24 @@ paths:
                 $ref: "#/components/schemas/Problem"
     delete:
       tags:
-        - Credentials
+      - Credentials
       description: Delete credentials by id
       operationId: delete
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
           description: No content
@@ -96,8 +96,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -113,24 +113,24 @@ paths:
   /{municipalityId}/credentials/graph/{id}:
     get:
       tags:
-        - Graph Credentials
+      - Graph Credentials
       description: Get Graph credentials by id
       operationId: getByMunicipalityIdAndId
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "200":
           description: Ok
@@ -150,8 +150,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -166,24 +166,24 @@ paths:
                 $ref: "#/components/schemas/Problem"
     put:
       tags:
-        - Graph Credentials
+      - Graph Credentials
       description: Update Graph credentials
       operationId: update_1
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       requestBody:
         content:
           application/json:
@@ -205,8 +205,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -221,24 +221,24 @@ paths:
                 $ref: "#/components/schemas/Problem"
     delete:
       tags:
-        - Graph Credentials
+      - Graph Credentials
       description: Delete Graph credentials by id
       operationId: delete_1
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
           description: No content
@@ -254,8 +254,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -271,17 +271,17 @@ paths:
   /{municipalityId}/credentials:
     get:
       tags:
-        - Credentials
+      - Credentials
       description: Get a list of credentials
       operationId: getAllByMunicipalityId
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       responses:
         "200":
           description: Ok
@@ -297,8 +297,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -313,17 +313,17 @@ paths:
                 $ref: "#/components/schemas/Problem"
     post:
       tags:
-        - Credentials
+      - Credentials
       description: Create credentials
       operationId: create
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       requestBody:
         content:
           application/json:
@@ -339,8 +339,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -356,17 +356,17 @@ paths:
   /{municipalityId}/credentials/graph:
     get:
       tags:
-        - Graph Credentials
+      - Graph Credentials
       description: Get a list of Graph credentials
       operationId: getAllByMunicipalityId_1
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       responses:
         "200":
           description: Ok
@@ -382,8 +382,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -398,17 +398,17 @@ paths:
                 $ref: "#/components/schemas/Problem"
     post:
       tags:
-        - Graph Credentials
+      - Graph Credentials
       description: Create Graph credentials
       operationId: create_1
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       requestBody:
         content:
           application/json:
@@ -429,8 +429,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -446,24 +446,24 @@ paths:
   /{municipalityId}/email/{namespace}:
     get:
       tags:
-        - Email
+      - Email
       description: Get a list of emails
       operationId: getAllEmails
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: namespace
-          in: path
-          description: A specific namespace
-          required: true
-          schema:
-            type: string
-          example: CONTACTCENTER
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: namespace
+        in: path
+        description: A specific namespace
+        required: true
+        schema:
+          type: string
+        example: CONTACTCENTER
       responses:
         "200":
           description: OK
@@ -479,8 +479,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -496,26 +496,26 @@ paths:
   /{municipalityId}/email/attachments/{attachmentId}:
     get:
       tags:
-        - Email
+      - Email
       summary: Get a messageAttachment
       description: Returns a messageAttachment as a stream for the specified attachmentId
       operationId: getAttachment
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality Id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: attachmentId
-          in: path
-          description: MessageId to fetch attachment for
-          required: true
-          schema:
-            type: integer
-            format: int32
-          example: 123
+      - name: municipalityId
+        in: path
+        description: Municipality Id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: attachmentId
+        in: path
+        description: MessageId to fetch attachment for
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: 123
       responses:
         "200":
           description: Successful Operation
@@ -525,8 +525,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -542,7 +542,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -558,24 +558,24 @@ paths:
   /{municipalityId}/email/{id}:
     delete:
       tags:
-        - Email
+      - Email
       description: Delete an email by id
       operationId: deleteEmail
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: id
-          in: path
-          description: Email message ID
-          required: true
-          schema:
-            type: string
-          example: 81471222-5798-11e9-ae24-57fa13b361e1
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: id
+        in: path
+        description: Email message ID
+        required: true
+        schema:
+          type: string
+        example: 81471222-5798-11e9-ae24-57fa13b361e1
       responses:
         "204":
           description: No content
@@ -585,8 +585,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -609,19 +609,19 @@ components:
           type: string
           description: Credentials id
           examples:
-            - 74531aac-ffea-42cc-8a0a-52715bb27850
+          - 74531aac-ffea-42cc-8a0a-52715bb27850
           readOnly: true
         username:
           type: string
           description: username to use for authentication against the email server
           examples:
-            - joe01doe
+          - joe01doe
           minLength: 1
         password:
           type: string
           description: password to use for authentication against the email server
           examples:
-            - mySecretPassword
+          - mySecretPassword
           minLength: 1
           writeOnly: true
         emailAddress:
@@ -635,47 +635,45 @@ components:
           type: string
           description: domain for the email server
           examples:
-            - https://mail.examples.com/EWS/Exchange.asmx
+          - https://mail.examples.com/EWS/Exchange.asmx
           minLength: 1
         namespace:
           type: string
           description: Namespace
           examples:
-            - my.namespace
+          - my.namespace
           minLength: 1
         action:
           type: string
           description: Action to take for new emails
           examples:
-            - PERSIST
+          - PERSIST
         metadata:
           type: object
           additionalProperties:
             type: string
           description: Metadata to add to the email
           examples:
-            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
         destinationFolder:
           type: string
           description: The folder to move emails to after processing
           examples:
-            - Processed
+          - Processed
           minLength: 1
         enabled:
           type: boolean
           description: If this configuration is active and should fetch emails
       required:
-        - destinationFolder
-        - domain
-        - emailAddress
-        - namespace
-        - password
-        - username
+      - destinationFolder
+      - domain
+      - emailAddress
+      - namespace
+      - password
+      - username
     Problem:
       type: object
       properties:
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
@@ -686,174 +684,48 @@ components:
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-    StatusType:
-      type: object
-      properties:
-        statusCode:
+        status:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
         type:
           type: string
           format: uri
         status:
-          $ref: "#/components/schemas/StatusType"
+          type: integer
+          format: int32
         violations:
           type: array
           items:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        message:
-          type: string
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
     ThrowableProblem:
       type: object
       properties:
-        cause: {}
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        message:
+        type:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
+          format: uri
         title:
           type: string
+        status:
+          type: integer
+          format: int32
         detail:
           type: string
         instance:
           type: string
           format: uri
-        type:
-          type: string
-          format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
+        causeAsProblem: {}
     Violation:
       type: object
       properties:
@@ -870,7 +742,7 @@ components:
           type: string
           description: Credentials id
           examples:
-            - 74531aac-ffea-42cc-8a0a-52715bb27850
+          - 74531aac-ffea-42cc-8a0a-52715bb27850
           readOnly: true
         clientSecret:
           type: string
@@ -878,24 +750,21 @@ components:
             Graph server. Do note it should be the secret value and not the Secret
             ID.
           examples:
-            - mySecretClientSecret
-          minLength: 1
+          - mySecretClientSecret
           writeOnly: true
         tenantId:
           type: string
           description: Tenant ID to use for authentication against the Microsoft Graph
             server.
           examples:
-            - myTenantId
-          minLength: 1
+          - myTenantId
           writeOnly: true
         clientId:
           type: string
           description: Client ID to use for authentication against the Microsoft Graph
             server.
           examples:
-            - myClientId
-          minLength: 1
+          - myClientId
           writeOnly: true
         emailAddress:
           type: array
@@ -903,37 +772,34 @@ components:
             graph application must have access to these email addresses.
           items:
             type: string
-          minItems: 1
         namespace:
           type: string
           description: Namespace
           examples:
-            - my.namespace
-          minLength: 1
+          - my.namespace
         metadata:
           type: object
           additionalProperties:
             type: string
           description: Metadata to add to the email.
           examples:
-            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
         destinationFolder:
           type: string
           description: The folder to move emails to after processing.
           examples:
-            - Processed
-          minLength: 1
+          - Processed
         enabled:
           type: boolean
           description: If this configuration is active and should fetch emails
       required:
-        - clientId
-        - clientSecret
-        - destinationFolder
-        - emailAddress
-        - metadata
-        - namespace
-        - tenantId
+      - clientId
+      - clientSecret
+      - destinationFolder
+      - emailAddress
+      - metadata
+      - namespace
+      - tenantId
     Email:
       type: object
       description: Email
@@ -947,40 +813,40 @@ components:
           type: string
           description: Sender E-Mail address
           examples:
-            - sender@sundsvall.se
+          - sender@sundsvall.se
         subject:
           type: string
           description: E-mail subject
           examples:
-            - E-mail subject
+          - E-mail subject
         message:
           type: string
           description: E-mail plain-text body
           examples:
-            - E-mail body
+          - E-mail body
         htmlMessage:
           type: string
           description: E-mail HTML body
           examples:
-            - <p>E-mail body</p>
+          - <p>E-mail body</p>
         id:
           type: string
           description: E-mail message id
           examples:
-            - 74531aac-ffea-42cc-8a0a-52715bb27850
+          - 74531aac-ffea-42cc-8a0a-52715bb27850
         metadata:
           type: object
           additionalProperties:
             type: string
           description: Metadata for the email
           examples:
-            - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
         receivedAt:
           type: string
           format: date-time
           description: The date and time the email was received
           examples:
-            - 2021-09-01T12:00:00+02:00
+          - 2021-09-01T12:00:00+02:00
         headers:
           type: object
           additionalProperties:
@@ -989,7 +855,7 @@ components:
               type: string
           description: The email headers
           examples:
-            - "{\"IN_REPLY_TO\": [\"reply-to@examples.com\"], \"REFERENCES\": [\"reference1\"\
+          - "{\"IN_REPLY_TO\": [\"reply-to@examples.com\"], \"REFERENCES\": [\"reference1\"\
             , \"reference2\"], \"MESSAGE_ID\": [\"123456789\"]}"
         attachments:
           type: array
@@ -1005,15 +871,15 @@ components:
           format: int64
           description: The attachment id
           examples:
-            - "1"
+          - "1"
         name:
           type: string
           description: The attachment filename
           examples:
-            - test.txt
+          - test.txt
         contentType:
           type: string
           description: The attachment content type
           examples:
-            - text/plain
+          - text/plain
   securitySchemes: {}

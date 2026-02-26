@@ -7,7 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.emailreader.api.model.GraphCredentials;
 import se.sundsvall.emailreader.integration.db.GraphCredentialsRepository;
 import se.sundsvall.emailreader.integration.db.entity.GraphCredentialsEntity;
