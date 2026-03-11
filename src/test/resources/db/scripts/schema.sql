@@ -51,7 +51,7 @@
     create table email_header (
         email_id varchar(255),
         id varchar(255) not null,
-        header_key enum ('AUTO_SUBMITTED','IN_REPLY_TO','MESSAGE_ID','REFERENCES'),
+        header_key enum ('AUTO_SUBMITTED','CONTENT_TYPE','IN_REPLY_TO','MESSAGE_ID','REFERENCES','RETURN_PATH'),
         primary key (id)
     ) engine=InnoDB;
 

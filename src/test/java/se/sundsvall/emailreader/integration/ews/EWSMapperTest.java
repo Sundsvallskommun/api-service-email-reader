@@ -43,9 +43,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.CONTENT_TYPE;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.api.model.Header.RETURN_PATH;
 
 @ExtendWith({
 	MockitoExtension.class
@@ -80,10 +82,16 @@ class EWSMapperTest {
 		final var autoSubmittedHeader = mock(InternetMessageHeader.class);
 		when(autoSubmittedHeader.getName()).thenReturn("auto-submitted");
 		when(autoSubmittedHeader.getValue()).thenReturn("auto-generated");
+		final var returnPathHeader = mock(InternetMessageHeader.class);
+		when(returnPathHeader.getName()).thenReturn("Return-Path");
+		when(returnPathHeader.getValue()).thenReturn("<>");
+		final var contentTypeHeader = mock(InternetMessageHeader.class);
+		when(contentTypeHeader.getName()).thenReturn("content-type");
+		when(contentTypeHeader.getValue()).thenReturn("multipart/report; report-type=delivery-status");
 
 		when(internetMessageHeaderCollection.iterator()).thenReturn(iterator);
-		when(iterator.hasNext()).thenReturn(true, true, true, true, false);
-		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader);
+		when(iterator.hasNext()).thenReturn(true, true, true, true, true, true, false);
+		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader, returnPathHeader, contentTypeHeader);
 
 		final var messageIdHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, MESSAGE_ID);
 		assertThat(messageIdHeaderResult).isPresent();
@@ -97,6 +105,12 @@ class EWSMapperTest {
 		final var autoSubmittedHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED);
 		assertThat(autoSubmittedHeaderResult).isPresent();
 		assertThat(autoSubmittedHeaderResult.get().getValue()).isEqualTo("auto-generated");
+		final var returnPathHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, RETURN_PATH);
+		assertThat(returnPathHeaderResult).isPresent();
+		assertThat(returnPathHeaderResult.get().getValue()).isEqualTo("<>");
+		final var contentTypeHeaderResult = ewsMapper.findHeader(internetMessageHeaderCollection, CONTENT_TYPE);
+		assertThat(contentTypeHeaderResult).isPresent();
+		assertThat(contentTypeHeaderResult.get().getValue()).isEqualTo("multipart/report; report-type=delivery-status");
 	}
 
 	@Test
@@ -120,23 +134,33 @@ class EWSMapperTest {
 		final var autoSubmittedHeader = mock(InternetMessageHeader.class);
 		when(autoSubmittedHeader.getName()).thenReturn("auto-submitted");
 		when(autoSubmittedHeader.getValue()).thenReturn("auto-generated");
+		final var returnPathHeader = mock(InternetMessageHeader.class);
+		when(returnPathHeader.getName()).thenReturn("Return-Path");
+		when(returnPathHeader.getValue()).thenReturn("<>");
+		final var contentTypeHeader = mock(InternetMessageHeader.class);
+		when(contentTypeHeader.getName()).thenReturn("content-type");
+		when(contentTypeHeader.getValue()).thenReturn("multipart/report; report-type=delivery-status");
 
-		when(iterator.hasNext()).thenReturn(true, true, true, true, false);
-		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader);
+		when(iterator.hasNext()).thenReturn(true, true, true, true, true, true, false);
+		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader, returnPathHeader, contentTypeHeader);
 		when(spy.findHeader(internetMessageHeaderCollection, MESSAGE_ID)).thenReturn(Optional.of(messageIdHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, REFERENCES)).thenReturn(Optional.of(referenceHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, IN_REPLY_TO)).thenReturn(Optional.of(inReplyToHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED)).thenReturn(Optional.of(autoSubmittedHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, RETURN_PATH)).thenReturn(Optional.of(returnPathHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, CONTENT_TYPE)).thenReturn(Optional.of(contentTypeHeader));
 		when(spy.createEmailHeader(any(Header.class), anyList())).thenCallRealMethod();
 		when(spy.extractValues(anyString())).thenCallRealMethod();
 
 		final var result = spy.toHeaders(emailMessageMock);
 
-		assertThat(result).isNotNull().hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
+		assertThat(result).isNotNull().hasSize(6).extracting("header", "values").containsExactlyInAnyOrder(
 			tuple(MESSAGE_ID, List.of("<Test1@test.se>")),
 			tuple(REFERENCES, List.of("<Test2@test.se>")),
 			tuple(IN_REPLY_TO, List.of("<Test3@test.se>")),
-			tuple(AUTO_SUBMITTED, List.of("auto-generated")));
+			tuple(AUTO_SUBMITTED, List.of("auto-generated")),
+			tuple(RETURN_PATH, List.of("<>")),
+			tuple(CONTENT_TYPE, List.of("multipart/report; report-type=delivery-status")));
 	}
 
 	@Test
@@ -160,23 +184,33 @@ class EWSMapperTest {
 		final var autoSubmittedHeader = mock(InternetMessageHeader.class);
 		when(autoSubmittedHeader.getName()).thenReturn("auto-submitted");
 		when(autoSubmittedHeader.getValue()).thenReturn("auto-generated ");
+		final var returnPathHeader = mock(InternetMessageHeader.class);
+		when(returnPathHeader.getName()).thenReturn("Return-Path");
+		when(returnPathHeader.getValue()).thenReturn("<>  ");
+		final var contentTypeHeader = mock(InternetMessageHeader.class);
+		when(contentTypeHeader.getName()).thenReturn("content-type");
+		when(contentTypeHeader.getValue()).thenReturn("multipart/report; report-type=delivery-status  ");
 
-		when(iterator.hasNext()).thenReturn(true, true, true, true, false);
-		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader);
+		when(iterator.hasNext()).thenReturn(true, true, true, true, true, true, false);
+		when(iterator.next()).thenReturn(messageIdHeader, referenceHeader, inReplyToHeader, autoSubmittedHeader, returnPathHeader, contentTypeHeader);
 		when(spy.findHeader(internetMessageHeaderCollection, MESSAGE_ID)).thenReturn(Optional.of(messageIdHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, REFERENCES)).thenReturn(Optional.of(referenceHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, IN_REPLY_TO)).thenReturn(Optional.of(inReplyToHeader));
 		when(spy.findHeader(internetMessageHeaderCollection, AUTO_SUBMITTED)).thenReturn(Optional.of(autoSubmittedHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, RETURN_PATH)).thenReturn(Optional.of(returnPathHeader));
+		when(spy.findHeader(internetMessageHeaderCollection, CONTENT_TYPE)).thenReturn(Optional.of(contentTypeHeader));
 		when(spy.createEmailHeader(any(Header.class), anyList())).thenCallRealMethod();
 		when(spy.extractValues(anyString())).thenCallRealMethod();
 
 		final var result = spy.toHeaders(emailMessageMock);
 
-		assertThat(result).isNotNull().hasSize(4).extracting("header", "values").containsExactlyInAnyOrder(
+		assertThat(result).isNotNull().hasSize(6).extracting("header", "values").containsExactlyInAnyOrder(
 			tuple(MESSAGE_ID, List.of("<Test1@test.se>")),
 			tuple(REFERENCES, List.of("<Test2@test.se>")),
 			tuple(IN_REPLY_TO, List.of("<Test3@test.se>")),
-			tuple(AUTO_SUBMITTED, List.of("auto-generated")));
+			tuple(AUTO_SUBMITTED, List.of("auto-generated")),
+			tuple(RETURN_PATH, List.of("<>")),
+			tuple(CONTENT_TYPE, List.of("multipart/report; report-type=delivery-status")));
 	}
 
 	@ParameterizedTest

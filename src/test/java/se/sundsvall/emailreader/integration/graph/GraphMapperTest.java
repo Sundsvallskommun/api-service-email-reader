@@ -53,7 +53,9 @@ class GraphMapperTest {
 			Arguments.of(Header.REFERENCES, "ref1, ref2"),
 			Arguments.of(Header.MESSAGE_ID, "12345"),
 			Arguments.of(Header.IN_REPLY_TO, "reply1"),
-			Arguments.of(Header.AUTO_SUBMITTED, "auto"));
+			Arguments.of(Header.AUTO_SUBMITTED, "auto"),
+			Arguments.of(Header.RETURN_PATH, "<>"),
+			Arguments.of(Header.CONTENT_TYPE, "multipart/report; report-type=delivery-status"));
 	}
 
 	@Test
@@ -141,9 +143,11 @@ class GraphMapperTest {
 			tuple(Header.MESSAGE_ID, List.of("12345")),
 			tuple(Header.REFERENCES, List.of("ref1,", "ref2")),
 			tuple(Header.IN_REPLY_TO, List.of("reply1")),
-			tuple(Header.AUTO_SUBMITTED, List.of("auto")));
+			tuple(Header.AUTO_SUBMITTED, List.of("auto")),
+			tuple(Header.RETURN_PATH, List.of("<>")),
+			tuple(Header.CONTENT_TYPE, List.of("multipart/report; report-type=delivery-status")));
 
-		verify(spy, times(4)).createEmailHeader(any(), any());
+		verify(spy, times(6)).createEmailHeader(any(), any());
 		verify(spy).toHeaders(any());
 	}
 

@@ -4,15 +4,17 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.CONTENT_TYPE;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.api.model.Header.RETURN_PATH;
 
 class HeaderTest {
 
 	@Test
 	void enums() {
-		assertThat(Header.values()).containsExactlyInAnyOrder(IN_REPLY_TO, REFERENCES, MESSAGE_ID, AUTO_SUBMITTED);
+		assertThat(Header.values()).containsExactlyInAnyOrder(IN_REPLY_TO, REFERENCES, MESSAGE_ID, AUTO_SUBMITTED, RETURN_PATH, CONTENT_TYPE);
 	}
 
 	@Test
@@ -21,5 +23,7 @@ class HeaderTest {
 		assertThat(REFERENCES.getName()).isEqualTo("References");
 		assertThat(MESSAGE_ID.getName()).isEqualTo("Message-ID");
 		assertThat(AUTO_SUBMITTED.getName()).isEqualTo("Auto-Submitted");
+		assertThat(RETURN_PATH.getName()).isEqualTo("Return-Path");
+		assertThat(CONTENT_TYPE.getName()).isEqualTo("Content-Type");
 	}
 }
