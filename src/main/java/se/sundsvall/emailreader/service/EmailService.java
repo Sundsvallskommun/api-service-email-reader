@@ -35,7 +35,6 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
 import static se.sundsvall.emailreader.service.mapper.EmailMapper.toEmails;
 
 @Service
@@ -150,23 +149,10 @@ public class EmailService {
 		}
 		email.setHtmlMessage(Optional.ofNullable(htmlEmail.getBody()).map(Objects::toString).orElse(null));
 
-		if (isAutoReply(email)) {
-			LOG.info("[{}]: Email with original id '{}' has been interpreted as an auto-reply and will be moved to {} without further processing.", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());
-			ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
-			return;
-		}
-
 		LOG.info("[{}]: Saving ews email with original id '{}'", credential.getEmailAddress(), email.getOriginalId());
 		emailRepository.saveAndFlush(email);
 		LOG.info("[{}]: Moving ews email with original id '{}' to folder '{}'", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());
 		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
-	}
-
-	boolean isAutoReply(final EmailEntity email) {
-		return email.getHeaders().stream()
-			.filter(header -> AUTO_SUBMITTED.getName().equalsIgnoreCase(header.getHeader().getName()))
-			.flatMap(header -> header.getValues().stream())
-			.anyMatch(value -> !"No".equalsIgnoreCase(value));
 	}
 
 	public void getMessageAttachmentStreamed(final long attachmentId, final HttpServletResponse response) {
@@ -189,11 +175,7 @@ public class EmailService {
 
 	@Transactional
 	public void saveEmail(final EmailEntity email) {
-		if (isAutoReply(email)) {
-			return;
-		}
 		LOG.info("Saving graph email with original id '{}'", email.getOriginalId());
 		emailRepository.save(email);
-
 	}
 }

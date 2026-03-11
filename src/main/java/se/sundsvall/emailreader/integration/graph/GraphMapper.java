@@ -23,8 +23,10 @@ import se.sundsvall.emailreader.utility.BlobBuilder;
 
 import static java.util.Collections.emptyList;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.CONTENT_TYPE;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.api.model.Header.RETURN_PATH;
 
 @Component
 public class GraphMapper {
@@ -73,6 +75,12 @@ public class GraphMapper {
 
 		findHeader(message, AUTO_SUBMITTED.getName())
 			.ifPresent(value -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(value))));
+
+		findHeader(message, RETURN_PATH.getName())
+			.ifPresent(value -> headers.add(createEmailHeader(RETURN_PATH, extractValues(value))));
+
+		findHeader(message, CONTENT_TYPE.getName())
+			.ifPresent(value -> headers.add(createEmailHeader(CONTENT_TYPE, List.of(value))));
 
 		return headers;
 	}

@@ -27,9 +27,11 @@ import se.sundsvall.emailreader.utility.BlobBuilder;
 
 import static java.util.Collections.emptyList;
 import static se.sundsvall.emailreader.api.model.Header.AUTO_SUBMITTED;
+import static se.sundsvall.emailreader.api.model.Header.CONTENT_TYPE;
 import static se.sundsvall.emailreader.api.model.Header.IN_REPLY_TO;
 import static se.sundsvall.emailreader.api.model.Header.MESSAGE_ID;
 import static se.sundsvall.emailreader.api.model.Header.REFERENCES;
+import static se.sundsvall.emailreader.api.model.Header.RETURN_PATH;
 import static se.sundsvall.emailreader.utility.ServiceUtil.detectMimeType;
 
 @Component
@@ -53,6 +55,8 @@ public final class EWSMapper {
 			findHeader(internetMessageHeaders, REFERENCES).ifPresent(header -> headers.add(createEmailHeader(REFERENCES, extractValues(header.getValue().strip()))));
 			findHeader(internetMessageHeaders, IN_REPLY_TO).ifPresent(header -> headers.add(createEmailHeader(IN_REPLY_TO, extractValues(header.getValue().strip()))));
 			findHeader(internetMessageHeaders, AUTO_SUBMITTED).ifPresent(header -> headers.add(createEmailHeader(AUTO_SUBMITTED, extractValues(header.getValue().strip()))));
+			findHeader(internetMessageHeaders, RETURN_PATH).ifPresent(header -> headers.add(createEmailHeader(RETURN_PATH, extractValues(header.getValue().strip()))));
+			findHeader(internetMessageHeaders, CONTENT_TYPE).ifPresent(header -> headers.add(createEmailHeader(CONTENT_TYPE, List.of(header.getValue().strip()))));
 
 			return headers;
 		} catch (final Exception e) {

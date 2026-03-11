@@ -111,7 +111,13 @@ public final class TestUtility {
 		final var autoSubmittedHeader = new InternetMessageHeader();
 		autoSubmittedHeader.setName("auto-submitted");
 		autoSubmittedHeader.setValue("auto");
-		message.setInternetMessageHeaders(List.of(messageIdHeader, referencesHeader, inReplyToHeader, autoSubmittedHeader));
+		final var returnPathHeader = new InternetMessageHeader();
+		returnPathHeader.setName("return-path");
+		returnPathHeader.setValue("<>");
+		final var contentTypeHeader = new InternetMessageHeader();
+		contentTypeHeader.setName("content-type");
+		contentTypeHeader.setValue("multipart/report; report-type=delivery-status");
+		message.setInternetMessageHeaders(List.of(messageIdHeader, referencesHeader, inReplyToHeader, autoSubmittedHeader, returnPathHeader, contentTypeHeader));
 		return message;
 	}
 
