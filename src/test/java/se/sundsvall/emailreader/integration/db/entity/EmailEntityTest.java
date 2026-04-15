@@ -48,6 +48,7 @@ class EmailEntityTest {
 		final var namespace = "someNamespace";
 		final var municipalityId = "someMunicipalityId";
 		final var recipients = List.of("someRecipient");
+		final var ccRecipients = List.of("someCcRecipient");
 		final var sender = "someSender";
 		final var subject = "someSubject";
 
@@ -75,6 +76,7 @@ class EmailEntityTest {
 			.withNamespace(namespace)
 			.withMunicipalityId(municipalityId)
 			.withRecipients(recipients)
+			.withCcRecipients(ccRecipients)
 			.withSender(sender)
 			.withSubject(subject)
 			.withHeaders(headers)
@@ -95,6 +97,7 @@ class EmailEntityTest {
 		assertThat(object.getNamespace()).isEqualTo(namespace);
 		assertThat(object.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(object.getRecipients()).isEqualTo(recipients);
+		assertThat(object.getCcRecipients()).isEqualTo(ccRecipients);
 		assertThat(object.getSender()).isEqualTo(sender);
 		assertThat(object.getSubject()).isEqualTo(subject);
 		assertThat(object.getHeaders()).isEqualTo(headers);

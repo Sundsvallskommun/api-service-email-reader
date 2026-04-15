@@ -102,6 +102,7 @@ class GraphMapperTest {
 		final var namespace = "namespace";
 		final var metadata = Map.of("key", "value");
 		final var recipients = List.of("recipient@example.com");
+		final var ccRecipients = List.of("cc@example.com");
 		final var sender = "sender@example.com";
 		final var messageIdHeader = createEmailHeaderEntity(Header.MESSAGE_ID, List.of("message-id"));
 		final var headers = List.of(messageIdHeader);
@@ -110,6 +111,7 @@ class GraphMapperTest {
 		final var spy = Mockito.spy(graphMapper);
 
 		when(spy.getRecipients(message)).thenReturn(recipients);
+		when(spy.getCcRecipients(message)).thenReturn(ccRecipients);
 		when(spy.getSender(message)).thenReturn(sender);
 		when(spy.toHeaders(message)).thenReturn(headers);
 		when(spy.stripHTML(message)).thenReturn(messageContent);
@@ -121,6 +123,7 @@ class GraphMapperTest {
 			assertThat(emailEntity.getNamespace()).isEqualTo(namespace);
 			assertThat(emailEntity.getMunicipalityId()).isEqualTo(municipalityId);
 			assertThat(emailEntity.getRecipients()).isEqualTo(recipients);
+			assertThat(emailEntity.getCcRecipients()).isEqualTo(ccRecipients);
 			assertThat(emailEntity.getSender()).isEqualTo(sender);
 			assertThat(emailEntity.getSubject()).isEqualTo(message.getSubject());
 			assertThat(emailEntity.getHeaders()).containsExactly(messageIdHeader);
@@ -252,6 +255,16 @@ class GraphMapperTest {
 		assertThat(result.getFirst()).isEqualTo(message.getToRecipients().getFirst().getEmailAddress().getAddress());
 	}
 
+	@Test
+	void getCcRecipients() {
+		final var message = createMessage();
+
+		final var result = graphMapper.getCcRecipients(message);
+
+		assertThat(result).isNotNull().hasSameSizeAs(message.getCcRecipients());
+		assertThat(result.getFirst()).isEqualTo(message.getCcRecipients().getFirst().getEmailAddress().getAddress());
+	}
+
 	private Message createMessage() {
 		final var message = new Message();
 		message.setId(UUID.randomUUID().toString());
@@ -273,6 +286,12 @@ class GraphMapperTest {
 		final var recipient = new Recipient();
 		recipient.setEmailAddress(recipientEmail);
 		message.setToRecipients(List.of(recipient));
+
+		final var ccEmail = new EmailAddress();
+		ccEmail.setAddress("cc@example.com");
+		final var ccRecipient = new Recipient();
+		ccRecipient.setEmailAddress(ccEmail);
+		message.setCcRecipients(List.of(ccRecipient));
 
 		final var header = new InternetMessageHeader();
 		header.setName("Message-ID");

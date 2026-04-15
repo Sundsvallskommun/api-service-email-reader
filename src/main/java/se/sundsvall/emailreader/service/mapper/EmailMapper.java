@@ -34,6 +34,7 @@ public final class EmailMapper {
 		return Email.builder()
 			.withSubject(emailEntity.getSubject())
 			.withRecipients(emailEntity.getRecipients())
+			.withCcRecipients(emailEntity.getCcRecipients())
 			.withSender(emailEntity.getSender())
 			.withMessage(emailEntity.getMessage())
 			.withHtmlMessage(emailEntity.getHtmlMessage())

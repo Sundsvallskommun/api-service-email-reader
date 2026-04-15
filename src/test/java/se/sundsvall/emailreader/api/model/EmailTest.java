@@ -18,6 +18,7 @@ class EmailTest {
 			.withId("someId")
 			.withSubject("someSubject")
 			.withRecipients(List.of("someRecipient"))
+			.withCcRecipients(List.of("someCcRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
 			.withHtmlMessage("someHtmlMessage")
@@ -34,6 +35,7 @@ class EmailTest {
 		assertThat(result.id()).isEqualTo("someId");
 		assertThat(result.subject()).isEqualTo("someSubject");
 		assertThat(result.recipients()).hasSize(1).element(0).satisfies(recipient -> assertThat(recipient).isEqualTo("someRecipient"));
+		assertThat(result.ccRecipients()).hasSize(1).element(0).satisfies(cc -> assertThat(cc).isEqualTo("someCcRecipient"));
 		assertThat(result.sender()).isEqualTo("someSender");
 		assertThat(result.message()).isEqualTo("someMessage");
 		assertThat(result.htmlMessage()).isEqualTo("someHtmlMessage");

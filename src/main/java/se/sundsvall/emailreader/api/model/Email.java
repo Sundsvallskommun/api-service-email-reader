@@ -16,6 +16,11 @@ public record Email(
 		description = "Recipient E-Mail addresses",
 		examples = "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"]")) List<String> recipients,
 
+	@ArraySchema(arraySchema = @Schema(
+		implementation = String.class,
+		description = "CC E-Mail addresses",
+		examples = "[\"cc1@sundsvall.se\", \"cc2@sundsvall.se\"]")) List<String> ccRecipients,
+
 	@Schema(description = "Sender E-Mail address", examples = "sender@sundsvall.se") String sender,
 
 	@Schema(description = "E-mail subject", examples = "E-mail subject") String subject,

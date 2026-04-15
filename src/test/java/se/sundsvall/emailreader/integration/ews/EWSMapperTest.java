@@ -287,6 +287,9 @@ class EWSMapperTest {
 		when(emailMessageMock.getDateTimeReceived()).thenReturn(Date.from(Instant.now()));
 		when(emailMessageMock.getToRecipients()).thenReturn(new EmailAddressCollection());
 		emailMessageMock.getToRecipients().add("recipient@example.com");
+		final var ccCollection = new EmailAddressCollection();
+		ccCollection.add("cc@example.com");
+		when(emailMessageMock.getCcRecipients()).thenReturn(ccCollection);
 
 		when(emailMessageMock.getAttachments()).thenReturn(new AttachmentCollection());
 		emailMessageMock.getAttachments().addFileAttachment("fileAttachment.txt");
@@ -305,6 +308,8 @@ class EWSMapperTest {
 			assertThat(emailEntity.getSender()).isEqualTo("sender@example.com");
 			assertThat(emailEntity.getRecipients()).hasSize(1).satisfies(
 				recipient -> assertThat(recipient.getFirst()).isEqualTo("recipient@example.com"));
+			assertThat(emailEntity.getCcRecipients()).hasSize(1).satisfies(
+				cc -> assertThat(cc.getFirst()).isEqualTo("cc@example.com"));
 			assertThat(emailEntity.getSubject()).isEqualTo("Test Email Subject");
 			assertThat(emailEntity.getMessage()).isEqualTo("Mocked email body");
 			assertThat(emailEntity.getReceivedAt()).isCloseTo(OffsetDateTime.now(), within(1, SECONDS));
