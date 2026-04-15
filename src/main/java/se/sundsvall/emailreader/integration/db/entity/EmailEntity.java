@@ -50,6 +50,14 @@ public class EmailEntity {
 			foreignKey = @ForeignKey(name = "fk_email_recipient_email_id")))
 	private List<String> recipients;
 
+	@ElementCollection
+	@CollectionTable(
+		name = "email_cc_recipient",
+		joinColumns = @JoinColumn(name = "email_id",
+			referencedColumnName = "id",
+			foreignKey = @ForeignKey(name = "fk_email_cc_recipient_email_id")))
+	private List<String> ccRecipients;
+
 	@Column(name = "sender")
 	private String sender;
 

@@ -48,6 +48,11 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table email_cc_recipient (
+        cc_recipients varchar(255),
+        email_id varchar(255) not null
+    ) engine=InnoDB;
+
     create table email_header (
         email_id varchar(255),
         id varchar(255) not null,
@@ -114,9 +119,14 @@
        foreign key (credentials_id) 
        references credentials (id);
 
-    alter table if exists email_header 
-       add constraint fk_email_header_email_id 
-       foreign key (email_id) 
+    alter table if exists email_cc_recipient
+       add constraint fk_email_cc_recipient_email_id
+       foreign key (email_id)
+       references email (id);
+
+    alter table if exists email_header
+       add constraint fk_email_header_email_id
+       foreign key (email_id)
        references email (id);
 
     alter table if exists email_header_value 

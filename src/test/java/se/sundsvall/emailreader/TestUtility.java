@@ -72,6 +72,7 @@ public final class TestUtility {
 			.withOriginalId("someOriginalId")
 			.withSubject("someSubject")
 			.withRecipients(List.of("someRecipient"))
+			.withCcRecipients(List.of("someCcRecipient"))
 			.withSender("someSender")
 			.withMessage("someMessage")
 			.withHtmlMessage("someHtmlMessage")

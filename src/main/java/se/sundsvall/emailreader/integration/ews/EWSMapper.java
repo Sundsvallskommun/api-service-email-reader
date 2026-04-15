@@ -99,6 +99,12 @@ public final class EWSMapper {
 			.map(EmailAddress::getAddress)
 			.toList();
 
+		final var ccRecipients = Optional.ofNullable(emailMessage.getCcRecipients())
+			.map(cc -> cc.getItems().stream()
+				.map(EmailAddress::getAddress)
+				.toList())
+			.orElse(emptyList());
+
 		final var attachments = Optional.ofNullable(emailMessage.getAttachments()).stream()
 			.flatMap(emailAttachments -> emailAttachments.getItems().stream())
 			.filter(FileAttachment.class::isInstance)
@@ -117,6 +123,7 @@ public final class EWSMapper {
 			.withSubject(emailMessage.getSubject())
 			.withSender(emailMessage.getFrom().getAddress())
 			.withRecipients(recipients)
+			.withCcRecipients(ccRecipients)
 			.withAttachments(attachments)
 			.withReceivedAt(receivedAt)
 			.withHeaders(toHeaders(emailMessage))

@@ -49,6 +49,7 @@ public class GraphMapper {
 			.withNamespace(namespace)
 			.withMunicipalityId(municipalityId)
 			.withRecipients(getRecipients(message))
+			.withCcRecipients(getCcRecipients(message))
 			.withSender(getSender(message))
 			.withSubject(message.getSubject())
 			.withHeaders(toHeaders(message))
@@ -150,6 +151,18 @@ public class GraphMapper {
 
 	List<String> getRecipients(final Message message) {
 		return Optional.ofNullable(message.getToRecipients())
+			.orElse(emptyList())
+			.stream()
+			.filter(Objects::nonNull)
+			.map(recipient -> Optional.ofNullable(recipient.getEmailAddress())
+				.map(EmailAddress::getAddress)
+				.orElse(null))
+			.filter(Objects::nonNull)
+			.toList();
+	}
+
+	List<String> getCcRecipients(final Message message) {
+		return Optional.ofNullable(message.getCcRecipients())
 			.orElse(emptyList())
 			.stream()
 			.filter(Objects::nonNull)
