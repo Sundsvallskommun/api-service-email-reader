@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.emailreader.integration.db.entity.CredentialsEntity;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.EmailService;
@@ -54,16 +55,41 @@ public class EwsScheduler {
 				final var emails = emailService.getAllEmailsInInbox(credential, address, emailSetUnHealthyConsumer);
 				LOG.info("[{}]: Fetched {} emails", address, emails.size());
 				for (final var email : emails) {
-					try {
-						LOG.info("[{}]: Processing email with id '{}'", address, email.getId());
-						emailService.saveAndMoveEmail(email, address, credential, emailSetUnHealthyConsumer);
-					} catch (final Exception e) {
-						LOG.error("[{}]: Failed to handle individual email", address, e);
-						emailSetUnHealthyConsumer.accept("Failed to handle individual email for " + address);
-					}
+					handleEmail(email, address, credential);
 				}
 				LOG.info("Done fetching mails for address '{}'.", address);
 			}
+		}
+	}
+
+	private void handleEmail(final EmailMessage email, final String address, final CredentialsEntity credential) {
+		final Optional<EmailEntity> loaded;
+		try {
+			LOG.info("[{}]: Processing email with id '{}'", address, email.getId());
+			loaded = emailService.loadEwsEmail(email, credential, emailSetUnHealthyConsumer);
+		} catch (final Exception e) {
+			LOG.error("[{}]: Failed to load email from EWS", address, e);
+			emailSetUnHealthyConsumer.accept("Failed to load email for " + address);
+			return;
+		}
+		if (loaded.isEmpty()) {
+			return;
+		}
+
+		final EmailEntity saved;
+		try {
+			saved = emailService.saveEmail(loaded.get());
+		} catch (final Exception e) {
+			LOG.error("[{}]: Failed to persist email with original id '{}', leaving in source inbox", address, loaded.get().getOriginalId(), e);
+			emailSetUnHealthyConsumer.accept("Failed to persist email for " + address);
+			return;
+		}
+
+		try {
+			emailService.moveEwsEmail(saved.getOriginalId(), address, credential.getDestinationFolder());
+		} catch (final Exception e) {
+			LOG.error("[{}]: Email persisted (id '{}') but move to '{}' failed, will retry on next run", address, saved.getId(), credential.getDestinationFolder(), e);
+			emailSetUnHealthyConsumer.accept("Failed to move email for " + address);
 		}
 	}
 

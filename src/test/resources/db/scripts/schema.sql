@@ -41,6 +41,7 @@
         id varchar(255) not null,
         municipality_id varchar(255),
         namespace varchar(255),
+        original_id varchar(255),
         sender varchar(255),
         subject varchar(255),
         html_message longtext,
@@ -104,9 +105,12 @@
         primary key (graph_credentials_id, metadata_key)
     ) engine=InnoDB;
 
-    alter table if exists attachment 
-       add constraint fk_email_attachment_email_id 
-       foreign key (email_id) 
+    alter table if exists email
+       add constraint uk_email_original_id_municipality_namespace unique (original_id, municipality_id, namespace);
+
+    alter table if exists attachment
+       add constraint fk_email_attachment_email_id
+       foreign key (email_id)
        references email (id);
 
     alter table if exists credentials_email_address 
@@ -149,7 +153,7 @@
        foreign key (graph_credentials_id) 
        references graph_credentials (id);
 
-    alter table if exists graph_credentials_metadata 
-       add constraint fk_graph_credentials_metadata_graph_credentials_id 
-       foreign key (graph_credentials_id) 
+    alter table if exists graph_credentials_metadata
+       add constraint fk_graph_credentials_metadata_graph_credentials_id
+       foreign key (graph_credentials_id)
        references graph_credentials (id);

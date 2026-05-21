@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.emailreader.integration.db.GraphCredentialsRepository;
+import se.sundsvall.emailreader.integration.db.entity.EmailEntity;
+import se.sundsvall.emailreader.integration.db.entity.GraphCredentialsEntity;
 import se.sundsvall.emailreader.integration.graph.GraphIntegration;
 import se.sundsvall.emailreader.service.EmailService;
 
@@ -39,31 +41,41 @@ public class GraphScheduler {
 
 		LOG.info("Checking for new emails");
 		graphCredentialsRepository.findAll()
-			.forEach(
+			.forEach(credential -> credential.getEmailAddress()
+				.forEach(emailAddress -> {
+					final var emails = graphIntegration.getEmails(emailAddress, credential, emailSetUnHealthyConsumer);
+					LOG.info("Fetched {} emails for address '{}'", emails.size(), emailAddress);
+					emails.forEach(email -> handleEmail(email, emailAddress, credential));
+				}));
+	}
 
-				credential -> credential.getEmailAddress()
-					.forEach(emailAddress -> {
-						final var emails = graphIntegration.getEmails(emailAddress, credential, emailSetUnHealthyConsumer);
-						LOG.info("Fetched {} emails for address '{}'", emails.size(), emailAddress);
-						emails.forEach(email -> {
-							try {
-								LOG.info("Saving email with original id '{}'", email.getOriginalId());
-								emailService.saveEmail(email);
-								LOG.info("Fetching attachments for email with original id '{}'", email.getOriginalId());
-								email.setAttachments(graphIntegration.getAttachments(emailAddress, credential, email.getOriginalId(), emailSetUnHealthyConsumer));
-								LOG.info("Fetched {} attachments for email with original id '{}'", email.getAttachments().size(), email.getOriginalId());
-								LOG.info("Saving attachments for email with original id '{}'", email.getOriginalId());
-								emailService.saveEmail(email);
+	private void handleEmail(final EmailEntity email, final String emailAddress, final GraphCredentialsEntity credential) {
+		try {
+			LOG.info("Saving email with original id '{}'", email.getOriginalId());
+			emailService.saveEmail(email);
+		} catch (final Exception e) {
+			LOG.error("Failed to persist email with original id '{}', leaving in source folder", email.getOriginalId(), e);
+			emailSetUnHealthyConsumer.accept("[Graph] Failed to handle individual email");
+			return;
+		}
 
-							} catch (final Exception e) {
-								LOG.error("Failed to handle individual email with id: '{}'. ", email.getId(), e);
-								emailSetUnHealthyConsumer.accept("[Graph] Failed to handle individual email");
-							} finally {
-								LOG.info("Moving email with original id '{}' to folder '{}'", email.getOriginalId(), credential.getDestinationFolder());
-								graphIntegration.moveEmail(emailAddress, email.getOriginalId(), credential, emailSetUnHealthyConsumer);
-							}
-						});
-					}));
+		try {
+			LOG.info("Fetching attachments for email with original id '{}'", email.getOriginalId());
+			email.setAttachments(graphIntegration.getAttachments(emailAddress, credential, email.getOriginalId(), emailSetUnHealthyConsumer));
+			LOG.info("Fetched {} attachments for email with original id '{}'", email.getAttachments().size(), email.getOriginalId());
+			emailService.saveEmail(email);
+		} catch (final Exception e) {
+			LOG.error("Email persisted but attachment fetch/save failed for original id '{}', leaving in source folder for retry", email.getOriginalId(), e);
+			emailSetUnHealthyConsumer.accept("[Graph] Failed to handle individual email");
+			return;
+		}
 
+		try {
+			LOG.info("Moving email with original id '{}' to folder '{}'", email.getOriginalId(), credential.getDestinationFolder());
+			graphIntegration.moveEmail(emailAddress, email.getOriginalId(), credential, emailSetUnHealthyConsumer);
+		} catch (final Exception e) {
+			LOG.error("Email persisted but failed to move email with original id '{}', will retry on next run", email.getOriginalId(), e);
+			emailSetUnHealthyConsumer.accept("[Graph] Failed to move email after successful persistence");
+		}
 	}
 }

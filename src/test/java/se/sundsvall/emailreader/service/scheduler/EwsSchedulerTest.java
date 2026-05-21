@@ -3,6 +3,7 @@ package se.sundsvall.emailreader.service.scheduler;
 import generated.se.sundsvall.messaging.SmsRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import microsoft.exchange.webservices.data.core.service.item.EmailMessage;
 import microsoft.exchange.webservices.data.property.complex.EmailAddress;
@@ -16,7 +17,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.emailreader.integration.ews.EWSIntegration;
-import se.sundsvall.emailreader.integration.ews.EWSMapper;
 import se.sundsvall.emailreader.integration.messaging.MessagingIntegration;
 import se.sundsvall.emailreader.service.EmailService;
 
@@ -39,8 +39,6 @@ import static se.sundsvall.emailreader.TestUtility.createEmailEntity;
 @ExtendWith(MockitoExtension.class)
 class EwsSchedulerTest {
 
-	@Mock
-	private EWSMapper ewsMapperMock;
 	@Mock
 	private Consumer<String> consumerMock;
 	@Mock
@@ -69,13 +67,12 @@ class EwsSchedulerTest {
 		final var emailMessage = mock(EmailMessage.class);
 		final var credential = createCredentialsEntity();
 		final var emailAddresses = "someEmailAddress";
-		final var emailMessageMock = mock(EmailMessage.class);
 		final var email = createEmailEntity(emptyMap());
 
 		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
 		when(emailServiceMock.getAllEmailsInInbox(eq(credential), eq(emailAddresses), any())).thenReturn(List.of(emailMessage));
-		when(ewsMapperMock.toEmail(any(), any(), any(), any())).thenReturn(email);
-		doNothing().when(emailServiceMock).saveAndMoveEmail(emailMessageMock, emailAddresses, credential, consumerMock);
+		when(emailServiceMock.loadEwsEmail(eq(emailMessage), eq(credential), any())).thenReturn(Optional.of(email));
+		when(emailServiceMock.saveEmail(email)).thenReturn(email);
 
 		// Act
 		ewsScheduler.checkForNewEmails();
@@ -83,35 +80,86 @@ class EwsSchedulerTest {
 		// Assert
 		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
 		verify(emailServiceMock).getAllEmailsInInbox(eq(credential), eq(emailAddresses), any());
-		verify(emailServiceMock).saveAndMoveEmail(any(), eq(emailAddresses), eq(credential), any());
+		verify(emailServiceMock).loadEwsEmail(eq(emailMessage), eq(credential), any());
+		verify(emailServiceMock).saveEmail(email);
+		verify(emailServiceMock).moveEwsEmail(email.getOriginalId(), emailAddresses, credential.getDestinationFolder());
 		verifyNoMoreInteractions(emailServiceMock);
 	}
 
 	@Test
-	void checkForNewEmails_noCredentials() throws Exception {
+	void checkForNewEmails_noCredentials() {
 		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of());
 
 		ewsScheduler.checkForNewEmails();
 
 		verify(emailServiceMock).findAllByActionAndActive("PERSIST");
-		verify(emailServiceMock, never()).getAllEmailsInInbox(any(), any(), any());
-		verify(emailServiceMock, never()).saveAndMoveEmail(any(), any(), any(), any());
 		verifyNoMoreInteractions(emailServiceMock);
 	}
 
 	@Test
-	void checkForNewEmails_continuesWhenCheckedException() throws Exception {
-		final var emailMessage1 = mock(EmailMessage.class);
-		final var emailMessage2 = mock(EmailMessage.class);
-		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(createCredentialsEntity(), createCredentialsEntity()));
-		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
-		doThrow(new Exception("Something is very wrong!")).when(emailServiceMock).saveAndMoveEmail(any(), any(), any(), any());
+	void checkForNewEmails_loadReturnsEmpty_skipsSaveAndMove() throws Exception {
+		final var emailMessage = mock(EmailMessage.class);
+		final var credential = createCredentialsEntity();
+
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
+		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage));
+		when(emailServiceMock.loadEwsEmail(any(), any(), any())).thenReturn(Optional.empty());
 
 		ewsScheduler.checkForNewEmails();
 
-		verify(emailServiceMock, times(1)).findAllByActionAndActive("PERSIST");
-		verify(emailServiceMock, times(2)).getAllEmailsInInbox(any(), any(), any());
-		verify(emailServiceMock, times(4)).saveAndMoveEmail(any(), any(), any(), any());
+		verify(emailServiceMock).loadEwsEmail(any(), any(), any());
+		verify(emailServiceMock, never()).saveEmail(any());
+		verify(emailServiceMock, never()).moveEwsEmail(any(), any(), any());
+	}
+
+	@Test
+	void checkForNewEmails_loadThrows_continuesToNextEmail() throws Exception {
+		final var emailMessage1 = mock(EmailMessage.class);
+		final var emailMessage2 = mock(EmailMessage.class);
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(createCredentialsEntity()));
+		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage1, emailMessage2));
+		when(emailServiceMock.loadEwsEmail(any(), any(), any())).thenThrow(new RuntimeException("EWS unavailable"));
+
+		ewsScheduler.checkForNewEmails();
+
+		verify(emailServiceMock, times(2)).loadEwsEmail(any(), any(), any());
+		verify(emailServiceMock, never()).saveEmail(any());
+		verify(emailServiceMock, never()).moveEwsEmail(any(), any(), any());
+	}
+
+	@Test
+	void checkForNewEmails_saveFailed_doesNotAttemptMove() throws Exception {
+		final var emailMessage = mock(EmailMessage.class);
+		final var credential = createCredentialsEntity();
+		final var email = createEmailEntity(emptyMap());
+
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
+		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage));
+		when(emailServiceMock.loadEwsEmail(any(), any(), any())).thenReturn(Optional.of(email));
+		when(emailServiceMock.saveEmail(email)).thenThrow(new RuntimeException("DB constraint violation"));
+
+		ewsScheduler.checkForNewEmails();
+
+		verify(emailServiceMock).saveEmail(email);
+		verify(emailServiceMock, never()).moveEwsEmail(any(), any(), any());
+	}
+
+	@Test
+	void checkForNewEmails_saveSucceededButMoveFailed_leavesEmailInDb() throws Exception {
+		final var emailMessage = mock(EmailMessage.class);
+		final var credential = createCredentialsEntity();
+		final var email = createEmailEntity(emptyMap());
+
+		when(emailServiceMock.findAllByActionAndActive("PERSIST")).thenReturn(List.of(credential));
+		when(emailServiceMock.getAllEmailsInInbox(any(), any(), any())).thenReturn(List.of(emailMessage));
+		when(emailServiceMock.loadEwsEmail(any(), any(), any())).thenReturn(Optional.of(email));
+		when(emailServiceMock.saveEmail(email)).thenReturn(email);
+		doThrow(new RuntimeException("EWS move failed")).when(emailServiceMock).moveEwsEmail(any(), any(), any());
+
+		ewsScheduler.checkForNewEmails();
+
+		verify(emailServiceMock).saveEmail(email);
+		verify(emailServiceMock).moveEwsEmail(eq(email.getOriginalId()), any(), any());
 	}
 
 	@Test
