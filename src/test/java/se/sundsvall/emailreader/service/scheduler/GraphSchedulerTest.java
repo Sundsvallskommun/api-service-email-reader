@@ -121,7 +121,9 @@ class GraphSchedulerTest {
 		verify(graphIntegration).getEmails(eq(userId), eq(credentials), any());
 		verify(emailService).saveEmail(email);
 		verify(emailService, times(2)).saveEmail(email2);
-		verify(graphIntegration).moveEmail(eq(userId), eq(email.getOriginalId()), eq(credentials), any());
+		// email1: attachment fetch failed → no move (will retry on next run)
+		verify(graphIntegration, never()).moveEmail(eq(userId), eq(email.getOriginalId()), eq(credentials), any());
+		// email2: full success → moved
 		verify(graphIntegration).moveEmail(eq(userId), eq(email2.getOriginalId()), eq(credentials), any());
 		verify(dept44HealthUtility).setHealthIndicatorUnhealthy(null, "Email error: [Graph] Failed to handle individual email");
 		verifyNoMoreInteractions(graphCredentialsRepository, emailService, graphIntegration, dept44HealthUtility);

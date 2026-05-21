@@ -65,8 +65,9 @@ public class GraphScheduler {
 			LOG.info("Fetched {} attachments for email with original id '{}'", email.getAttachments().size(), email.getOriginalId());
 			emailService.saveEmail(email);
 		} catch (final Exception e) {
-			LOG.error("Email persisted but attachment fetch/save failed for original id '{}'", email.getOriginalId(), e);
+			LOG.error("Email persisted but attachment fetch/save failed for original id '{}', leaving in source folder for retry", email.getOriginalId(), e);
 			emailSetUnHealthyConsumer.accept("[Graph] Failed to handle individual email");
+			return;
 		}
 
 		try {
