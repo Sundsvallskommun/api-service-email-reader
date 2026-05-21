@@ -132,27 +132,26 @@ public class EmailService {
 		}
 	}
 
-	@Transactional
-	public void saveAndMoveEmail(final EmailMessage ewsEmail, final String emailAddress, final CredentialsEntity credential, final Consumer<String> setUnHealthyConsumer) throws Exception {
-
+	public Optional<EmailEntity> loadEwsEmail(final EmailMessage ewsEmail, final CredentialsEntity credential, final Consumer<String> setUnHealthyConsumer) throws Exception {
 		final var email = ewsMapper.toEmail(ewsIntegration.loadMessage(ewsEmail, setUnHealthyConsumer), credential.getMunicipalityId(), credential.getNamespace(), credential.getMetadata());
 
 		if (email == null) {
-			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}, ", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
-			return;
+			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
+			return Optional.empty();
 		}
 
 		final var htmlEmail = ewsIntegration.loadHTMLMessage(ewsEmail, setUnHealthyConsumer);
 		if (htmlEmail == null) {
-			LOG.warn("[{}]: Email could not be mapped from EWS message, skipping email with id: {}, ", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
-			return;
+			LOG.warn("[{}]: HTML body could not be loaded from EWS, skipping email with id: {}", credential.getEmailAddress(), ewsEmail.getId().getUniqueId());
+			return Optional.empty();
 		}
 		email.setHtmlMessage(Optional.ofNullable(htmlEmail.getBody()).map(Objects::toString).orElse(null));
+		return Optional.of(email);
+	}
 
-		LOG.info("[{}]: Saving ews email with original id '{}'", credential.getEmailAddress(), email.getOriginalId());
-		emailRepository.saveAndFlush(email);
-		LOG.info("[{}]: Moving ews email with original id '{}' to folder '{}'", credential.getEmailAddress(), email.getOriginalId(), credential.getDestinationFolder());
-		ewsIntegration.moveEmail(ItemId.getItemIdFromString(email.getOriginalId()), emailAddress, credential.getDestinationFolder());
+	public void moveEwsEmail(final String originalId, final String emailAddress, final String destinationFolder) throws Exception {
+		LOG.info("[{}]: Moving ews email with original id '{}' to folder '{}'", emailAddress, originalId, destinationFolder);
+		ewsIntegration.moveEmail(ItemId.getItemIdFromString(originalId), emailAddress, destinationFolder);
 	}
 
 	public void getMessageAttachmentStreamed(final long attachmentId, final HttpServletResponse response) {
@@ -174,8 +173,13 @@ public class EmailService {
 	}
 
 	@Transactional
-	public void saveEmail(final EmailEntity email) {
-		LOG.info("Saving graph email with original id '{}'", email.getOriginalId());
-		emailRepository.save(email);
+	public EmailEntity saveEmail(final EmailEntity email) {
+		Optional.ofNullable(email.getOriginalId())
+			.flatMap(originalId -> emailRepository.findByOriginalIdAndMunicipalityIdAndNamespace(originalId, email.getMunicipalityId(), email.getNamespace()))
+			.ifPresent(existing -> {
+				LOG.info("Email with original id '{}' already persisted as '{}', updating in place", email.getOriginalId(), existing.getId());
+				email.setId(existing.getId());
+			});
+		return emailRepository.saveAndFlush(email);
 	}
 }

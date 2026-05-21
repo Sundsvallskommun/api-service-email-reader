@@ -11,7 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,12 @@ import org.hibernate.annotations.UuidGenerator;
 import static org.hibernate.annotations.TimeZoneStorageType.NORMALIZE;
 
 @Entity
-@Table(name = "email")
+@Table(name = "email",
+	uniqueConstraints = @UniqueConstraint(
+		name = "uk_email_original_id_municipality_namespace",
+		columnNames = {
+			"original_id", "municipality_id", "namespace"
+		}))
 @Data
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
@@ -39,7 +44,7 @@ public class EmailEntity {
 	@Column(name = "id")
 	private String id;
 
-	@Transient
+	@Column(name = "original_id")
 	private String originalId;
 
 	@ElementCollection

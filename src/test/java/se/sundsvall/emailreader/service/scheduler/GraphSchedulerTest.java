@@ -17,6 +17,8 @@ import se.sundsvall.emailreader.service.EmailService;
 import static java.util.Collections.emptyMap;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -123,5 +125,52 @@ class GraphSchedulerTest {
 		verify(graphIntegration).moveEmail(eq(userId), eq(email2.getOriginalId()), eq(credentials), any());
 		verify(dept44HealthUtility).setHealthIndicatorUnhealthy(null, "Email error: [Graph] Failed to handle individual email");
 		verifyNoMoreInteractions(graphCredentialsRepository, emailService, graphIntegration, dept44HealthUtility);
+	}
+
+	@Test
+	void checkForNewEmails_firstSaveFailed_doesNotMove() {
+		final var userId = "test@example.com";
+		final var messageId = "messageId";
+		final var credentials = GraphCredentialsEntity.builder()
+			.withClientId("c").withClientSecret("s").withTenantId("t")
+			.withEmailAddress(List.of(userId))
+			.withMunicipalityId("m").withNamespace("n").withMetadata(emptyMap())
+			.build();
+		final var email = EmailEntity.builder().withOriginalId(messageId).build();
+
+		when(graphCredentialsRepository.findAll()).thenReturn(List.of(credentials));
+		when(graphIntegration.getEmails(eq(userId), eq(credentials), any())).thenReturn(List.of(email));
+		when(emailService.saveEmail(email)).thenThrow(new RuntimeException("DB constraint violation"));
+
+		graphScheduler.checkForNewEmails();
+
+		verify(emailService).saveEmail(email);
+		verify(graphIntegration, never()).getAttachments(any(), any(), any(), any());
+		verify(graphIntegration, never()).moveEmail(any(), any(), any(), any());
+		verify(dept44HealthUtility).setHealthIndicatorUnhealthy(null, "Email error: [Graph] Failed to handle individual email");
+	}
+
+	@Test
+	void checkForNewEmails_moveFailedAfterPersist_doesNotPropagate() {
+		final var userId = "test@example.com";
+		final var messageId = "messageId";
+		final var credentials = GraphCredentialsEntity.builder()
+			.withClientId("c").withClientSecret("s").withTenantId("t")
+			.withEmailAddress(List.of(userId))
+			.withMunicipalityId("m").withNamespace("n").withMetadata(emptyMap())
+			.build();
+		final var email = EmailEntity.builder().withOriginalId(messageId).build();
+
+		when(graphCredentialsRepository.findAll()).thenReturn(List.of(credentials));
+		when(graphIntegration.getEmails(eq(userId), eq(credentials), any())).thenReturn(List.of(email));
+		when(graphIntegration.getAttachments(eq(userId), eq(credentials), eq(messageId), any())).thenReturn(List.of());
+		doThrow(new RuntimeException("Graph move failed"))
+			.when(graphIntegration).moveEmail(eq(userId), eq(messageId), eq(credentials), any());
+
+		graphScheduler.checkForNewEmails();
+
+		verify(emailService, times(2)).saveEmail(email);
+		verify(graphIntegration).moveEmail(eq(userId), eq(messageId), eq(credentials), any());
+		verify(dept44HealthUtility).setHealthIndicatorUnhealthy(null, "Email error: [Graph] Failed to move email after successful persistence");
 	}
 }
