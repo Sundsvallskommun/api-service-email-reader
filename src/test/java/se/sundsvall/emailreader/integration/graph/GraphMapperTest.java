@@ -4,6 +4,7 @@ import com.microsoft.graph.models.Attachment;
 import com.microsoft.graph.models.EmailAddress;
 import com.microsoft.graph.models.FileAttachment;
 import com.microsoft.graph.models.InternetMessageHeader;
+import com.microsoft.graph.models.ItemAttachment;
 import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.Message;
 import com.microsoft.graph.models.Recipient;
@@ -93,6 +94,26 @@ class GraphMapperTest {
 		assertThat(result.getFirst().getName()).isEqualTo("test.txt");
 		assertThat(result.getFirst().getContentType()).isEqualTo("text/plain");
 		assertThat(result.getFirst().getContent()).isEqualTo(blob);
+	}
+
+	@Test
+	void toAttachmentsSkipsNonFileAttachments() {
+		final var fileAttachment = new FileAttachment();
+		fileAttachment.setName("test.txt");
+		fileAttachment.setContentBytes("Test Content".getBytes());
+		fileAttachment.setContentType("text/plain");
+
+		when(blobBuilder.createBlob(any())).thenReturn(blob);
+
+		final var result = graphMapper.toAttachments(List.of(new ItemAttachment(), fileAttachment, new ItemAttachment()));
+
+		assertThat(result).hasSize(1).doesNotContainNull();
+		assertThat(result.getFirst().getName()).isEqualTo("test.txt");
+	}
+
+	@Test
+	void toAttachmentsHandlesNullInput() {
+		assertThat(graphMapper.toAttachments(null)).isEmpty();
 	}
 
 	@Test
