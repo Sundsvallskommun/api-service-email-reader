@@ -176,12 +176,10 @@ public class GraphMapper {
 	public List<AttachmentEntity> toAttachments(final List<Attachment> attachments) {
 		return Optional.ofNullable(attachments)
 			.orElse(emptyList()).stream()
-			.map(attachment -> {
-				if (attachment instanceof final FileAttachment fileAttachment) {
-					return toAttachment(fileAttachment);
-				}
-				return null;
-			}).toList();
+			.filter(FileAttachment.class::isInstance)
+			.map(FileAttachment.class::cast)
+			.map(this::toAttachment)
+			.toList();
 	}
 
 	private AttachmentEntity toAttachment(final FileAttachment attachment) {
