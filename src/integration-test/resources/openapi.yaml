@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.3"
 servers:
-- url: http://localhost:59381
+- url: http://localhost:64564
   description: Generated server url
 tags:
 - name: Email
@@ -629,8 +629,8 @@ components:
           description: List of email addresses to check for new emails. The provided
             user must have access to these email addresses.
           examples:
-          - "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"\
-            ]"
+          - - myothersupportemail@sundsvall.se
+            - mysupportemail@sundsvall.se
           items:
             type: string
           minItems: 1
@@ -657,7 +657,8 @@ components:
             type: string
           description: Metadata to add to the email
           examples:
-          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - casetype: myCaseType
+            key2: value2
         destinationFolder:
           type: string
           description: The folder to move emails to after processing
@@ -705,10 +706,10 @@ components:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        causeAsProblem:
-          $ref: "#/components/schemas/ThrowableProblem"
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
@@ -777,8 +778,8 @@ components:
           description: List of email addresses to check for new emails. The provided
             graph application must have access to these email addresses.
           examples:
-          - "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"\
-            ]"
+          - - myothersupportemail@sundsvall.se
+            - mysupportemail@sundsvall.se
           items:
             type: string
           minItems: 1
@@ -794,7 +795,8 @@ components:
             type: string
           description: Metadata to add to the email.
           examples:
-          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - casetype: myCaseType
+            key2: value2
         destinationFolder:
           type: string
           description: The folder to move emails to after processing.
@@ -820,15 +822,16 @@ components:
           type: array
           description: Recipient E-Mail addresses
           examples:
-          - "[\"myothersupportemail@sundsvall.se\", \"mysupportemail@sundsvall.se\"\
-            ]"
+          - - myothersupportemail@sundsvall.se
+            - mysupportemail@sundsvall.se
           items:
             type: string
         ccRecipients:
           type: array
           description: CC E-Mail addresses
           examples:
-          - "[\"cc1@sundsvall.se\", \"cc2@sundsvall.se\"]"
+          - - cc1@sundsvall.se
+            - cc2@sundsvall.se
           items:
             type: string
         sender:
@@ -862,7 +865,8 @@ components:
             type: string
           description: Metadata for the email
           examples:
-          - "{\"casetype\":\"myCaseType\", \"key2\":\"value2\"}"
+          - casetype: myCaseType
+            key2: value2
         receivedAt:
           type: string
           format: date-time
@@ -877,8 +881,13 @@ components:
               type: string
           description: The email headers
           examples:
-          - "{\"IN_REPLY_TO\": [\"reply-to@examples.com\"], \"REFERENCES\": [\"reference1\"\
-            , \"reference2\"], \"MESSAGE_ID\": [\"123456789\"]}"
+          - IN_REPLY_TO:
+            - reply-to@examples.com
+            REFERENCES:
+            - reference1
+            - reference2
+            MESSAGE_ID:
+            - "123456789"
         attachments:
           type: array
           items:
@@ -893,7 +902,7 @@ components:
           format: int64
           description: The attachment id
           examples:
-          - "1"
+          - 1
         name:
           type: string
           description: The attachment filename
