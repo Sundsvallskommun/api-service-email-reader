@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mariadb.jdbc.MariaDbBlob;
 
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
-import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToString;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEqualsExcluding;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCodeExcluding;
+import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanToStringExcluding;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetters;
 import static com.google.code.beanmatchers.BeanMatchers.registerValueGenerator;
 import static java.time.LocalDateTime.now;
@@ -24,6 +24,7 @@ class AttachmentEntityTest {
 	@BeforeAll
 	static void setup() {
 		registerValueGenerator(() -> now().plusDays(new Random().nextInt()), LocalDateTime.class);
+		registerValueGenerator(EmailEntity::new, EmailEntity.class);
 	}
 
 	@Test
@@ -32,9 +33,9 @@ class AttachmentEntityTest {
 		assertThat(AttachmentEntity.class, allOf(
 			hasValidBeanConstructor(),
 			hasValidGettersAndSetters(),
-			hasValidBeanHashCode(),
-			hasValidBeanEquals(),
-			hasValidBeanToString()));
+			hasValidBeanHashCodeExcluding("email"),
+			hasValidBeanEqualsExcluding("email"),
+			hasValidBeanToStringExcluding("email")));
 	}
 
 	@Test
@@ -58,7 +59,7 @@ class AttachmentEntityTest {
 		object.prePersist();
 
 		// Assert
-		assertThat(object).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(object).isNotNull().hasNoNullFieldsOrPropertiesExcept("email");
 		assertThat(object.getId()).isEqualTo(id);
 		assertThat(object.getName()).isEqualTo(name);
 		assertThat(object.getContent()).isEqualTo(file);
