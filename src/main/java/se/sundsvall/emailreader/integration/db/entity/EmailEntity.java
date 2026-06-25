@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
@@ -81,10 +82,7 @@ public class EmailEntity {
 	@Column(name = "namespace")
 	private String namespace;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "email_id",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = "fk_email_attachment_email_id"))
+	@OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<AttachmentEntity> attachments;
 
 	@Column(name = "received_at")
@@ -103,15 +101,27 @@ public class EmailEntity {
 			foreignKey = @ForeignKey(name = "fk_email_metadata_email_id")))
 	private Map<String, String> metadata;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "email_id",
-		referencedColumnName = "id",
-		foreignKey = @ForeignKey(name = "fk_email_header_email_id"))
+	@OneToMany(mappedBy = "email", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EmailHeaderEntity> headers;
 
 	@PrePersist
 	void prePersist() {
 		createdAt = OffsetDateTime.now();
+		linkChildren();
+	}
+
+	@PreUpdate
+	void preUpdate() {
+		linkChildren();
+	}
+
+	private void linkChildren() {
+		if (headers != null) {
+			headers.forEach(header -> header.setEmail(this));
+		}
+		if (attachments != null) {
+			attachments.forEach(attachment -> attachment.setEmail(this));
+		}
 	}
 
 }
