@@ -62,7 +62,7 @@
     ) engine=InnoDB;
 
     create table email_header_value (
-        order_index integer not null,
+        order_index integer not null check ((order_index>=0)),
         value varchar(2048),
         header_id varchar(255) not null,
         primary key (order_index, header_id)
@@ -105,12 +105,12 @@
         primary key (graph_credentials_id, metadata_key)
     ) engine=InnoDB;
 
-    alter table if exists email
+    alter table if exists email 
        add constraint uk_email_original_id_municipality_namespace unique (original_id, municipality_id, namespace);
 
-    alter table if exists attachment
-       add constraint fk_email_attachment_email_id
-       foreign key (email_id)
+    alter table if exists attachment 
+       add constraint fk_email_attachment_email_id 
+       foreign key (email_id) 
        references email (id);
 
     alter table if exists credentials_email_address 
@@ -123,14 +123,14 @@
        foreign key (credentials_id) 
        references credentials (id);
 
-    alter table if exists email_cc_recipient
-       add constraint fk_email_cc_recipient_email_id
-       foreign key (email_id)
+    alter table if exists email_cc_recipient 
+       add constraint fk_email_cc_recipient_email_id 
+       foreign key (email_id) 
        references email (id);
 
-    alter table if exists email_header
-       add constraint fk_email_header_email_id
-       foreign key (email_id)
+    alter table if exists email_header 
+       add constraint fk_email_header_email_id 
+       foreign key (email_id) 
        references email (id);
 
     alter table if exists email_header_value 
@@ -153,7 +153,7 @@
        foreign key (graph_credentials_id) 
        references graph_credentials (id);
 
-    alter table if exists graph_credentials_metadata
-       add constraint fk_graph_credentials_metadata_graph_credentials_id
-       foreign key (graph_credentials_id)
+    alter table if exists graph_credentials_metadata 
+       add constraint fk_graph_credentials_metadata_graph_credentials_id 
+       foreign key (graph_credentials_id) 
        references graph_credentials (id);
