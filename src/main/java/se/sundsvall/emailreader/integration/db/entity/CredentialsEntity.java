@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -76,7 +77,7 @@ public class CredentialsEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = LocalDateTime.now();
+		createdAt = LocalDateTime.now(ZoneId.systemDefault());
 	}
 
 }

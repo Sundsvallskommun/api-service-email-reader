@@ -14,6 +14,7 @@ import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -106,7 +107,7 @@ public class EmailEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = OffsetDateTime.now();
+		createdAt = OffsetDateTime.now(ZoneId.systemDefault());
 		linkChildren();
 	}
 

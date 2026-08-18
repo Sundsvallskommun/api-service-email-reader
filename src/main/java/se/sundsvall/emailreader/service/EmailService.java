@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -107,7 +108,7 @@ public class EmailService {
 
 	public List<EmailEntity> getOldEmails() {
 		return emailRepository.findAll().stream()
-			.filter(email -> email.getCreatedAt().isBefore(OffsetDateTime.now().minusDays(1)))
+			.filter(email -> email.getCreatedAt().isBefore(OffsetDateTime.now(ZoneId.systemDefault()).minusDays(1)))
 			.toList();
 	}
 
