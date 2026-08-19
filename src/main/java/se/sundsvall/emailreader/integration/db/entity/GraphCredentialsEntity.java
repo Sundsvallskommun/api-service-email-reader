@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
@@ -77,6 +78,6 @@ public class GraphCredentialsEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = OffsetDateTime.now();
+		createdAt = OffsetDateTime.now(ZoneId.systemDefault());
 	}
 }

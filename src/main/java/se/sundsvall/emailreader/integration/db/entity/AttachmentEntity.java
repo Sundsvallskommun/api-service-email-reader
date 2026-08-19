@@ -14,6 +14,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.sql.Blob;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,7 +58,7 @@ public class AttachmentEntity {
 
 	@PrePersist
 	void prePersist() {
-		createdAt = LocalDateTime.now();
+		createdAt = LocalDateTime.now(ZoneId.systemDefault());
 	}
 
 }
