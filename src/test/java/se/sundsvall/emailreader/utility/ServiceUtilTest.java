@@ -1,15 +1,11 @@
 package se.sundsvall.emailreader.utility;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.spy;
 
 class ServiceUtilTest {
 
@@ -24,9 +20,15 @@ class ServiceUtilTest {
 	void detectMimeTypeThrowsException() throws IOException {
 		assertThat(ServiceUtil.detectMimeType(null, null)).isEqualTo("application/octet-stream");
 
-		final var inputStream = spy(new ByteArrayInputStream("data".getBytes()));
-		doThrow(new IOException()).when(inputStream).read(any(byte[].class));
-		assertThat(ServiceUtil.detectMimeTypeFromStream(null, inputStream)).isEqualTo("application/octet-stream");
+		// Fails on the single-byte read that every other read overload delegates to, so detection
+		// fails regardless of which overload the detector happens to call.
+		final var failingStream = new InputStream() {
+			@Override
+			public int read() throws IOException {
+				throw new IOException("Unable to read stream");
+			}
+		};
+		assertThat(ServiceUtil.detectMimeTypeFromStream(null, failingStream)).isEqualTo("application/octet-stream");
 	}
 
 	@Test
