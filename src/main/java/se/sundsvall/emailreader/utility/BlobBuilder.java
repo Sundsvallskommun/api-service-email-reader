@@ -1,22 +1,14 @@
 package se.sundsvall.emailreader.utility;
 
-import jakarta.persistence.EntityManager;
 import java.sql.Blob;
-import org.hibernate.Session;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 @Component
 public class BlobBuilder {
 
-	private final EntityManager entityManager;
-
-	public BlobBuilder(final EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
-
 	public Blob createBlob(final byte[] content) {
-		final var session = entityManager.unwrap(Session.class);
-		return session.getLobHelper().createBlob(content);
+		return Hibernate.getLobHelper().createBlob(content);
 	}
 
 }
