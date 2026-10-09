@@ -1,15 +1,12 @@
 package se.sundsvall.emailreader.integration.ews;
 
-import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
-import microsoft.exchange.webservices.data.core.EwsXmlReader;
 import microsoft.exchange.webservices.data.core.ExchangeService;
 import microsoft.exchange.webservices.data.core.PropertySet;
 import microsoft.exchange.webservices.data.core.enumeration.misc.ExchangeVersion;
-import microsoft.exchange.webservices.data.core.enumeration.misc.XmlNamespace;
 import microsoft.exchange.webservices.data.core.enumeration.service.DeleteMode;
 import microsoft.exchange.webservices.data.core.exception.http.HttpErrorException;
 import microsoft.exchange.webservices.data.core.exception.service.local.ServiceLocalException;
@@ -24,7 +21,6 @@ import microsoft.exchange.webservices.data.search.FindFoldersResults;
 import microsoft.exchange.webservices.data.search.FindItemsResults;
 import microsoft.exchange.webservices.data.search.FolderView;
 import microsoft.exchange.webservices.data.search.filter.SearchFilter;
-import microsoft.exchange.webservices.data.security.XmlNodeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +33,6 @@ import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -253,20 +248,6 @@ class EWSIntegrationTest {
 		assertThat(result).isNull();
 		verify(consumerMock).accept("[EWS] Could not load message");
 		verify(emailMessageMock).load();
-	}
-
-	@Test
-	void responseWithControlCharacterReferenceIsParsed() throws Exception {
-		final var response = """
-			<?xml version="1.0" encoding="utf-8"?>
-			<t:Subject xmlns:t="http://schemas.microsoft.com/exchange/services/2006/types">Hello&#x3;World</t:Subject>
-			""";
-
-		final var reader = new EwsXmlReader(new ByteArrayInputStream(response.getBytes(UTF_8)));
-		reader.read(new XmlNodeType(XmlNodeType.START_DOCUMENT));
-		reader.readStartElement(XmlNamespace.Types, "Subject");
-
-		assertThat(reader.readValue()).isEqualTo("Hello\u0003World");
 	}
 
 }

@@ -10,7 +10,8 @@ import javax.xml.stream.XMLInputFactory;
  * Exchange encodes control characters found in message content (subject, body, headers) as character references, which
  * are only legal in XML 1.1. A strict parser rejects the whole EWS response, so the message can never be loaded and is
  * retried on every run. ews-java-api creates its parser through {@link XMLInputFactory#newInstance()} without any
- * configuration hook, so this factory is installed through the JAXP system property instead.
+ * configuration hook, so this factory is installed through the JAXP system property instead, at startup before the
+ * application context is created so that every StAX consumer in the service gets the same factory.
  */
 public class LenientXmlInputFactory extends WstxInputFactory {
 
@@ -18,7 +19,7 @@ public class LenientXmlInputFactory extends WstxInputFactory {
 		setProperty(WstxInputProperties.P_ALLOW_XML11_ESCAPED_CHARS_IN_XML10, true);
 	}
 
-	static void install() {
+	public static void install() {
 		System.setProperty(XMLInputFactory.class.getName(), LenientXmlInputFactory.class.getName());
 	}
 }
