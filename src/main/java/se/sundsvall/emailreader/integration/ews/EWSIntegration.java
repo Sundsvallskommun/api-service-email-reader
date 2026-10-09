@@ -48,6 +48,11 @@ public class EWSIntegration {
 	private static final Logger LOG = LoggerFactory.getLogger(EWSIntegration.class);
 	private static final List<String> SMS_MAIL_MESSAGE_KEYS_TO_PARSE = List.of("Message", "Recipient", "Sender");
 	private static final String COULD_NOT_LOAD_MESSAGE = "Could not load message";
+
+	static {
+		LenientXmlInputFactory.install();
+	}
+
 	private final FolderView folderView = new FolderView(10);
 	private final ExchangeService exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP2);
 	private final PropertySet propertySetTextBody = new PropertySet(BasePropertySet.FirstClassProperties, ItemSchema.Body);
