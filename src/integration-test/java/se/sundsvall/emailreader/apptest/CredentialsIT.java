@@ -1,5 +1,16 @@
 package se.sundsvall.emailreader.apptest;
 
+import java.util.List;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
+import se.sundsvall.dept44.test.AbstractAppTest;
+import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
+import se.sundsvall.emailreader.Application;
+import se.sundsvall.emailreader.api.model.Credentials;
+import se.sundsvall.emailreader.integration.db.CredentialsRepository;
+import tools.jackson.core.type.TypeReference;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
@@ -7,19 +18,6 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
-
-import java.util.List;
-
-import tools.jackson.core.type.TypeReference;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
-
-import se.sundsvall.dept44.test.AbstractAppTest;
-import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
-import se.sundsvall.emailreader.Application;
-import se.sundsvall.emailreader.api.model.Credentials;
-import se.sundsvall.emailreader.integration.db.CredentialsRepository;
 
 @WireMockAppTestSuite(files = "classpath:/CredentialsIT/",
 	classes = Application.class)

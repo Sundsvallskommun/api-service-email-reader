@@ -1,14 +1,5 @@
 package se.sundsvall.emailreader.apptest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.http.HttpMethod.DELETE;
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
-
-import tools.jackson.core.type.TypeReference;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -21,6 +12,15 @@ import se.sundsvall.emailreader.Application;
 import se.sundsvall.emailreader.api.model.Email;
 import se.sundsvall.emailreader.api.model.Header;
 import se.sundsvall.emailreader.integration.db.EmailRepository;
+import tools.jackson.core.type.TypeReference;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.springframework.http.HttpMethod.DELETE;
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 @WireMockAppTestSuite(files = "classpath:/EmailIT/", classes = Application.class)
 @Sql(scripts = {
